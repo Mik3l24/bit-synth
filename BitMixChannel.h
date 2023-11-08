@@ -6,13 +6,13 @@
 
 
 // Always one input
-class BitMixInput : public BitReceiver
+class BitMixChannel : public BitReceiver
 {
 public:
     float getSample(int sample_index);
 
 public:
-    BitMixInput();
+    BitMixChannel();
 
 protected: // Parameters
     float level = .125f;
