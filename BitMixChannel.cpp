@@ -11,6 +11,7 @@ float BitMixChannel::getSample(int sample_index)
     if(checkConnections() == status::UNCONNECTED)
         return 0.0f;
 
+    std::cout << "sample : " << inputs[0]->getOut()[sample_index] << '\n'; //Debug
     // Currently 0 to level, could alternatively be -level/2 to level/2
     return float(inputs[0]->getOut()[sample_index]) * level;
 }
