@@ -49,8 +49,13 @@ public:
     std::vector<ptr<GateNode>> gates;
     std::vector<ptr<BitMixChannel>> bit_inputs;
 
+protected:
+    // Parameters
+    float master_level = .125f;
+
 private:
     // Voice processing
-    double amp_level = 0.0;
+    float enveloped_level = 0.0;
+    bool voice_active = false;
 };
 
