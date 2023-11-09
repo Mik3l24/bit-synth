@@ -8,7 +8,7 @@
 class Connectable
 {
 public:
-    [[nodiscard]] bool isUnconnected() const { return unconnected }
+    [[nodiscard]] bool isUnconnected() const { return unconnected; }
 protected:
     bool unconnected = false;
 };
