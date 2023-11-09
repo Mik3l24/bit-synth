@@ -8,8 +8,6 @@
 
 #include <JuceHeader.h>
 #include "SineSynthTutorial_01_b.h"
-#include "GateNode.h"
-#include "Oscillator.h"
 
 class Application    : public juce::JUCEApplication
 {
