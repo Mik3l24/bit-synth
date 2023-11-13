@@ -28,7 +28,7 @@ class BitReceiver : public virtual Connectable
 {
 public:
     status checkConnections();
-    virtual void setInput(const BitSource* input, int index = 0);
+    void setInput(const BitSource* input, int index = 0);
 
 protected:
     std::vector<const BitSource*> inputs;
