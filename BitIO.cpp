@@ -17,3 +17,10 @@ status BitReceiver::checkConnections()
     }
     return status::SUCCESS;
 }
+
+void BitReceiver::setInput(const BitSource* input, int index)
+{
+    assert(index < num_inputs);
+    inputs[index] = input;
+    unconnected = false;
+}

@@ -19,5 +19,6 @@ float BitMixChannel::getSample(int sample_index)
 
 BitMixChannel::BitMixChannel()
 {
+    num_inputs = 1;
     inputs.assign({nullptr});
 }

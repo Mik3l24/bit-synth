@@ -23,15 +23,22 @@ status GateNode::processBlock()
     return status::SUCCESS;
 }
 
+void GateNode::resetStatus()
+{
+    ready = false;
+}
+
 
 
 UnaryGate::UnaryGate()
 {
+    num_inputs = 1;
     inputs.assign({nullptr});
 }
 
 BinaryGate::BinaryGate()
 {
+    num_inputs = 2;
     inputs.assign({nullptr, nullptr});
 }
 

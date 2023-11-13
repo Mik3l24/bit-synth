@@ -10,7 +10,7 @@ class GateNode : public BitSource, public BitReceiver
 {
 public:
     status processBlock();
-
+    void resetStatus();
 
 private:
     // Called in processBlock() if all inputs are ready
