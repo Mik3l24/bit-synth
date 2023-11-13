@@ -6,8 +6,8 @@
   ==============================================================================
 */
 
-#include <JuceHeader.h>
-#include "SineSynthTutorial_01_b.h"
+#include <juce_gui_extra/juce_gui_extra.h>
+#include "MainContentComponent.h"
 
 class Application    : public juce::JUCEApplication
 {
@@ -18,7 +18,6 @@ public:
     const juce::String getApplicationName() override       { return "SineSynthTutorial"; }
     const juce::String getApplicationVersion() override    { return "1.0.0"; }
 
-    const boost::dynamic_bitset<> cool = boost::dynamic_bitset<>(128);
 
     void initialise (const juce::String&) override
     {

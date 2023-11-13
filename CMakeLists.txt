@@ -43,6 +43,8 @@ target_sources(bitprocessing
         Oscillator.cpp
         BitMixChannel.cpp
         BitSynthVoice.cpp
+        SynthAudioSource.cpp
+        MainContentComponent.cpp
 )
 
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer
