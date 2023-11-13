@@ -9,6 +9,8 @@ class Connectable
 {
 public:
     [[nodiscard]] bool isUnconnected() const { return unconnected; }
+public: // Constructors, destructors
+    virtual ~Connectable() = default;
 protected:
     bool unconnected = false;
 };

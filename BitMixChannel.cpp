@@ -13,7 +13,7 @@ float BitMixChannel::getSample(int sample_index)
 
     std::cout << "sample : " << inputs[0]->getOut()[sample_index] << '\n'; //Debug
     // Currently 0 to level, could alternatively be -level/2 to level/2
-    return float(inputs[0]->getOut()[sample_index]) * level;
+    return float(bool(inputs[0]->getOut()[sample_index])) * level;
 }
 
 
