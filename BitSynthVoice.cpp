@@ -30,6 +30,11 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& outputBuffer, int s
 
     const int endSample = startSample + numSamples;
 
+    // Prepare
+    // Should be preferably done in prepareToPlay(), but neither SynthesiserVoice nor Synthesiser provides that.
+    // TODO: Make a custom Synthesiser class with prepareToPlay().
+    for(auto& osc : oscillators)
+        osc->prepareToPlay(outputBuffer.getNumSamples(), getSampleRate());
 
     //// Bit processing ////
     // Process oscillators
@@ -45,6 +50,11 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& outputBuffer, int s
             all_done = true;
             for(auto& gate : gates) // Gates should be sorted to minimize loop repeats
             {
+                // Skip gates
+                // Is skipping gates faster than processing them?
+                // or would popping them from a queue be better?
+                if(gate->isReady() || gate->isUnconnected())
+                    continue;
                 switch(gate->processBlock())
                 {
                     case status::SUCCESS:
@@ -55,7 +65,6 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& outputBuffer, int s
                         break;
                     case status::UNCONNECTED:
                         // processBlock() already handles propagation of unconnected gates
-                        // But maybe we could use marking the gate to be skipped? // TODO?
                         break;
                 }
             }
@@ -97,6 +106,8 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& outputBuffer, int s
             outputBuffer.addSample(channel_index, startSample, sample);
     }
 
-
+    // Reset gates
+    for(auto& gate : gates)
+        gate->resetStatus();
 
 }
