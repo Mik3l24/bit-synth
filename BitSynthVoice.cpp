@@ -43,6 +43,7 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& outputBuffer, int s
             osc->processSample(sample_index);
 
     // Process gates
+    if(!gates.empty())
     {
         bool any_processing_done; // Guard against infinite loops due to recursion
         bool all_done;
@@ -104,7 +105,7 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& outputBuffer, int s
 
         // Saving to buffer
         for(auto channel_index = outputBuffer.getNumChannels(); --channel_index >= 0;)
-            outputBuffer.addSample(channel_index, startSample, sample);
+            outputBuffer.addSample(channel_index, sample_index, sample);
     }
 
     // Reset gates
