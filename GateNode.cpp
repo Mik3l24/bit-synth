@@ -7,6 +7,7 @@
 status GateNode::processBlock()
 {
     // Should this be checked in processBlock?
+    // Could be later moved to the construction of the voices from the GUI
     if(checkConnections() == status::UNCONNECTED)
         return status::UNCONNECTED;
 
@@ -20,6 +21,7 @@ status GateNode::processBlock()
     }
 
     out = operation();
+    ready = true; // How did I forget this?
     return status::SUCCESS;
 }
 

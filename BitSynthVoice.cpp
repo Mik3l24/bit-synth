@@ -44,9 +44,10 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& outputBuffer, int s
 
     // Process gates
     {
-        bool any_processing_done = false; // Guard against infinite loops due to recursion
+        bool any_processing_done; // Guard against infinite loops due to recursion
         bool all_done;
         do {
+            any_processing_done = false;
             all_done = true;
             for(auto& gate : gates) // Gates should be sorted to minimize loop repeats
             {
