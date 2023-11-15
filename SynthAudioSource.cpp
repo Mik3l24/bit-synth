@@ -2,7 +2,7 @@
 // Created by micha on 13.11.2023.
 //
 #include "SynthAudioSource.h"
-#include "BitSynthVoice.h"
+#include "dsp/BitSynthVoice.h"
 
 
 SynthAudioSource::SynthAudioSource(juce::MidiKeyboardState& keyState)
@@ -30,8 +30,8 @@ SynthAudioSource::SynthAudioSource(juce::MidiKeyboardState& keyState)
         gates[2]->setInput(gates[0].get());
         gates[1]->setInput(gates[2].get(), 0);
         gates[1]->setInput(oscillators[2].get(), 1);
-        gates[3]->setInput(gates[0].get(), 0);
-        // no input for gates[3][1]
+        gates[3]->setInput(oscillators[0].get(), 0);
+        gates[3]->setInput(oscillators[1].get(), 1);
 
         auto& mixer = voice->bit_inputs;
         mixer.emplace_back(new BitMixChannel());
@@ -39,9 +39,9 @@ SynthAudioSource::SynthAudioSource(juce::MidiKeyboardState& keyState)
         mixer.emplace_back(new BitMixChannel());
 
         mixer[0]->setInput(oscillators[0].get());
-        mixer[0]->setLevel(.25);
+        mixer[0]->setLevel(.25f);
         mixer[1]->setInput(gates[1].get());
-        mixer[1]->setLevel(.065);
+        mixer[1]->setLevel(.0f);
         mixer[2]->setInput(gates[3].get());
         mixer[2]->setLevel(.065);
 

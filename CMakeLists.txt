@@ -38,11 +38,11 @@ include_directories(${Boost_INCLUDE_DIRS})
 target_sources(bitprocessing
     PRIVATE
         Main.cpp
-        BitIO.cpp
-        GateNode.cpp
-        Oscillator.cpp
-        BitMixChannel.cpp
-        BitSynthVoice.cpp
+        dsp/bitprocessing/BitIO.cpp
+        dsp/bitprocessing/GateNode.cpp
+        dsp/bitprocessing/Oscillator.cpp
+        dsp/bitprocessing/BitMixChannel.cpp
+        dsp/BitSynthVoice.cpp
         SynthAudioSource.cpp
         MainContentComponent.cpp
 )

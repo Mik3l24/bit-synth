@@ -7,9 +7,9 @@
 #include <vector>
 #include <memory>
 
-#include "Oscillator.h"
-#include "GateNode.h"
-#include "BitMixChannel.h"
+#include "bitprocessing/Oscillator.h"
+#include "bitprocessing/GateNode.h"
+#include "bitprocessing/BitMixChannel.h"
 
 template <typename T> using ptr = std::unique_ptr<T>;
 
