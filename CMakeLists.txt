@@ -43,6 +43,7 @@ target_sources(bitprocessing
         dsp/bitprocessing/Oscillator.cpp
         dsp/bitprocessing/BitMixChannel.cpp
         dsp/BitSynthVoice.cpp
+        synth_management/BitSynthesizer.cpp
         SynthAudioSource.cpp
         MainContentComponent.cpp
 )

@@ -5,6 +5,8 @@
 
 #include <juce_audio_utils/juce_audio_utils.h>
 
+#include "synth_management/BitSynthesizer.h"
+
 class SynthAudioSource : public juce::AudioSource
 {
 public:
@@ -21,6 +23,6 @@ public:
 
 private:
     juce::MidiKeyboardState& keyboardState;
-    juce::Synthesiser synth;
+    BitSynthesizer synth;
 };
 
