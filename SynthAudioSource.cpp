@@ -39,8 +39,11 @@ SynthAudioSource::SynthAudioSource(juce::MidiKeyboardState& keyState)
         mixer.emplace_back(new BitMixChannel());
 
         mixer[0]->setInput(oscillators[0].get());
+        mixer[0]->setLevel(.25);
         mixer[1]->setInput(gates[1].get());
+        mixer[1]->setLevel(.065);
         mixer[2]->setInput(gates[3].get());
+        mixer[2]->setLevel(.065);
 
     }
 

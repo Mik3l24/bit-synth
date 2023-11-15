@@ -11,6 +11,8 @@ class BitMixChannel : public BitReceiver
 public:
     float getSample(int sample_index);
 
+    void setLevel(float _level) { level = _level; }
+
 public:
     BitMixChannel();
 
