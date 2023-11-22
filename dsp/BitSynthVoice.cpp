@@ -113,3 +113,8 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& outputBuffer, int s
         gate->resetStatus();
 
 }
+
+void BitSynthVoice::setMasterLevel(float level)
+{
+    master_level = level;
+}

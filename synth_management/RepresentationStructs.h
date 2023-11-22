@@ -11,54 +11,65 @@
 //  < 0 = Oscillator
 typedef int ConnectionID;
 
-
-
-struct OscillatorTemplate
+struct IdentifiableRepresentation
 {
     ConnectionID id;
+    ConnectionID index;
+
+    explicit IdentifiableRepresentation(ConnectionID id, ConnectionID index)
+            : id(id), index(index) {}
+};
+
+
+struct SourceRepresentation : public IdentifiableRepresentation
+{
+    explicit SourceRepresentation(ConnectionID id, ConnectionID index)
+            : IdentifiableRepresentation(id, index) {}
+};
+
+
+struct OscillatorRepresentation : public SourceRepresentation
+{
     double ratio = 1.0;
     double starting_phase = 0.0;
-    double pulse_width = 0.5;
+    float pulse_width = 0.5f;
 
-    OscillatorTemplate(ConnectionID id)
-            : id(id) {}
+    explicit OscillatorRepresentation(ConnectionID id)
+            : SourceRepresentation(id, -id - 1) {}
 
-    OscillatorTemplate(ConnectionID id, double ratio, double starting_phase, double pulse_width)
-            : id(id), ratio(ratio), starting_phase(starting_phase), pulse_width(pulse_width) {}
+    OscillatorRepresentation(ConnectionID id, double ratio, double starting_phase, double pulse_width)
+            : SourceRepresentation(id, -id - 1), ratio(ratio), starting_phase(starting_phase), pulse_width(pulse_width) {}
 
 };
 
 
-struct GateNodeTemplate
+struct GateNodeRepresentation : public SourceRepresentation
 {
     enum class Type
     {
         NOT,
         AND, OR, XOR,
     };
-    ConnectionID id;
-    ConnectionID sorted_id;
     const Type type;
     const size_t num_inputs = 2;
     ConnectionID input_ids[2] = {0, 0};
 
-    GateNodeTemplate(ConnectionID id, Type type, size_t num_inputs)
-            : id(id), sorted_id(id), type(type), num_inputs(num_inputs) {}
-    GateNodeTemplate(ConnectionID id, Type type, ConnectionID input_ids[2])
-            : id(id), sorted_id(id), type(type), input_ids{input_ids[0], input_ids[1]} {}
-    GateNodeTemplate(ConnectionID id, ConnectionID input_id)  // Special case for NOT... until I add a buffer gate?
-            : id(id), sorted_id(id), type(Type::NOT), num_inputs(1), input_ids{input_id} {}
+    GateNodeRepresentation(ConnectionID id, Type type, size_t num_inputs)
+            : SourceRepresentation(id, id - 1), type(type), num_inputs(num_inputs) {}
+    GateNodeRepresentation(ConnectionID id, Type type, ConnectionID input_ids[2])
+            : SourceRepresentation(id, id - 1), type(type), input_ids{input_ids[0], input_ids[1]} {}
+    GateNodeRepresentation(ConnectionID id, ConnectionID input_id)  // Special case for NOT... until I add a buffer gate?
+            : SourceRepresentation(id, id - 1), type(Type::NOT), num_inputs(1), input_ids{input_id} {}
 };
 
 
-struct BitMixChannelTemplate
+struct BitMixChannelRepresentation : public IdentifiableRepresentation
 {
-    ConnectionID id;
     ConnectionID input_id = 0;
     float level = .5f;
 
-    BitMixChannelTemplate(ConnectionID id)
-            : id(id) {}
-    BitMixChannelTemplate(ConnectionID id, ConnectionID input_id, float level)
-            : id(id), input_id(input_id), level(level) {}
+    explicit BitMixChannelRepresentation(ConnectionID id)
+            : IdentifiableRepresentation(id, id - 1) {}
+    BitMixChannelRepresentation(ConnectionID id, ConnectionID input_id, float level)
+            : IdentifiableRepresentation(id, id - 1), input_id(input_id), level(level) {}
 };

@@ -42,6 +42,8 @@ public:
 
     void renderNextBlock(juce::AudioSampleBuffer& outputBuffer, int startSample, int numSamples) override;
 
+public: // Parameter access methods
+    void setMasterLevel(float level);
 
 public:
     // Bit processing
