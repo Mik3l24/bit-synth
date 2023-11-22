@@ -1,4 +1,4 @@
-//// Components.h ////
+//// RepresentationStructs.h ////
 // Structs for representing bitprocessing components to be constructed in BitSynthVoice
 //
 // Created by micha on 15.11.2023.
@@ -37,16 +37,17 @@ struct GateNodeTemplate
         AND, OR, XOR,
     };
     ConnectionID id;
+    ConnectionID sorted_id;
     const Type type;
     const size_t num_inputs = 2;
     ConnectionID input_ids[2] = {0, 0};
 
     GateNodeTemplate(ConnectionID id, Type type, size_t num_inputs)
-            : id(id), type(type), num_inputs(num_inputs) {}
+            : id(id), sorted_id(id), type(type), num_inputs(num_inputs) {}
     GateNodeTemplate(ConnectionID id, Type type, ConnectionID input_ids[2])
-            : id(id), type(type), input_ids{input_ids[0], input_ids[1]} {}
+            : id(id), sorted_id(id), type(type), input_ids{input_ids[0], input_ids[1]} {}
     GateNodeTemplate(ConnectionID id, ConnectionID input_id)  // Special case for NOT... until I add a buffer gate?
-            : id(id), type(Type::NOT), num_inputs(1), input_ids{input_id} {}
+            : id(id), sorted_id(id), type(Type::NOT), num_inputs(1), input_ids{input_id} {}
 };
 
 

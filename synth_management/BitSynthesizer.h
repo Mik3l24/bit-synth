@@ -5,7 +5,7 @@
 
 #include <juce_audio_utils/juce_audio_utils.h>
 
-#include "Components.h"
+#include "RepresentationStructs.h"
 #include "../dsp/BitSynthVoice.h"
 
 
