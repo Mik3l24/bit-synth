@@ -23,15 +23,15 @@ protected: // Utility access methods
 
 public: // Voice parameter access methods // TODO: removal methods
     // Oscillators
-    void addOscillator();
+    ConnectionID addOscillator();
     void setOscillatorRatio(ConnectionID id, double ratio);
     void setOscillatorStartingPhase(ConnectionID id, double starting_phase);
     void setOscillatorPulseWidth(ConnectionID id, float pulse_width);
     // Gates
-    void addGate(GateNodeRepresentation::Type type);
+    ConnectionID addGate(GateNodeRepresentation::Type type);
     void setGateInput(ConnectionID id, ConnectionID input_id, size_t input_index);
     // Mix channels
-    void addMixChannel();
+    ConnectionID addMixChannel();
     void setMixChannelInput(ConnectionID id, ConnectionID input_id);
     void setMixChannelLevel(ConnectionID id, float level);
     // Other

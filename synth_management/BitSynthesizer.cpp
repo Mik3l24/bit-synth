@@ -56,7 +56,7 @@ SourceRepresentation* BitSynthesizer::getSource(ConnectionID id)
 }
 
 
-void BitSynthesizer::addOscillator()
+ConnectionID BitSynthesizer::addOscillator()
 {
     // Add representation
     ConnectionID id = -(ConnectionID(oscillators.size()) + 1);
@@ -68,6 +68,7 @@ void BitSynthesizer::addOscillator()
 
         bit_voice->oscillators.emplace_back(new Oscillator());
     }
+    return id;
 }
 
 void BitSynthesizer::setOscillatorRatio(ConnectionID id, double ratio)
@@ -121,7 +122,7 @@ inline GateNode* selectNewGate(GateNodeRepresentation& gate)
     }
 }
 
-void BitSynthesizer::addGate(GateNodeRepresentation::Type type)
+ConnectionID BitSynthesizer::addGate(GateNodeRepresentation::Type type)
 {
     // Add representation
     ConnectionID id = ConnectionID(gates.size()) + 1;
@@ -134,6 +135,7 @@ void BitSynthesizer::addGate(GateNodeRepresentation::Type type)
 
         bit_voice->gates.emplace_back(selectNewGate(gate));
     }
+    return id;
 }
 
 void BitSynthesizer::setGateInput(ConnectionID id, ConnectionID input_id, size_t input_index)
@@ -158,7 +160,7 @@ void BitSynthesizer::setGateInput(ConnectionID id, ConnectionID input_id, size_t
     }
 }
 
-void BitSynthesizer::addMixChannel()
+ConnectionID BitSynthesizer::addMixChannel()
 {
     // Add representation
     ConnectionID id = ConnectionID(mix_channels.size()) + 1;
@@ -170,7 +172,7 @@ void BitSynthesizer::addMixChannel()
 
         bit_voice->bit_inputs.emplace_back(new BitMixChannel());
     }
-
+    return id;
 }
 
 void BitSynthesizer::setMixChannelInput(ConnectionID id, ConnectionID input_id)

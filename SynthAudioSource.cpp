@@ -2,23 +2,22 @@
 // Created by micha on 13.11.2023.
 //
 #include "SynthAudioSource.h"
-#include "dsp/BitSynthVoice.h"
 
 
 SynthAudioSource::SynthAudioSource(juce::MidiKeyboardState& keyState)
-    : keyboardState(keyState), synth(4)
+    : keyboardState(keyState), synth(8)
 {
     // Mock setup
-    synth.addOscillator();
-    synth.addOscillator();
-    synth.setOscillatorRatio(-2, 2.5);
+    auto osc1 = synth.addOscillator();
+    auto osc2 = synth.addOscillator();
+    synth.setOscillatorRatio(osc2, 2.5);
 
-    synth.addGate(GateNodeRepresentation::Type::XOR);
-    synth.setGateInput(1, -1, 0);
-    synth.setGateInput(1, -2, 1);
+    auto gate1 = synth.addGate(GateNodeRepresentation::Type::AND);
+    synth.setGateInput(gate1, osc1, 0);
+    synth.setGateInput(gate1, osc2, 1);
 
-    synth.addMixChannel();
-    synth.setMixChannelInput(1, 1);
+    auto ch1 = synth.addMixChannel();
+    synth.setMixChannelInput(ch1, gate1);
 
 }
 
