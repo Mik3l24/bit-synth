@@ -6,49 +6,20 @@
 
 
 SynthAudioSource::SynthAudioSource(juce::MidiKeyboardState& keyState)
-    : keyboardState(keyState)
+    : keyboardState(keyState), synth(4)
 {
-    auto voice = new BitSynthVoice(); // We shouldn't retain it, so it's a temporary measure to set it up
-    // Perhaps the "SynthesiserSound" can be a template for the structure of the voice?
-
     // Mock setup
-    {
-        auto& oscillators = voice->oscillators;
-        for(int i = 0; i < 3; i++)
-            oscillators.emplace_back(new Oscillator());
-        oscillators[1]->setRatio(2.5);
-        oscillators[2]->setPulseWidth(0.75);
+    synth.addOscillator();
+    synth.addOscillator();
+    synth.setOscillatorRatio(-2, 2.5);
 
-        auto& gates = voice->gates;
-        gates.emplace_back(new XorGate());
-        gates.emplace_back(new AndGate());
-        gates.emplace_back(new NotGate());
-        gates.emplace_back(new OrGate()); //will be unconnected
+    synth.addGate(GateNodeRepresentation::Type::XOR);
+    synth.setGateInput(1, -1, 0);
+    synth.setGateInput(1, -2, 1);
 
-        gates[0]->setInput(oscillators[0].get(), 0);
-        gates[0]->setInput(oscillators[1].get(), 1);
-        gates[2]->setInput(gates[0].get());
-        gates[1]->setInput(gates[2].get(), 0);
-        gates[1]->setInput(oscillators[2].get(), 1);
-        gates[3]->setInput(oscillators[0].get(), 0);
-        gates[3]->setInput(oscillators[1].get(), 1);
+    synth.addMixChannel();
+    synth.setMixChannelInput(1, 1);
 
-        auto& mixer = voice->bit_inputs;
-        mixer.emplace_back(new BitMixChannel());
-        mixer.emplace_back(new BitMixChannel());
-        mixer.emplace_back(new BitMixChannel());
-
-        mixer[0]->setInput(oscillators[0].get());
-        mixer[0]->setLevel(.25f);
-        mixer[1]->setInput(gates[1].get());
-        mixer[1]->setLevel(.0f);
-        mixer[2]->setInput(gates[3].get());
-        mixer[2]->setLevel(.065);
-
-    }
-
-    synth.addSound(new BitSynthSound());
-    synth.addVoice(voice);
 }
 
 SynthAudioSource::~SynthAudioSource()
