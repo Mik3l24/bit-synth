@@ -16,6 +16,7 @@ inline BitSynthVoice* castVoice(juce::SynthesiserVoice* voice)
 
 BitSynthesizer::BitSynthesizer(int num_voices)
 {
+    addSound(new BitSynthSound());
     for(int i = 0; i < num_voices; i++)
         addVoice(new BitSynthVoice());
 }
@@ -58,7 +59,7 @@ SourceRepresentation* BitSynthesizer::getSource(ConnectionID id)
 void BitSynthesizer::addOscillator()
 {
     // Add representation
-    ConnectionID id = ConnectionID(oscillators.size()) + 1;
+    ConnectionID id = -(ConnectionID(oscillators.size()) + 1);
     oscillators.emplace_back(id);
     // Add the new oscillator to all voices
     for(auto& voice : voices)
