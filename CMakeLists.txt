@@ -44,6 +44,14 @@ target_sources(bitprocessing
         dsp/bitprocessing/BitMixChannel.cpp
         dsp/BitSynthVoice.cpp
         synth_management/BitSynthesizer.cpp
+        ui/SourceConnector.cpp
+        ui/TargetConnector.cpp
+        ui/OscillatorParameters.cpp
+        ui/MixChannelParameters.cpp
+        ui/Gate.cpp
+        ui/ElementAdderButton.cpp
+        ui/ElementPicker.cpp
+        ui/StructureEditor.cpp
         SynthAudioSource.cpp
         MainContentComponent.cpp
 )
