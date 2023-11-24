@@ -15,7 +15,11 @@ public:
     explicit ElementAdderButton(GateType gate_type);
     ~ElementAdderButton() override;
 
-public: // Methods
+public: // Access methods
+    [[nodiscard]] ElementType getElementType() const;
+    [[nodiscard]] GateType getGateType() const;
+
+public: // Overrides
     void mouseDrag(const juce::MouseEvent& event) override;
 
 protected:
