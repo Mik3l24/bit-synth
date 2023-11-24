@@ -2,7 +2,7 @@
 // Created by micha on 06.11.2023.
 //
 #pragma once
-#include "../../Declarations.h"
+#include "DspNames.h"
 #include <vector>
 
 class Connectable

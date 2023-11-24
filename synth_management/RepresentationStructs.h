@@ -5,11 +5,7 @@
 //
 #pragma once
 
-// ID standard:
-// == 0 = none
-//  > 0 = Gate
-//  < 0 = Oscillator
-typedef int ConnectionID;
+#include "SynthManagementNames.h"
 
 struct IdentifiableRepresentation
 {
@@ -37,7 +33,7 @@ struct OscillatorRepresentation : public SourceRepresentation
     explicit OscillatorRepresentation(ConnectionID id)
             : SourceRepresentation(id, -id - 1) {}
 
-    OscillatorRepresentation(ConnectionID id, double ratio, double starting_phase, double pulse_width)
+    OscillatorRepresentation(ConnectionID id, double ratio, double starting_phase, float pulse_width)
             : SourceRepresentation(id, -id - 1), ratio(ratio), starting_phase(starting_phase), pulse_width(pulse_width) {}
 
 };
@@ -45,21 +41,16 @@ struct OscillatorRepresentation : public SourceRepresentation
 
 struct GateNodeRepresentation : public SourceRepresentation
 {
-    enum class Type
-    {
-        NOT,
-        AND, OR, XOR,
-    };
-    const Type type;
+    const GateType type;
     const size_t num_inputs = 2;
     ConnectionID input_ids[2] = {0, 0};
 
-    GateNodeRepresentation(ConnectionID id, Type type, size_t num_inputs)
+    GateNodeRepresentation(ConnectionID id, GateType type, size_t num_inputs)
             : SourceRepresentation(id, id - 1), type(type), num_inputs(num_inputs) {}
-    GateNodeRepresentation(ConnectionID id, Type type, ConnectionID input_ids[2])
+    GateNodeRepresentation(ConnectionID id, GateType type, ConnectionID input_ids[2])
             : SourceRepresentation(id, id - 1), type(type), input_ids{input_ids[0], input_ids[1]} {}
     GateNodeRepresentation(ConnectionID id, ConnectionID input_id)  // Special case for NOT... until I add a buffer gate?
-            : SourceRepresentation(id, id - 1), type(Type::NOT), num_inputs(1), input_ids{input_id} {}
+            : SourceRepresentation(id, id - 1), type(GateType::NOT), num_inputs(1), input_ids{input_id} {}
 };
 
 

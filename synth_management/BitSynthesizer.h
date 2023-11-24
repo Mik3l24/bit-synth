@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "RepresentationStructs.h"
-
+#include "SynthManagementNames.h"
 
 
 class BitSynthesizer : public juce::Synthesiser
@@ -28,7 +28,7 @@ public: // Voice parameter access methods // TODO: removal methods
     void setOscillatorStartingPhase(ConnectionID id, double starting_phase);
     void setOscillatorPulseWidth(ConnectionID id, float pulse_width);
     // Gates
-    ConnectionID addGate(GateNodeRepresentation::Type type);
+    ConnectionID addGate(GateType type);
     void setGateInput(ConnectionID id, ConnectionID input_id, size_t input_index);
     // Mix channels
     ConnectionID addMixChannel();

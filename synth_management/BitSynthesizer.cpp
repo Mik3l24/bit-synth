@@ -4,6 +4,7 @@
 
 #include "BitSynthesizer.h"
 #include "../dsp/BitSynthVoice.h"
+#include "SynthManagementNames.h"
 
 inline BitSynthVoice* castVoice(juce::SynthesiserVoice* voice)
 {
@@ -111,22 +112,22 @@ inline GateNode* selectNewGate(GateNodeRepresentation& gate)
 {
     switch(gate.type)
     {
-        case GateNodeRepresentation::Type::NOT:
+        case GateType::NOT:
             return new NotGate();
-        case GateNodeRepresentation::Type::AND:
+        case GateType::AND:
             return new AndGate();
-        case GateNodeRepresentation::Type::OR:
+        case GateType::OR:
             return new OrGate();
-        case GateNodeRepresentation::Type::XOR:
+        case GateType::XOR:
             return new XorGate();
     }
 }
 
-ConnectionID BitSynthesizer::addGate(GateNodeRepresentation::Type type)
+ConnectionID BitSynthesizer::addGate(GateType type)
 {
     // Add representation
     ConnectionID id = ConnectionID(gates.size()) + 1;
-    gates.emplace_back(id, type, type == GateNodeRepresentation::Type::NOT ? 1 : 2);
+    gates.emplace_back(id, type, type == GateType::NOT ? 1 : 2);
     GateNodeRepresentation& gate = gates.back();
     // Add the new gate to all voices
     for(auto& voice : voices)

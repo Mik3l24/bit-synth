@@ -2,6 +2,7 @@
 // Created by micha on 13.11.2023.
 //
 #include "SynthAudioSource.h"
+#include "synth_management/SynthManagementNames.h"
 
 
 SynthAudioSource::SynthAudioSource(juce::MidiKeyboardState& keyState)
@@ -12,7 +13,7 @@ SynthAudioSource::SynthAudioSource(juce::MidiKeyboardState& keyState)
     auto osc2 = synth.addOscillator();
     synth.setOscillatorRatio(osc2, 2.5);
 
-    auto gate1 = synth.addGate(GateNodeRepresentation::Type::AND);
+    auto gate1 = synth.addGate(GateType::AND);
     synth.setGateInput(gate1, osc1, 0);
     synth.setGateInput(gate1, osc2, 1);
 
