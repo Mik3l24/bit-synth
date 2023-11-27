@@ -28,7 +28,8 @@ namespace ui {
 //[/MiscUserDefs]
 
 //==============================================================================
-Gate::Gate (int type, int id)
+Gate::Gate(ConnectionID id, GateType type, BitSynthesizer* synth)
+    : SynthConnected(synth), type(type)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]

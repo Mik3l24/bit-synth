@@ -22,6 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include <juce_gui_basics/juce_gui_basics.h>
 
+#include "../synth_management/SynthConnected.h"
 #include "TargetConnector.h"
 
 namespace ui
@@ -40,11 +41,12 @@ namespace ui
                                                                     //[/Comments]
 */
 class MixChannelParameters: public juce::Component,
-                            public juce::Slider::Listener
+                            public juce::Slider::Listener,
+                            public SynthConnected
 {
 public:
     //==============================================================================
-    MixChannelParameters(ConnectionID id);
+    MixChannelParameters(ConnectionID id, BitSynthesizer* synth);
     ~MixChannelParameters() override;
 
     //==============================================================================
@@ -58,6 +60,7 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+    const ConnectionID id;
     //[/UserVariables]
 
     //==============================================================================

@@ -9,7 +9,11 @@ MainContentComponent::MainContentComponent()
 
 {
     addAndMakeVisible(keyboardComponent);
-    setSize(600, 160);
+
+    structure_editor = std::make_unique<ui::StructureEditor>(synthAudioSource.getBitSynth());
+    addAndMakeVisible(*structure_editor);
+
+    setSize(600, 800);
     setAudioChannels(0, 2);
     startTimer(400);
 }
@@ -21,7 +25,8 @@ MainContentComponent::~MainContentComponent()
 
 void MainContentComponent::resized()
 {
-    keyboardComponent.setBounds(10, 10, getWidth() - 20, getHeight() - 20);
+    keyboardComponent.setBounds(10, getHeight() - 110, getWidth() - 20, 100);
+    structure_editor->setBounds(0, 0, getWidth(), getHeight() - 120);
 }
 
 void MainContentComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate)

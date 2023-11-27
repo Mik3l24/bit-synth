@@ -26,6 +26,7 @@
 #include "Gate.h"
 #include "OscillatorParameters.h"
 #include "MixChannelParameters.h"
+#include "../synth_management/SynthConnected.h"
 
 namespace ui {
 //[/Headers]
@@ -41,11 +42,14 @@ namespace ui {
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class StructureEditor  : public juce::Component, juce::DragAndDropTarget
+class StructureEditor:
+    public juce::Component,
+    public juce::DragAndDropTarget,
+    public SynthConnected
 {
 public:
     //==============================================================================
-    StructureEditor ();
+    StructureEditor(BitSynthesizer* synth);
     ~StructureEditor() override;
 
     //==============================================================================

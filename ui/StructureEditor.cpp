@@ -18,6 +18,7 @@
 */
 
 //[Headers] You can add your own extra header files here...
+#include "DragSourceType.h"
 //[/Headers]
 
 #include "StructureEditor.h"
@@ -28,7 +29,8 @@ namespace ui {
 //[/MiscUserDefs]
 
 //==============================================================================
-StructureEditor::StructureEditor ()
+StructureEditor::StructureEditor(BitSynthesizer* synth)
+    : SynthConnected(synth)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -43,6 +45,7 @@ StructureEditor::StructureEditor ()
 
 
     //[Constructor] You can add your own custom stuff here..
+
     //[/Constructor]
 }
 
@@ -77,6 +80,9 @@ void StructureEditor::resized()
 
     picker->setBounds ((getWidth() / 2) - (proportionOfWidth (0.6000f) / 2), 0, proportionOfWidth (0.6000f), 24);
     //[UserResized] Add your own custom resize handling here..
+    auto parentDragContainer = juce::DragAndDropContainer::findParentDragContainerFor(this);
+    if(parentDragContainer != nullptr)
+        parentDragContainer->isDragAndDropActive();
     //[/UserResized]
 }
 
@@ -84,11 +90,56 @@ void StructureEditor::resized()
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 bool StructureEditor::isInterestedInDragSource(const juce::DragAndDropTarget::SourceDetails& dragSourceDetails)
 {
-    return false;
+    return dragSourceDetails.description.equals(DragSourceType::ELEMENT_ADDER_BUTTON);
 }
 
 void StructureEditor::itemDropped(const juce::DragAndDropTarget::SourceDetails& dragSourceDetails)
 {
+    auto* button = dynamic_cast<ElementAdderButton*>(dragSourceDetails.sourceComponent.get());
+    if(button == nullptr)
+    {
+        std::cout << "StructureEditor::itemDropped: source is not ElementAdderButton" << std::endl;
+        return;
+    }
+
+    juce::Component* component = nullptr;
+    switch(button->getElementType())
+    {
+        ConnectionID id;
+        case ElementType::OSCILLATOR:
+        {
+            id = synth->addOscillator();
+            osc_components.emplace_back(new OscillatorParameters(id, synth));
+            component = osc_components.back().get();
+            break;
+        }
+        case ElementType::GATE:
+        {
+            GateType gate_type = button->getGateType();
+            id = synth->addGate(gate_type);
+            gate_components.emplace_back(new Gate(id, gate_type, synth));
+            component = gate_components.back().get();
+            break;
+        }
+        case ElementType::MIX_CHANNEL:
+        {
+            id = synth->addMixChannel();
+            mix_components.emplace_back(new MixChannelParameters(id, synth));
+            component = mix_components.back().get();
+            break;
+        }
+
+    }
+    if(component == nullptr)
+    {
+        std::cout << "StructureEditor::itemDropped: component is nullptr" << std::endl;
+        return;
+    }
+
+    // Add the component and place it at the mouse position
+    addAndMakeVisible(component);
+    component->setCentrePosition(dragSourceDetails.localPosition);
+
 }
 
 //[/MiscUserCode]

@@ -28,7 +28,8 @@ namespace ui {
 //[/MiscUserDefs]
 
 //==============================================================================
-OscillatorParameters::OscillatorParameters (ConnectionID id)
+OscillatorParameters::OscillatorParameters(ConnectionID id, BitSynthesizer* synth)
+    : SynthConnected(synth), id(id)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]

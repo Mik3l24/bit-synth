@@ -23,6 +23,8 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "SourceConnector.h"
+#include "../synth_management/SynthConnected.h"
+
 
 namespace ui {
 //[/Headers]
@@ -39,11 +41,12 @@ namespace ui {
                                                                     //[/Comments]
 */
 class OscillatorParameters  : public juce::Component,
-                              public juce::Slider::Listener
+                              public juce::Slider::Listener,
+                              public SynthConnected
 {
 public:
     //==============================================================================
-    OscillatorParameters (ConnectionID id);
+    OscillatorParameters(ConnectionID id, BitSynthesizer* synth);
     ~OscillatorParameters() override;
 
     //==============================================================================
@@ -58,6 +61,7 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+    const ConnectionID id;
     //[/UserVariables]
 
     //==============================================================================

@@ -18,6 +18,7 @@ public:
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override;
 
     void setUsingBitSynthSound();
+    BitSynthesizer* getBitSynth() { return &synth; }
 
 
 
