@@ -51,6 +51,7 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+    [[nodiscard]] double getRatio() const;
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;

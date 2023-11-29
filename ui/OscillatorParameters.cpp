@@ -233,31 +233,38 @@ void OscillatorParameters::sliderValueChanged (juce::Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == pw_slider.get())
     {
         //[UserSliderCode_pw_slider] -- add your slider handling code here..
+        synth->setOscillatorPulseWidth(id, float(pw_slider->getValue()) + .5f); // Ofset from slider's [-0.5, 0.5] to [0, 1]
         //[/UserSliderCode_pw_slider]
     }
     else if (sliderThatWasMoved == numerator_slider.get())
     {
         //[UserSliderCode_numerator_slider] -- add your slider handling code here..
+        synth->setOscillatorRatio(id, getRatio());
         //[/UserSliderCode_numerator_slider]
     }
     else if (sliderThatWasMoved == phase_slider.get())
     {
         //[UserSliderCode_phase_slider] -- add your slider handling code here..
+        synth->setOscillatorStartingPhase(id,
+                                          float(phase_slider->getValue()) * juce::MathConstants<float>::pi);
         //[/UserSliderCode_phase_slider]
     }
     else if (sliderThatWasMoved == denominator_slider.get())
     {
         //[UserSliderCode_denominator_slider] -- add your slider handling code here..
+        synth->setOscillatorRatio(id, getRatio());
         //[/UserSliderCode_denominator_slider]
     }
     else if (sliderThatWasMoved == transpose_slider.get())
     {
         //[UserSliderCode_transpose_slider] -- add your slider handling code here..
+        // TODO: implement in Oscillator
         //[/UserSliderCode_transpose_slider]
     }
     else if (sliderThatWasMoved == fine_slider.get())
     {
         //[UserSliderCode_fine_slider] -- add your slider handling code here..
+        // TODO: implement in Oscillator
         //[/UserSliderCode_fine_slider]
     }
 
@@ -268,6 +275,10 @@ void OscillatorParameters::sliderValueChanged (juce::Slider* sliderThatWasMoved)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+inline double OscillatorParameters::getRatio() const
+{
+    return numerator_slider->getValue() / denominator_slider->getValue();
+}
 //[/MiscUserCode]
 
 
