@@ -120,6 +120,8 @@ inline GateNode* selectNewGate(GateNodeRepresentation& gate)
             return new OrGate();
         case GateType::XOR:
             return new XorGate();
+        default:
+            throw std::runtime_error("BitSynthesizer::selectNewGate: Invalid gate type!");
     }
 }
 
