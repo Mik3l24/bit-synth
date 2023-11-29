@@ -34,14 +34,14 @@ OscillatorParameters::OscillatorParameters(ConnectionID id, BitSynthesizer* synt
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    pw_slider.reset (new juce::Slider ("new slider"));
+    pw_slider.reset (new juce::Slider ("pw_slider"));
     addAndMakeVisible (pw_slider.get());
     pw_slider->setRange (-0.5, 0.5, 0);
     pw_slider->setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag);
     pw_slider->setTextBoxStyle (juce::Slider::NoTextBox, false, 80, 20);
     pw_slider->addListener (this);
 
-    ratio_label.reset (new juce::Label ("new label",
+    ratio_label.reset (new juce::Label ("ratio_label",
                                         TRANS("Ratio")));
     addAndMakeVisible (ratio_label.get());
     ratio_label->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
@@ -52,7 +52,7 @@ OscillatorParameters::OscillatorParameters(ConnectionID id, BitSynthesizer* synt
 
     ratio_label->setBounds (32, 32, 70, 16);
 
-    numerator_slider.reset (new juce::Slider ("new slider"));
+    numerator_slider.reset (new juce::Slider ("numerator_slider"));
     addAndMakeVisible (numerator_slider.get());
     numerator_slider->setRange (1, 64, 1);
     numerator_slider->setSliderStyle (juce::Slider::LinearBarVertical);
@@ -69,7 +69,7 @@ OscillatorParameters::OscillatorParameters(ConnectionID id, BitSynthesizer* synt
     phase_slider->setTextBoxStyle (juce::Slider::NoTextBox, false, 80, 20);
     phase_slider->addListener (this);
 
-    denominator_slider.reset (new juce::Slider ("new slider"));
+    denominator_slider.reset (new juce::Slider ("denominator_slider"));
     addAndMakeVisible (denominator_slider.get());
     denominator_slider->setRange (1, 64, 1);
     denominator_slider->setSliderStyle (juce::Slider::LinearBarVertical);
@@ -79,7 +79,7 @@ OscillatorParameters::OscillatorParameters(ConnectionID id, BitSynthesizer* synt
 
     denominator_slider->setBounds (80, 16, 32, 16);
 
-    phase_label.reset (new juce::Label ("new label",
+    phase_label.reset (new juce::Label ("phase_label",
                                         TRANS("Phase")));
     addAndMakeVisible (phase_label.get());
     phase_label->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
@@ -88,7 +88,7 @@ OscillatorParameters::OscillatorParameters(ConnectionID id, BitSynthesizer* synt
     phase_label->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     phase_label->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    pw_label.reset (new juce::Label ("new label",
+    pw_label.reset (new juce::Label ("pw_label",
                                      TRANS("Pulse Width")));
     addAndMakeVisible (pw_label.get());
     pw_label->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
@@ -97,7 +97,7 @@ OscillatorParameters::OscillatorParameters(ConnectionID id, BitSynthesizer* synt
     pw_label->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     pw_label->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    transpose_slider.reset (new juce::Slider ("new slider"));
+    transpose_slider.reset (new juce::Slider ("transpose_slider"));
     addAndMakeVisible (transpose_slider.get());
     transpose_slider->setRange (-36, 36, 1);
     transpose_slider->setSliderStyle (juce::Slider::LinearBar);
@@ -106,7 +106,7 @@ OscillatorParameters::OscillatorParameters(ConnectionID id, BitSynthesizer* synt
 
     transpose_slider->setBounds (16, 56, 32, 16);
 
-    transpose_label.reset (new juce::Label ("new label",
+    transpose_label.reset (new juce::Label ("transpose_label",
                                             TRANS("Transpose")));
     addAndMakeVisible (transpose_label.get());
     transpose_label->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
@@ -117,7 +117,7 @@ OscillatorParameters::OscillatorParameters(ConnectionID id, BitSynthesizer* synt
 
     transpose_label->setBounds (0, 80, 70, 16);
 
-    fine_slider.reset (new juce::Slider ("phase_knob"));
+    fine_slider.reset (new juce::Slider ("fine_slider"));
     addAndMakeVisible (fine_slider.get());
     fine_slider->setTooltip (TRANS("cents"));
     fine_slider->setRange (-100, 100, 1);
@@ -125,7 +125,7 @@ OscillatorParameters::OscillatorParameters(ConnectionID id, BitSynthesizer* synt
     fine_slider->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 40, 20);
     fine_slider->addListener (this);
 
-    fine_label.reset (new juce::Label ("new label",
+    fine_label.reset (new juce::Label ("fine_label",
                                        TRANS("Fine")));
     addAndMakeVisible (fine_label.get());
     fine_label->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
