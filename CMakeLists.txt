@@ -29,6 +29,7 @@ juce_add_gui_app(bitprocessing
 
 juce_generate_juce_header(bitprocessing)
 include_directories(${Boost_INCLUDE_DIRS})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 # `target_sources` adds source files to a target. We pass the target that needs the sources as the
 # first argument, then a visibility parameter for the sources which should normally be PRIVATE.

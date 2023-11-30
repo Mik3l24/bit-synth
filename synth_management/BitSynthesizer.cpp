@@ -3,7 +3,7 @@
 //
 
 #include "BitSynthesizer.h"
-#include "../dsp/BitSynthVoice.h"
+#include "dsp/BitSynthVoice.h"
 #include "SynthManagementNames.h"
 
 inline BitSynthVoice* castVoice(juce::SynthesiserVoice* voice)
