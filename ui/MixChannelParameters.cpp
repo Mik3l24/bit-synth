@@ -52,6 +52,7 @@ MixChannelParameters::MixChannelParameters (ConnectionID id, BitSynthesizer* syn
 
     target.reset (new TargetConnector (id));
     addAndMakeVisible (target.get());
+    target->addListener(this);
     target->setBounds (0, 40, 10, 10);
 
 
@@ -123,6 +124,7 @@ void MixChannelParameters::sliderValueChanged (juce::Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == level_slider.get())
     {
         //[UserSliderCode_level_slider] -- add your slider handling code here..
+        synth->setMixChannelLevel(id, float(level_slider->getValue()));
         //[/UserSliderCode_level_slider]
     }
 

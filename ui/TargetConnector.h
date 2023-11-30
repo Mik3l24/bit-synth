@@ -25,6 +25,8 @@
 #include "../synth_management/SynthManagementNames.h"
 #include "../synth_management/SynthConnected.h"
 
+#include "SourceConnector.h"
+
 namespace ui {
 //[/Headers]
 
@@ -38,7 +40,7 @@ namespace ui {
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class TargetConnector  : public juce::TextButton, juce::DragAndDropTarget
+class TargetConnector  : public juce::TextButton, public juce::DragAndDropTarget
 {
 public:
     class Listener
@@ -60,7 +62,7 @@ public:
     void addListener(Listener* listener);
     void removeListener(Listener* listener);
 
-    void makeConnection(ConnectionID source_id);
+    void makeConnection(SourceConnector * source);
 
     //[/UserMethods]
 

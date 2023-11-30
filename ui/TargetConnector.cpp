@@ -18,6 +18,7 @@
 */
 
 //[Headers] You can add your own extra header files here...
+#include "DragSourceType.h"
 //[/Headers]
 
 #include "TargetConnector.h"
@@ -62,7 +63,7 @@ void TargetConnector::paint (juce::Graphics& g)
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (juce::Colour (0xff505050));
+    g.fillAll (juce::Colour (0xff101050));
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -82,11 +83,16 @@ void TargetConnector::resized()
 
 bool TargetConnector::isInterestedInDragSource(const juce::DragAndDropTarget::SourceDetails& dragSourceDetails)
 {
-    return false;
+    return dragSourceDetails.description.equals(DragSourceType::SOURCE_CONNECTOR);
 }
 
 void TargetConnector::itemDropped(const juce::DragAndDropTarget::SourceDetails& dragSourceDetails)
 {
+    auto* source = dynamic_cast<SourceConnector*>(dragSourceDetails.sourceComponent.get());
+    if(source == nullptr)
+        return;
+
+    makeConnection(source);
 }
 
 void TargetConnector::addListener(TargetConnector::Listener* listener)
@@ -99,9 +105,10 @@ void TargetConnector::removeListener(TargetConnector::Listener* listener)
     connectorListeners.remove(listener);
 }
 
-void TargetConnector::makeConnection(ConnectionID source_id)
+void TargetConnector::makeConnection(SourceConnector* source)
 {
-    connectorListeners.call(&Listener::connectionMade, this, source_id);
+    connectorListeners.call(&Listener::connectionMade, this, source->getConnectionID());
+    // Change the path // TODO
 }
 
 //[/MiscUserCode]

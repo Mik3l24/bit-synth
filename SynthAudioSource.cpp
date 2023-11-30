@@ -8,18 +8,7 @@
 SynthAudioSource::SynthAudioSource(juce::MidiKeyboardState& keyState)
     : keyboardState(keyState), synth(8)
 {
-    // Mock setup
-    auto osc1 = synth.addOscillator();
-    auto osc2 = synth.addOscillator();
-    synth.setOscillatorRatio(osc2, 2.5);
-
-    auto gate1 = synth.addGate(GateType::AND);
-    synth.setGateInput(gate1, osc1, 0);
-    synth.setGateInput(gate1, osc2, 1);
-
-    auto ch1 = synth.addMixChannel();
-    synth.setMixChannelInput(ch1, gate1);
-
+    // Mock setup no longer necessary
 }
 
 SynthAudioSource::~SynthAudioSource()

@@ -46,6 +46,7 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+    ConnectionID getConnectionID() const;
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -57,6 +58,7 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+    ConnectionID id;
     //[/UserVariables]
 
     //==============================================================================

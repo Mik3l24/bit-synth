@@ -18,6 +18,8 @@
 */
 
 //[Headers] You can add your own extra header files here...
+#include "synth_management/SynthManagementNames.h"
+#include "DragSourceType.h"
 //[/Headers]
 
 #include "SourceConnector.h"
@@ -29,6 +31,7 @@ namespace ui {
 
 //==============================================================================
 SourceConnector::SourceConnector (ConnectionID id)
+    : juce::TextButton(), id(id)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -79,6 +82,7 @@ void SourceConnector::resized()
 void SourceConnector::mouseDrag (const juce::MouseEvent& e)
 {
     //[UserCode_mouseDrag] -- Add your code here...
+    juce::DragAndDropContainer::findParentDragContainerFor(this)->startDragging(DragSourceType::SOURCE_CONNECTOR, this);
     //[/UserCode_mouseDrag]
 }
 
@@ -91,6 +95,10 @@ void SourceConnector::mouseUp (const juce::MouseEvent& e)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+ConnectionID SourceConnector::getConnectionID() const
+{
+    return id;
+}
 //[/MiscUserCode]
 
 
