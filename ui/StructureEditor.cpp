@@ -19,6 +19,7 @@
 
 //[Headers] You can add your own extra header files here...
 #include "DragSourceType.h"
+#include "Theme.h"
 //[/Headers]
 
 #include "StructureEditor.h"
@@ -67,7 +68,7 @@ void StructureEditor::paint (juce::Graphics& g)
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (juce::Colour (0xff505050));
+    g.fillAll (Theme::getStructureBackground());
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]

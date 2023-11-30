@@ -68,7 +68,7 @@ private:
     std::unique_ptr<SourceConnector> source;
     std::unique_ptr<TargetConnector> target0;
     std::unique_ptr<TargetConnector> target1;
-    juce::Path internalPath1;
+    juce::Path gatePath;
     juce::Path internalPath2;
     juce::Path internalPath3;
     juce::Path internalPath4;

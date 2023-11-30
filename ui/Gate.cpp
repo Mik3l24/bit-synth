@@ -18,6 +18,7 @@
 */
 
 //[Headers] You can add your own extra header files here...
+#include "Theme.h"
 //[/Headers]
 
 #include "Gate.h"
@@ -52,12 +53,13 @@ Gate::Gate(ConnectionID id, GateType type, BitSynthesizer* synth)
 
     target1->setBounds (8, 55, 10, 10);
 
-    internalPath1.startNewSubPath (30.0f, 30.0f);
-    internalPath1.lineTo (54.0f, 30.0f);
-    internalPath1.quadraticTo (72.0f, 30.0f, 72.0f, 50.0f);
-    internalPath1.quadraticTo (72.0f, 70.0f, 54.0f, 70.0f);
-    internalPath1.lineTo (30.0f, 70.0f);
-    internalPath1.closeSubPath();
+    // TODO: Switch on type
+    gatePath.startNewSubPath (30.0f, 30.0f);
+    gatePath.lineTo (54.0f, 30.0f);
+    gatePath.quadraticTo (72.0f, 30.0f, 72.0f, 50.0f);
+    gatePath.quadraticTo (72.0f, 70.0f, 54.0f, 70.0f);
+    gatePath.lineTo (30.0f, 70.0f);
+    gatePath.closeSubPath();
 
     internalPath2.setUsingNonZeroWinding (false);
     internalPath2.startNewSubPath (13.0f, 59.0f);
@@ -102,45 +104,19 @@ Gate::~Gate()
 void Gate::paint (juce::Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
+    juce::Colour strokeColour = Theme::getStructureLogicForeground();
+    float strokeThickness = Theme::getStructureLogicStrokeThickness();
     //[/UserPrePaint]
 
-    {
-        float x = 0, y = 0;
-        juce::Colour strokeColour = juce::Colour (0xff505050);
-        //[UserPaintCustomArguments] Customize the painting arguments here..
-        //[/UserPaintCustomArguments]
-        g.setColour (strokeColour);
-        g.strokePath (internalPath1, juce::PathStrokeType (5.000f), juce::AffineTransform::translation(x, y));
-    }
 
-    {
-        float x = 0, y = 0;
-        juce::Colour strokeColour = juce::Colour (0xff505050);
-        //[UserPaintCustomArguments] Customize the painting arguments here..
-        //[/UserPaintCustomArguments]
-        g.setColour (strokeColour);
-        g.strokePath (internalPath2, juce::PathStrokeType (5.000f), juce::AffineTransform::translation(x, y));
-    }
-
-    {
-        float x = 0, y = 0;
-        juce::Colour strokeColour = juce::Colour (0xff505050);
-        //[UserPaintCustomArguments] Customize the painting arguments here..
-        //[/UserPaintCustomArguments]
-        g.setColour (strokeColour);
-        g.strokePath (internalPath3, juce::PathStrokeType (5.000f), juce::AffineTransform::translation(x, y));
-    }
-
-    {
-        float x = 0, y = 0;
-        juce::Colour strokeColour = juce::Colour (0xff505050);
-        //[UserPaintCustomArguments] Customize the painting arguments here..
-        //[/UserPaintCustomArguments]
-        g.setColour (strokeColour);
-        g.strokePath (internalPath4, juce::PathStrokeType (5.000f), juce::AffineTransform::translation(x, y));
-    }
 
     //[UserPaint] Add your own custom painting code here..
+    g.setColour(strokeColour);
+
+    g.strokePath(gatePath, juce::PathStrokeType(strokeThickness), juce::AffineTransform::translation(0, 0));
+    g.strokePath(internalPath2, juce::PathStrokeType(strokeThickness), juce::AffineTransform::translation(0, 0));
+    g.strokePath(internalPath3, juce::PathStrokeType(strokeThickness), juce::AffineTransform::translation(0, 0));
+    g.strokePath(internalPath4, juce::PathStrokeType(strokeThickness), juce::AffineTransform::translation(0, 0));
     //[/UserPaint]
 }
 
