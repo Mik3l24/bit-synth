@@ -133,6 +133,13 @@ void MixChannelParameters::sliderValueChanged (juce::Slider* sliderThatWasMoved)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void MixChannelParameters::connectionMade(TargetConnector* connector, ConnectionID source_id)
+{
+    if(connector == target.get())
+    {
+        synth->setMixChannelInput(id, source_id);
+    }
+}
 //[/MiscUserCode]
 
 

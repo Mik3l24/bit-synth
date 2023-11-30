@@ -38,8 +38,15 @@ namespace ui {
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class TargetConnector  : public juce::TextButton, juce::DragAndDropTarget //, public SynthConnected //to implement later
+class TargetConnector  : public juce::TextButton, juce::DragAndDropTarget
 {
+public:
+    class Listener
+    {
+    public:
+        virtual ~Listener() = default;
+        virtual void connectionMade(TargetConnector* connector, ConnectionID source_id) = 0;
+    };
 public:
     //==============================================================================
     TargetConnector (ConnectionID id);
@@ -49,6 +56,12 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
     bool isInterestedInDragSource(const juce::DragAndDropTarget::SourceDetails &dragSourceDetails) override;
     void itemDropped(const juce::DragAndDropTarget::SourceDetails &dragSourceDetails) override;
+
+    void addListener(Listener* listener);
+    void removeListener(Listener* listener);
+
+    void makeConnection(ConnectionID source_id);
+
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -58,6 +71,8 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+    ConnectionID id;
+    juce::ListenerList<Listener> connectorListeners;
     //[/UserVariables]
 
     //==============================================================================

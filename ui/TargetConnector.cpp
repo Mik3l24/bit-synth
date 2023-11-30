@@ -28,9 +28,10 @@ namespace ui {
 //[/MiscUserDefs]
 
 //==============================================================================
-TargetConnector::TargetConnector (ConnectionID id)
+TargetConnector::TargetConnector (ConnectionID)
 {
     //[Constructor_pre] You can add your own custom stuff here..
+    setButtonText(">");
     //[/Constructor_pre]
 
 
@@ -86,6 +87,21 @@ bool TargetConnector::isInterestedInDragSource(const juce::DragAndDropTarget::So
 
 void TargetConnector::itemDropped(const juce::DragAndDropTarget::SourceDetails& dragSourceDetails)
 {
+}
+
+void TargetConnector::addListener(TargetConnector::Listener* listener)
+{
+    connectorListeners.add(listener);
+}
+
+void TargetConnector::removeListener(TargetConnector::Listener* listener)
+{
+    connectorListeners.remove(listener);
+}
+
+void TargetConnector::makeConnection(ConnectionID source_id)
+{
+    connectorListeners.call(&Listener::connectionMade, this, source_id);
 }
 
 //[/MiscUserCode]

@@ -42,7 +42,8 @@ namespace ui
 */
 class MixChannelParameters: public juce::Component,
                             public juce::Slider::Listener,
-                            public SynthConnected
+                            public SynthConnected,
+                            public TargetConnector::Listener
 {
 public:
     //==============================================================================
@@ -51,6 +52,7 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+    void connectionMade(TargetConnector* connector, ConnectionID source_id) override;
     //[/UserMethods]
 
     void paint(juce::Graphics& g) override;

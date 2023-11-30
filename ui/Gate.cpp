@@ -30,7 +30,7 @@ namespace ui {
 
 //==============================================================================
 Gate::Gate(ConnectionID id, GateType type, BitSynthesizer* synth)
-    : SynthConnected(synth), type(type)
+    : SynthConnected(synth), type(type), id(id)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -44,12 +44,14 @@ Gate::Gate(ConnectionID id, GateType type, BitSynthesizer* synth)
     target0.reset (new TargetConnector(id));
     addAndMakeVisible (target0.get());
     target0->setName ("new component");
+    target0->addListener(this);
 
     target0->setBounds (8, 36, 10, 10);
 
     target1.reset (new TargetConnector(id));
     addAndMakeVisible (target1.get());
     target1->setName ("new component");
+    target1->addListener(this);
 
     target1->setBounds (8, 55, 10, 10);
 
@@ -127,6 +129,19 @@ void Gate::resized()
 
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
+}
+
+void Gate::connectionMade(TargetConnector* connector, ConnectionID source_id)
+{
+    if(connector == target0.get())
+    {
+        synth->setGateInput(id, source_id, 0);
+    }
+    else if(connector == target1.get() && type != GateType::NOT)
+    {
+        synth->setGateInput(id, source_id, 1);
+    }
+
 }
 
 
