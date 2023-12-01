@@ -58,68 +58,78 @@ Gate::Gate(ConnectionID id, GateType type, BitSynthesizer* synth)
     switch(type) // Body
     {
     case GateType::AND:
-        gatePath.startNewSubPath(30.0f, 30.0f);
-        gatePath.lineTo(54.0f, 30.0f);
-        gatePath.quadraticTo(72.0f, 30.0f, 72.0f, 50.0f);
-        gatePath.quadraticTo(72.0f, 70.0f, 54.0f, 70.0f);
-        gatePath.lineTo(30.0f, 70.0f);
-        gatePath.closeSubPath();
+        bodyPath.startNewSubPath(30.0f, 30.0f);
+        bodyPath.lineTo(54.0f, 30.0f);
+        bodyPath.quadraticTo(72.0f, 30.0f, 72.0f, 50.0f);
+        bodyPath.quadraticTo(72.0f, 70.0f, 54.0f, 70.0f);
+        bodyPath.lineTo(30.0f, 70.0f);
+        bodyPath.closeSubPath();
         break;
     case GateType::XOR:
         // The additional curve
-        gatePath.startNewSubPath (19.0f, 69.0f);
-        gatePath.quadraticTo(28.0f, 63.0f, 28.0f, 49.0f);
-        gatePath.quadraticTo(28.0f, 37.0f, 20.0f, 30.0f);
+        bodyPath.startNewSubPath (19.0f, 69.0f);
+        bodyPath.quadraticTo(28.0f, 63.0f, 28.0f, 49.0f);
+        bodyPath.quadraticTo(28.0f, 37.0f, 20.0f, 30.0f);
     case GateType::OR:
         // The common _or body
-        gatePath.startNewSubPath (45.0f, 29.0f);
-        gatePath.quadraticTo(64.0f, 29.0f, 70.0f, 50.0f);
-        gatePath.quadraticTo(63.0f, 70.0f, 46.0f, 70.0f);
-        gatePath.lineTo(28.0f, 70.0f);
-        gatePath.quadraticTo(36.0f, 63.0f, 36.0f, 49.0f);
-        gatePath.quadraticTo(36.0f, 37.0f, 29.0f, 29.0f);
-        gatePath.closeSubPath();
+        bodyPath.startNewSubPath (45.0f, 29.0f);
+        bodyPath.quadraticTo(64.0f, 29.0f, 70.0f, 50.0f);
+        bodyPath.quadraticTo(63.0f, 70.0f, 46.0f, 70.0f);
+        bodyPath.lineTo(28.0f, 70.0f);
+        bodyPath.quadraticTo(36.0f, 63.0f, 36.0f, 49.0f);
+        bodyPath.quadraticTo(36.0f, 37.0f, 29.0f, 29.0f);
+        bodyPath.closeSubPath();
         break;
     case GateType::NOT:
-        // TODO
-        // break;
+        bodyPath.startNewSubPath (28.0f, 33.0f);
+        bodyPath.lineTo(63.0f, 50.0f);
+        bodyPath.lineTo(28.0f, 67.0f);
+        bodyPath.closeSubPath();
+        break;
     default:
         // Crossed out
-        gatePath.startNewSubPath (30.0f, 30.0f);
-        gatePath.lineTo(70.0f, 70.0f);
-        gatePath.closeSubPath();
-        gatePath.startNewSubPath (30.0f, 70.0f);
-        gatePath.lineTo(70.0f, 30.0f);
-        gatePath.closeSubPath();
+        bodyPath.startNewSubPath (30.0f, 30.0f);
+        bodyPath.lineTo(70.0f, 70.0f);
+        bodyPath.closeSubPath();
+        bodyPath.startNewSubPath (30.0f, 70.0f);
+        bodyPath.lineTo(70.0f, 30.0f);
+        bodyPath.closeSubPath();
         break;
     }
+
     switch(type) // Target tips
     {
     case GateType::AND:
     case GateType::XOR:
-        // Shorter AND target 0 tip
-        gatePath.setUsingNonZeroWinding(false);
-        gatePath.startNewSubPath(13.0f, 59.0f);
-        gatePath.lineTo(28.0f, 59.0f);
-        gatePath.closeSubPath();
+        // target0 tip
+        connectorsPath.setUsingNonZeroWinding(false);
+        connectorsPath.startNewSubPath(13.0f, 59.0f);
+        connectorsPath.lineTo(27.0f, 59.0f);
+        connectorsPath.closeSubPath();
 
-        // Shorter AND target 1 tip
-        gatePath.setUsingNonZeroWinding(false);
-        gatePath.startNewSubPath(13.0f, 41.0f);
-        gatePath.lineTo(29.0f, 41.0f);
-        gatePath.closeSubPath();
+        // target1 tip
+        connectorsPath.setUsingNonZeroWinding(false);
+        connectorsPath.startNewSubPath(13.0f, 41.0f);
+        connectorsPath.lineTo(27.0f, 41.0f);
+        connectorsPath.closeSubPath();
         break;
     case GateType::OR: // OR tips are slightly longer
-        gatePath.setUsingNonZeroWinding (false);
-        gatePath.startNewSubPath(13.0f, 59.0f);
-        gatePath.lineTo(33.0f, 59.0f);
-        gatePath.closeSubPath();
+        connectorsPath.setUsingNonZeroWinding (false);
+        connectorsPath.startNewSubPath(13.0f, 59.0f);
+        connectorsPath.lineTo(34.0f, 59.0f);
+        connectorsPath.closeSubPath();
 
-        gatePath.setUsingNonZeroWinding (false);
-        gatePath.startNewSubPath(13.0f, 41.0f);
-        gatePath.lineTo(34.0f, 41.0f);
-        gatePath.closeSubPath();
-
+        connectorsPath.setUsingNonZeroWinding (false);
+        connectorsPath.startNewSubPath(13.0f, 41.0f);
+        connectorsPath.lineTo(34.0f, 41.0f);
+        connectorsPath.closeSubPath();
+        break;
+    case GateType::NOT:
+        connectorsPath.setUsingNonZeroWinding (false);
+        connectorsPath.startNewSubPath(13.0f, 50.0f);
+        connectorsPath.lineTo(26.0f, 50.0f);
+        connectorsPath.closeSubPath();
+        break;
     default:
         break;
     }
@@ -127,10 +137,9 @@ Gate::Gate(ConnectionID id, GateType type, BitSynthesizer* synth)
 
 
     // Source tip
-    internalPath3.startNewSubPath (72.0f, 51.0f);
-    internalPath3.lineTo (86.0f, 51.0f);
-    internalPath3.closeSubPath();
-
+    connectorsPath.startNewSubPath (72.0f, 50.0f);
+    connectorsPath.lineTo (86.0f, 50.0f);
+    connectorsPath.closeSubPath();
 
 
 
@@ -163,6 +172,7 @@ void Gate::paint (juce::Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     juce::Colour strokeColour = Theme::getStructureLogicForeground();
+    juce::Colour fillColour = Theme::getStructureBackground();
     float strokeThickness = Theme::getStructureLogicStrokeThickness();
     //[/UserPrePaint]
 
@@ -171,10 +181,21 @@ void Gate::paint (juce::Graphics& g)
     //[UserPaint] Add your own custom painting code here..
     g.setColour(strokeColour);
 
-    g.strokePath(gatePath, juce::PathStrokeType(strokeThickness), juce::AffineTransform::translation(0, 0));
-    g.strokePath(internalPath2, juce::PathStrokeType(strokeThickness), juce::AffineTransform::translation(0, 0));
-    g.strokePath(internalPath3, juce::PathStrokeType(strokeThickness), juce::AffineTransform::translation(0, 0));
-    g.strokePath(internalPath4, juce::PathStrokeType(strokeThickness), juce::AffineTransform::translation(0, 0));
+    g.strokePath(bodyPath,
+                 juce::PathStrokeType(strokeThickness, juce::PathStrokeType::JointStyle::curved, juce::PathStrokeType::EndCapStyle::rounded),
+                 juce::AffineTransform::translation(0, 0));
+    g.strokePath(connectorsPath,
+                 juce::PathStrokeType(strokeThickness, juce::PathStrokeType::JointStyle::curved, juce::PathStrokeType::EndCapStyle::rounded),
+                 juce::AffineTransform::translation(0, 0));
+
+    if(type == GateType::NOT)
+    {
+        constexpr float x = 61.0f, y = 45.0f, width = 10.0f, height = 10.0f;
+        g.setColour(fillColour);
+        g.fillEllipse(x, y, width, height);
+        g.setColour(strokeColour);
+        g.drawEllipse(x, y, width, height, 3.500f);
+    }
     //[/UserPaint]
 }
 
