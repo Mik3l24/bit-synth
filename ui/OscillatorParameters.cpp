@@ -275,6 +275,16 @@ void OscillatorParameters::sliderValueChanged (juce::Slider* sliderThatWasMoved)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void OscillatorParameters::mouseDown(const juce::MouseEvent& e)
+{
+    dragger.startDraggingComponent(this, e);
+}
+
+void OscillatorParameters::mouseDrag(const juce::MouseEvent& e)
+{
+    dragger.dragComponent(this, e, nullptr);
+}
+
 inline double OscillatorParameters::getRatio() const
 {
     return numerator_slider->getValue() / denominator_slider->getValue();

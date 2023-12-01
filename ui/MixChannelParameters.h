@@ -59,6 +59,9 @@ public:
     void resized() override;
     void sliderValueChanged(juce::Slider* sliderThatWasMoved) override;
 
+    void mouseDown(const juce::MouseEvent& e) override;
+    void mouseDrag(const juce::MouseEvent& e) override;
+
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
@@ -70,6 +73,7 @@ private:
     std::unique_ptr<juce::Label> level_label;
     std::unique_ptr<TargetConnector> target;
 
+    juce::ComponentDragger dragger;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MixChannelParameters)

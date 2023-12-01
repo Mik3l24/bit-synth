@@ -232,6 +232,16 @@ void Gate::connectionMade(TargetConnector* connector, ConnectionID source_id)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void Gate::mouseDown(const juce::MouseEvent &e)
+{
+    dragger.startDraggingComponent(this, e);
+}
+
+void Gate::mouseDrag(const juce::MouseEvent &e)
+{
+    dragger.dragComponent(this, e, nullptr);
+
+}
 //[/MiscUserCode]
 
 

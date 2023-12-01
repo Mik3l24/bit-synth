@@ -135,6 +135,17 @@ void MixChannelParameters::sliderValueChanged (juce::Slider* sliderThatWasMoved)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void MixChannelParameters::mouseDown(const juce::MouseEvent& e)
+{
+    dragger.startDraggingComponent(this, e);
+}
+
+void MixChannelParameters::mouseDrag(const juce::MouseEvent& e)
+{
+    dragger.dragComponent(this, e, nullptr);
+}
+
+
 void MixChannelParameters::connectionMade(TargetConnector* connector, ConnectionID source_id)
 {
     if(connector == target.get())

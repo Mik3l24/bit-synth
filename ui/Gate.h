@@ -59,7 +59,8 @@ public:
     void paint (juce::Graphics& g) override;
     void resized() override;
 
-
+    void mouseDown(const juce::MouseEvent &e) override;
+    void mouseDrag(const juce::MouseEvent &e) override;
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
@@ -73,6 +74,8 @@ private:
     std::unique_ptr<TargetConnector> target1;
     juce::Path bodyPath;
     juce::Path connectorsPath;
+
+    juce::ComponentDragger dragger;
 
 
     //==============================================================================

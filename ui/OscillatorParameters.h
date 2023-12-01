@@ -58,11 +58,14 @@ public:
     void resized() override;
     void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
 
-
+    void mouseDown(const juce::MouseEvent& e) override;
+    void mouseDrag(const juce::MouseEvent& e) override;
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     const ConnectionID id;
+
+    juce::ComponentDragger dragger;
     //[/UserVariables]
 
     //==============================================================================
