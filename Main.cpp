@@ -15,13 +15,13 @@ public:
     //==============================================================================
     Application() = default;
 
-    const juce::String getApplicationName() override       { return "SineSynthTutorial"; }
-    const juce::String getApplicationVersion() override    { return "1.0.0"; }
+    const juce::String getApplicationName() override       { return "Boolean Synthesizer"; }
+    const juce::String getApplicationVersion() override    { return "0.0.1"; }
 
 
     void initialise (const juce::String&) override
     {
-        mainWindow.reset (new MainWindow ("SineSynthTutorial", new MainContentComponent, *this));
+        mainWindow.reset (new MainWindow ("Boolean Synthesizer", new MainContentComponent, *this));
     }
 
     void shutdown() override                         { mainWindow = nullptr; }
