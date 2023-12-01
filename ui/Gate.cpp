@@ -55,27 +55,83 @@ Gate::Gate(ConnectionID id, GateType type, BitSynthesizer* synth)
 
     target1->setBounds (8, 55, 10, 10);
 
-    // TODO: Switch on type
-    gatePath.startNewSubPath (30.0f, 30.0f);
-    gatePath.lineTo (54.0f, 30.0f);
-    gatePath.quadraticTo (72.0f, 30.0f, 72.0f, 50.0f);
-    gatePath.quadraticTo (72.0f, 70.0f, 54.0f, 70.0f);
-    gatePath.lineTo (30.0f, 70.0f);
-    gatePath.closeSubPath();
+    switch(type) // Body
+    {
+    case GateType::AND:
+        gatePath.startNewSubPath(30.0f, 30.0f);
+        gatePath.lineTo(54.0f, 30.0f);
+        gatePath.quadraticTo(72.0f, 30.0f, 72.0f, 50.0f);
+        gatePath.quadraticTo(72.0f, 70.0f, 54.0f, 70.0f);
+        gatePath.lineTo(30.0f, 70.0f);
+        gatePath.closeSubPath();
+        break;
+    case GateType::XOR:
+        // The additional curve
+        gatePath.startNewSubPath (19.0f, 69.0f);
+        gatePath.quadraticTo(28.0f, 63.0f, 28.0f, 49.0f);
+        gatePath.quadraticTo(28.0f, 37.0f, 20.0f, 30.0f);
+    case GateType::OR:
+        // The common _or body
+        gatePath.startNewSubPath (45.0f, 29.0f);
+        gatePath.quadraticTo(64.0f, 29.0f, 70.0f, 50.0f);
+        gatePath.quadraticTo(63.0f, 70.0f, 46.0f, 70.0f);
+        gatePath.lineTo(28.0f, 70.0f);
+        gatePath.quadraticTo(36.0f, 63.0f, 36.0f, 49.0f);
+        gatePath.quadraticTo(36.0f, 37.0f, 29.0f, 29.0f);
+        gatePath.closeSubPath();
+        break;
+    case GateType::NOT:
+        // TODO
+        // break;
+    default:
+        // Crossed out
+        gatePath.startNewSubPath (30.0f, 30.0f);
+        gatePath.lineTo(70.0f, 70.0f);
+        gatePath.closeSubPath();
+        gatePath.startNewSubPath (30.0f, 70.0f);
+        gatePath.lineTo(70.0f, 30.0f);
+        gatePath.closeSubPath();
+        break;
+    }
+    switch(type) // Target tips
+    {
+    case GateType::AND:
+    case GateType::XOR:
+        // Shorter AND target 0 tip
+        gatePath.setUsingNonZeroWinding(false);
+        gatePath.startNewSubPath(13.0f, 59.0f);
+        gatePath.lineTo(28.0f, 59.0f);
+        gatePath.closeSubPath();
 
-    internalPath2.setUsingNonZeroWinding (false);
-    internalPath2.startNewSubPath (13.0f, 59.0f);
-    internalPath2.lineTo (28.0f, 59.0f);
-    internalPath2.closeSubPath();
+        // Shorter AND target 1 tip
+        gatePath.setUsingNonZeroWinding(false);
+        gatePath.startNewSubPath(13.0f, 41.0f);
+        gatePath.lineTo(29.0f, 41.0f);
+        gatePath.closeSubPath();
+        break;
+    case GateType::OR: // OR tips are slightly longer
+        gatePath.setUsingNonZeroWinding (false);
+        gatePath.startNewSubPath(13.0f, 59.0f);
+        gatePath.lineTo(33.0f, 59.0f);
+        gatePath.closeSubPath();
 
+        gatePath.setUsingNonZeroWinding (false);
+        gatePath.startNewSubPath(13.0f, 41.0f);
+        gatePath.lineTo(34.0f, 41.0f);
+        gatePath.closeSubPath();
+
+    default:
+        break;
+    }
+
+
+
+    // Source tip
     internalPath3.startNewSubPath (72.0f, 51.0f);
     internalPath3.lineTo (86.0f, 51.0f);
     internalPath3.closeSubPath();
 
-    internalPath4.setUsingNonZeroWinding (false);
-    internalPath4.startNewSubPath (13.0f, 41.0f);
-    internalPath4.lineTo (29.0f, 41.0f);
-    internalPath4.closeSubPath();
+
 
 
     //[UserPreSize]
