@@ -6,6 +6,8 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 
 #include "SynthAudioSource.h"
+#include "ui/StructureEditor.h"
+
 
 class MainContentComponent : public juce::AudioAppComponent,
                              private juce::Timer
@@ -28,6 +30,7 @@ private:
     juce::MidiKeyboardState keyboardState;
     SynthAudioSource synthAudioSource;
     juce::MidiKeyboardComponent keyboardComponent;
+    std::unique_ptr<ui::StructureEditor> structure_editor;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainContentComponent)
 };
