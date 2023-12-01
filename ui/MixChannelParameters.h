@@ -53,6 +53,9 @@ public:
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
     void connectionMade(TargetConnector* connector, ConnectionID source_id) override;
+
+    std::optional<std::pair<juce::Point<int>, juce::Point<int>>> getConnectionPoints() const;
+
     //[/UserMethods]
 
     void paint(juce::Graphics& g) override;

@@ -27,6 +27,22 @@
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 namespace ui {
+
+// Creates a path that only follows cardinal directions
+juce::Path taxiwayPath(const juce::Point<float>& start, const juce::Point<float>& end)
+{
+    juce::Path path;
+    path.startNewSubPath(start);
+    float midpoint_x = start.getX() - end.getX() > -5.0f // FIXME: doesn't actually remove the midpoint for small differences like intended
+        ? (start.getX() + end.getX()) / 2.0f
+        : end.getX();
+    path.lineTo(midpoint_x, start.getY());
+    path.lineTo(midpoint_x, end.getY());
+    // Could improve this by making a vertical midpoint if the end is to the left of the start
+    path.lineTo(end);
+    return path;
+}
+
 //[/MiscUserDefs]
 
 //==============================================================================
@@ -71,6 +87,33 @@ void StructureEditor::paint (juce::Graphics& g)
     g.fillAll (Theme::getStructureBackground());
 
     //[UserPaint] Add your own custom painting code here..
+    // Paint lines between sources and targets
+    g.setColour(Theme::getStructureLogicForeground());
+    for(auto& gate : gate_components)
+    {
+        for(auto i = 0; i <= 1; i++)
+        {
+            std::optional<std::pair<juce::Point<int>, juce::Point<int>>> points = gate->getConnectionPoints(i);
+            if(points.has_value())
+            {
+                g.strokePath(taxiwayPath(
+                    getLocalPoint(nullptr,points.value().first).toFloat(),
+                    getLocalPoint(nullptr,points.value().second).toFloat()),
+                           juce::PathStrokeType(Theme::getStructureLogicStrokeThickness()));
+            }
+        }
+    }
+    for(auto& channel : mix_components)
+    {
+        std::optional<std::pair<juce::Point<int>, juce::Point<int>>> points = channel->getConnectionPoints();
+        if(points.has_value())
+        {
+            g.strokePath(taxiwayPath(
+                    getLocalPoint(nullptr,points.value().first).toFloat(),
+                    getLocalPoint(nullptr,points.value().second).toFloat()),
+                           juce::PathStrokeType(Theme::getStructureLogicStrokeThickness()));
+        }
+    }
     //[/UserPaint]
 }
 

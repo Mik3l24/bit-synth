@@ -232,6 +232,16 @@ void Gate::connectionMade(TargetConnector* connector, ConnectionID source_id)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+std::optional<std::pair<juce::Point<int>, juce::Point<int>>> Gate::getConnectionPoints(unsigned int target) const
+{
+    if(target == 0)
+        return target0->getConnectionPoints();
+    else if(target == 1 && type != GateType::NOT)
+        return target1->getConnectionPoints();
+    else
+        return std::nullopt;
+}
+
 void Gate::mouseDown(const juce::MouseEvent &e)
 {
     dragger.startDraggingComponent(this, e);
@@ -240,6 +250,10 @@ void Gate::mouseDown(const juce::MouseEvent &e)
 void Gate::mouseDrag(const juce::MouseEvent &e)
 {
     dragger.dragComponent(this, e, nullptr);
+    if(e.mouseWasDraggedSinceMouseDown())
+        // I guess this is a bit of a hack to repaint the StructureEditor
+        if(auto* parent = dynamic_cast<juce::Component*>(juce::DragAndDropContainer::findParentDragContainerFor(this)))
+            parent->repaint();
 
 }
 //[/MiscUserCode]

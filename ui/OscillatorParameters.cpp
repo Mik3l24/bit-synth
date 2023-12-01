@@ -283,6 +283,10 @@ void OscillatorParameters::mouseDown(const juce::MouseEvent& e)
 void OscillatorParameters::mouseDrag(const juce::MouseEvent& e)
 {
     dragger.dragComponent(this, e, nullptr);
+    if(e.mouseWasDraggedSinceMouseDown())
+        // I guess this is a bit of a hack to repaint the StructureEditor
+        if(auto* parent = dynamic_cast<juce::Component*>(juce::DragAndDropContainer::findParentDragContainerFor(this)))
+            parent->repaint();
 }
 
 inline double OscillatorParameters::getRatio() const

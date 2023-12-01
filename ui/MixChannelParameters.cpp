@@ -135,6 +135,11 @@ void MixChannelParameters::sliderValueChanged (juce::Slider* sliderThatWasMoved)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+std::optional<std::pair<juce::Point<int>, juce::Point<int>>> MixChannelParameters::getConnectionPoints() const
+{
+    return target->getConnectionPoints();
+}
+
 void MixChannelParameters::mouseDown(const juce::MouseEvent& e)
 {
     dragger.startDraggingComponent(this, e);
@@ -143,6 +148,10 @@ void MixChannelParameters::mouseDown(const juce::MouseEvent& e)
 void MixChannelParameters::mouseDrag(const juce::MouseEvent& e)
 {
     dragger.dragComponent(this, e, nullptr);
+    if(e.mouseWasDraggedSinceMouseDown())
+        // I guess this is a bit of a hack to repaint the StructureEditor
+        if(auto* parent = dynamic_cast<juce::Component*>(juce::DragAndDropContainer::findParentDragContainerFor(this)))
+            parent->repaint();
 }
 
 

@@ -64,6 +64,8 @@ public:
 
     void makeConnection(SourceConnector * source);
 
+    std::optional<std::pair<juce::Point<int>, juce::Point<int>>> getConnectionPoints() const;
+
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -75,6 +77,7 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     ConnectionID id;
     juce::ListenerList<Listener> connectorListeners;
+    SourceConnector* source = nullptr;
     //[/UserVariables]
 
     //==============================================================================

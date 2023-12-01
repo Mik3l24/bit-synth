@@ -45,6 +45,7 @@ namespace ui {
 class StructureEditor:
     public juce::Component,
     public juce::DragAndDropTarget,
+    public juce::DragAndDropContainer,
     public SynthConnected
 {
 public:

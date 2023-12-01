@@ -107,8 +107,20 @@ void TargetConnector::removeListener(TargetConnector::Listener* listener)
 
 void TargetConnector::makeConnection(SourceConnector* source)
 {
+    this->source = source;
     connectorListeners.call(&Listener::connectionMade, this, source->getConnectionID());
-    // Change the path // TODO
+    // I guess this is a bit of a hack to repaint the StructureEditor
+    if(auto* parent = dynamic_cast<juce::Component*>(juce::DragAndDropContainer::findParentDragContainerFor(this)))
+        parent->repaint();
+}
+
+std::optional<std::pair<juce::Point<int>, juce::Point<int>>> TargetConnector::getConnectionPoints() const
+{
+    if(source == nullptr)
+        return std::nullopt;
+
+    return std::make_pair(getScreenPosition().translated(getWidth()/2, getHeight()/2),
+                          source->getScreenPosition().translated(source->getWidth()/2, source->getHeight()/2));
 }
 
 //[/MiscUserCode]

@@ -10,8 +10,7 @@
 
 
 class MainContentComponent : public juce::AudioAppComponent,
-                             private juce::Timer,
-                             public juce::DragAndDropContainer
+                             private juce::Timer
 {
 public:
     void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override;
