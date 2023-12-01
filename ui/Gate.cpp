@@ -37,23 +37,31 @@ Gate::Gate(ConnectionID id, GateType type, BitSynthesizer* synth)
 
     source.reset (new SourceConnector (id));
     addAndMakeVisible (source.get());
-    source->setName ("new component");
+    source->setName ("source");
 
-    source->setBounds (80, 46, 10, 10);
+    source->setCentrePosition(86, 50);
 
     target0.reset (new TargetConnector(id));
     addAndMakeVisible (target0.get());
-    target0->setName ("new component");
+    target0->setName ("target0");
     target0->addListener(this);
 
-    target0->setBounds (8, 36, 10, 10);
+    if(type != GateType::NOT)
+    {
+        target0->setCentrePosition(13, 41);
 
-    target1.reset (new TargetConnector(id));
-    addAndMakeVisible (target1.get());
-    target1->setName ("new component");
-    target1->addListener(this);
+        target1.reset(new TargetConnector(id));
+        addAndMakeVisible(target1.get());
+        target1->setName("target1");
+        target1->addListener(this);
 
-    target1->setBounds (8, 55, 10, 10);
+        target1->setCentrePosition(13, 59);
+    }
+    else // if(type == GateType::NOT)
+    {
+        target0->setCentrePosition(13, 50);
+        target1 = nullptr;
+    }
 
     switch(type) // Body
     {
@@ -101,13 +109,13 @@ Gate::Gate(ConnectionID id, GateType type, BitSynthesizer* synth)
     {
     case GateType::AND:
     case GateType::XOR:
-        // target0 tip
+        // target1 tip
         connectorsPath.setUsingNonZeroWinding(false);
         connectorsPath.startNewSubPath(13.0f, 59.0f);
         connectorsPath.lineTo(27.0f, 59.0f);
         connectorsPath.closeSubPath();
 
-        // target1 tip
+        // target0 tip
         connectorsPath.setUsingNonZeroWinding(false);
         connectorsPath.startNewSubPath(13.0f, 41.0f);
         connectorsPath.lineTo(27.0f, 41.0f);
