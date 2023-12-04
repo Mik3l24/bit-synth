@@ -124,10 +124,8 @@ void StructureEditor::resized()
     //[/UserPreResize]
 
     picker->setBounds ((getWidth() / 2) - (proportionOfWidth (0.6000f) / 2), 0, proportionOfWidth (0.6000f), 24);
+
     //[UserResized] Add your own custom resize handling here..
-    auto parentDragContainer = juce::DragAndDropContainer::findParentDragContainerFor(this);
-    if(parentDragContainer != nullptr)
-        parentDragContainer->isDragAndDropActive();
     //[/UserResized]
 }
 
