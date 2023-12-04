@@ -110,7 +110,6 @@ namespace ui
         //[UserPrePaint] Add your own custom painting code here..
         //[/UserPrePaint]
 
-        g.fillAll(juce::Colour(0xff505050));
 
         //[UserPaint] Add your own custom painting code here..
         //[/UserPaint]

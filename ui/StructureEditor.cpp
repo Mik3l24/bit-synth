@@ -123,7 +123,7 @@ void StructureEditor::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    picker->setBounds ((getWidth() / 2) - (proportionOfWidth (0.6000f) / 2), 0, proportionOfWidth (0.6000f), 24);
+    picker->setCentrePosition(getWidth() / 2, picker->getHeight() / 2);
 
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
