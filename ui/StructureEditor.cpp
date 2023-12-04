@@ -89,6 +89,7 @@ void StructureEditor::paint (juce::Graphics& g)
     //[UserPaint] Add your own custom painting code here..
     // Paint lines between sources and targets
     g.setColour(Theme::getStructureLogicForeground());
+    const float stroke_thickness = Theme::getStructureConnectionStrokeThickness();
     for(auto& gate : gate_components)
     {
         for(auto i = 0; i <= 1; i++)
@@ -99,7 +100,7 @@ void StructureEditor::paint (juce::Graphics& g)
                 g.strokePath(taxiwayPath(
                     getLocalPoint(nullptr,points.value().first).toFloat(),
                     getLocalPoint(nullptr,points.value().second).toFloat()),
-                           juce::PathStrokeType(Theme::getStructureLogicStrokeThickness()));
+                           juce::PathStrokeType(stroke_thickness));
             }
         }
     }
@@ -111,7 +112,7 @@ void StructureEditor::paint (juce::Graphics& g)
             g.strokePath(taxiwayPath(
                     getLocalPoint(nullptr,points.value().first).toFloat(),
                     getLocalPoint(nullptr,points.value().second).toFloat()),
-                           juce::PathStrokeType(Theme::getStructureLogicStrokeThickness()));
+                           juce::PathStrokeType(stroke_thickness));
         }
     }
     //[/UserPaint]

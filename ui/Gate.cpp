@@ -182,6 +182,7 @@ void Gate::paint (juce::Graphics& g)
     juce::Colour strokeColour = Theme::getStructureLogicForeground();
     juce::Colour fillColour = Theme::getStructureBackground();
     float strokeThickness = Theme::getStructureLogicStrokeThickness();
+    float connectionThickness = Theme::getStructureConnectionStrokeThickness();
     //[/UserPrePaint]
 
 
@@ -193,7 +194,7 @@ void Gate::paint (juce::Graphics& g)
                  juce::PathStrokeType(strokeThickness, juce::PathStrokeType::JointStyle::curved, juce::PathStrokeType::EndCapStyle::rounded),
                  juce::AffineTransform::translation(0, 0));
     g.strokePath(connectorsPath,
-                 juce::PathStrokeType(strokeThickness, juce::PathStrokeType::JointStyle::curved, juce::PathStrokeType::EndCapStyle::rounded),
+                 juce::PathStrokeType(connectionThickness, juce::PathStrokeType::JointStyle::curved, juce::PathStrokeType::EndCapStyle::rounded),
                  juce::AffineTransform::translation(0, 0));
 
     if(type == GateType::NOT)
