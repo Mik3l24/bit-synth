@@ -37,7 +37,7 @@ namespace ui {
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class SourceConnector  : public juce::TextButton
+class SourceConnector  : public juce::TextButton, public juce::DragAndDropTarget
 {
 public:
     //==============================================================================
@@ -54,7 +54,8 @@ public:
     void mouseDrag (const juce::MouseEvent& e) override;
     void mouseUp (const juce::MouseEvent& e) override;
 
-
+    bool isInterestedInDragSource(const juce::DragAndDropTarget::SourceDetails &dragSourceDetails) override;
+    void itemDropped(const juce::DragAndDropTarget::SourceDetails &dragSourceDetails) override;
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.

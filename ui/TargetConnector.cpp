@@ -126,6 +126,17 @@ std::optional<std::pair<juce::Point<int>, juce::Point<int>>> TargetConnector::ge
 //[/MiscUserCode]
 
 
+void TargetConnector::mouseDrag(const juce::MouseEvent& e)
+{
+    if(e.mouseWasDraggedSinceMouseDown())
+        juce::DragAndDropContainer::findParentDragContainerFor(this)
+            ->startDragging(DragSourceType::TARGET_CONNECTOR, this);
+    else
+        juce::TextButton::mouseDrag(e);
+
+}
+
+
 //==============================================================================
 #if 0
 /*  -- Projucer information section --

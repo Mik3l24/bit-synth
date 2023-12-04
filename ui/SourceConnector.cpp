@@ -20,6 +20,7 @@
 //[Headers] You can add your own extra header files here...
 #include "synth_management/SynthManagementNames.h"
 #include "DragSourceType.h"
+#include "TargetConnector.h"
 //[/Headers]
 
 #include "SourceConnector.h"
@@ -92,7 +93,19 @@ void SourceConnector::mouseUp (const juce::MouseEvent& e)
     //[/UserCode_mouseUp]
 }
 
+bool SourceConnector::isInterestedInDragSource(const juce::DragAndDropTarget::SourceDetails& dragSourceDetails)
+{
+    return dragSourceDetails.description.equals(DragSourceType::TARGET_CONNECTOR);
+}
 
+void SourceConnector::itemDropped(const juce::DragAndDropTarget::SourceDetails& dragSourceDetails)
+{
+    auto* target = dynamic_cast<TargetConnector*>(dragSourceDetails.sourceComponent.get());
+    if(target == nullptr)
+        return;
+
+    target->makeConnection(this);
+}
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 ConnectionID SourceConnector::getConnectionID() const

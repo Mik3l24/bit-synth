@@ -70,6 +70,7 @@ public:
 
     void paint (juce::Graphics& g) override;
     void resized() override;
+    void mouseDrag(const juce::MouseEvent& e) override;
 
 
 
