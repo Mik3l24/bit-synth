@@ -76,11 +76,25 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& outputBuffer, int s
         // Feedback could be interesting if delay was implemented, but for now, let's disallow this.
         if(!any_processing_done)
         {
-            // uh, How should we handle errors? Exception?  // TODO later
-            std::cout << "Error: BitSynthVoice::renderNextBlock() : Gate loop\n";
-            return;
+            if(std::all_of( // the gates are unconnected
+                gates.begin(), gates.end(),
+                [](const auto& gate)->bool
+                    { return gate->isUnconnected(); }))
+            {
+                // Gates being unconnected isn't harmful and might not even warrant a warning if an oscillator
+                // is connected directly to a mix channel, as the synth will still be audible.
+                // However, it could be a sign of a mistake, so let's warn the user.
+                std::clog << "Warning: BitSynthVoice::renderNextBlock() : All gates are unconnected\n";
+            }
+            else
+            {
+                // However, a feedback loop can cause a crash, most likely from accessing the feedbacked gate's
+                // uninitialized output by the mix channel, thereby processing of the block should be terminated.
+                // Exceptions aren't used, because they seem to permanently disable audio till program restart.
+                std::clog << "Error: BitSynthVoice::renderNextBlock() : Gate feedback loop\n";
+                return;
+            }
         }
-
     }
 
     // Process mix channels to get floating point samples
