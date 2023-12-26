@@ -21,7 +21,8 @@ public:
 public:
     Theme() = delete;
 
-public:
+public: // Theme access methods
+    // Colors
     static juce::Colour getStructureBackground()
     {
         switch(scheme)
@@ -46,12 +47,18 @@ public:
         }
     }
 
+    // Thickness
     static float getStructureLogicStrokeThickness()
     {
-        return 5.0f;
+        return 3.5f;
     }
 
-private:
+    static float getStructureConnectionStrokeThickness()
+    {
+        return 2.0f;
+    }
+
+private: // Theme state
     static Scheme scheme;
 };
 

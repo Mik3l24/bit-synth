@@ -89,6 +89,7 @@ void StructureEditor::paint (juce::Graphics& g)
     //[UserPaint] Add your own custom painting code here..
     // Paint lines between sources and targets
     g.setColour(Theme::getStructureLogicForeground());
+    const float stroke_thickness = Theme::getStructureConnectionStrokeThickness();
     for(auto& gate : gate_components)
     {
         for(auto i = 0; i <= 1; i++)
@@ -99,7 +100,7 @@ void StructureEditor::paint (juce::Graphics& g)
                 g.strokePath(taxiwayPath(
                     getLocalPoint(nullptr,points.value().first).toFloat(),
                     getLocalPoint(nullptr,points.value().second).toFloat()),
-                           juce::PathStrokeType(Theme::getStructureLogicStrokeThickness()));
+                           juce::PathStrokeType(stroke_thickness));
             }
         }
     }
@@ -111,7 +112,7 @@ void StructureEditor::paint (juce::Graphics& g)
             g.strokePath(taxiwayPath(
                     getLocalPoint(nullptr,points.value().first).toFloat(),
                     getLocalPoint(nullptr,points.value().second).toFloat()),
-                           juce::PathStrokeType(Theme::getStructureLogicStrokeThickness()));
+                           juce::PathStrokeType(stroke_thickness));
         }
     }
     //[/UserPaint]
@@ -122,11 +123,9 @@ void StructureEditor::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    picker->setBounds ((getWidth() / 2) - (proportionOfWidth (0.6000f) / 2), 0, proportionOfWidth (0.6000f), 24);
+    picker->setCentrePosition(getWidth() / 2, picker->getHeight() / 2);
+
     //[UserResized] Add your own custom resize handling here..
-    auto parentDragContainer = juce::DragAndDropContainer::findParentDragContainerFor(this);
-    if(parentDragContainer != nullptr)
-        parentDragContainer->isDragAndDropActive();
     //[/UserResized]
 }
 
