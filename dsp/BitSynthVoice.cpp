@@ -55,7 +55,9 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& outputBuffer, int s
                 // Skip gates
                 // Is skipping gates faster than processing them?
                 // or would popping them from a queue be better?
-                if(gate->isReady() || gate->isUnconnected())
+                // Quick fix: clearing the status of gates unconnected by proxy is currently only done in processBlock,
+                // so we can't skip them
+                if(gate->isReady() /*|| gate->isUnconnected()*/) // Quick fix
                     continue;
                 switch(gate->processBlock())
                 {
