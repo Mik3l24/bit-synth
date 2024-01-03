@@ -25,6 +25,7 @@ void BitSynthVoice::stopNote(float, bool allowTailOff)
 
 void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& outputBuffer, int startSample, int numSamples)
 {
+    // Stopping processing effectively functions as a gate envelope
     if(!voice_active)
         return;
 
@@ -61,9 +62,7 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& outputBuffer, int s
                 // Skip gates
                 // Is skipping gates faster than processing them?
                 // or would popping them from a queue be better?
-                // Quick fix: clearing the status of gates unconnected by proxy is currently only done in processBlock,
-                // so we can't skip them
-                if(gate->isReady() /*|| gate->isUnconnected()*/) // Quick fix
+                if(gate->isReady())
                     continue;
                 switch(gate->processBlock())
                 {
@@ -74,7 +73,7 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& outputBuffer, int s
                         all_done = false;
                         break;
                     case status::UNCONNECTED:
-                        // processBlock() already handles propagation of unconnected gates
+                        // processBlock() no longer returns UNCONNECTED, so this case isn't used anymore
                         break;
                 }
             }
@@ -106,7 +105,7 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& outputBuffer, int s
     }
 
     // Process mix channels to get floating point samples
-    //  I don't think there is a way to avoid having two sample-wise loops.
+    // This sample-wise loop is unavoidable, as floats need to be processed sample by sample.
     for(auto sample_index = startSample; sample_index < endSample; sample_index++)
     {
         float sample = 0.0f;

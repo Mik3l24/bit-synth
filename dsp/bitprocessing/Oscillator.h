@@ -7,16 +7,16 @@
 
 class Oscillator : public BitSource
 {
-public:
-    void prepareToPlay(int samplesPerBlockExpected, double sampleRate);
-    void prepareVoice(double pitch);
-    void processSample(int sample_index);
-
 public: // Constructors, destructors
     // Oscillators are all processed first, so they're always ready
     Oscillator() { ready = true; }
 
-public:
+public: // DSP setup and processing methods
+    void prepareToPlay(int samplesPerBlockExpected, double sampleRate);
+    void prepareVoice(double pitch);
+    void processSample(int sample_index);
+
+public: // Parameter setters, getters
     void setRatio(double _ratio) { ratio = _ratio; }
     void setPulseWidth(float _pulse_width) { pulse_width = _pulse_width; }
     void setStartingPhase(double _starting_phase) { starting_phase = _starting_phase; }
