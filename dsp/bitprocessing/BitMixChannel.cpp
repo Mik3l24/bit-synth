@@ -10,12 +10,9 @@ float BitMixChannel::getSample(int sample_index)
         return 0.0f;
 
     // Currently 0 to level, could alternatively be -level/2 to level/2
-    return float(inputs[0]->getOut()[sample_index]) * level;
+    return float(getOutFromInput()[sample_index]) * level;
 }
 
 
 BitMixChannel::BitMixChannel()
-{
-    num_inputs = 1;
-    inputs.assign({nullptr});
-}
+    : BitReceiver(1) {}

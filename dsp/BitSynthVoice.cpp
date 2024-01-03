@@ -36,6 +36,12 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& outputBuffer, int s
     for(auto& osc : oscillators)
         osc->prepareToPlay(outputBuffer.getNumSamples(), getSampleRate());
 
+    for(auto& gate : gates)
+        gate->prepareToPlay(outputBuffer.getNumSamples());
+
+    for(auto& mix_channel : bit_inputs)
+        mix_channel->prepareToPlay(outputBuffer.getNumSamples());
+
     //// Bit processing ////
     // Process oscillators
     for(auto sample_index = startSample; sample_index < endSample; sample_index++)

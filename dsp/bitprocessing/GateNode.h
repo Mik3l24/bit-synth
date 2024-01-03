@@ -9,6 +9,9 @@
 class GateNode : public BitSource, public BitReceiver
 {
 public:
+    GateNode(size_t num_inputs = 1);
+
+public:
     status processBlock();
     void resetStatus();
 
