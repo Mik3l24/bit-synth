@@ -22,6 +22,7 @@
 //[/Headers]
 
 #include "TargetConnector.h"
+#include "StructureEditor.h"
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
@@ -109,8 +110,8 @@ void TargetConnector::makeConnection(SourceConnector* source)
 {
     this->source = source;
     connectorListeners.call(&Listener::connectionMade, this, source->getConnectionID());
-    // I guess this is a bit of a hack to repaint the StructureEditor
-    if(auto* parent = dynamic_cast<juce::Component*>(juce::DragAndDropContainer::findParentDragContainerFor(this)))
+
+    if(auto* parent = findParentComponentOfClass<StructureEditor>())
         parent->repaint();
 }
 
