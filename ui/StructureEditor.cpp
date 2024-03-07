@@ -29,17 +29,30 @@
 namespace ui {
 
 // Creates a path that only follows cardinal directions
-juce::Path taxiwayPath(const juce::Point<float>& start, const juce::Point<float>& end)
+juce::Path taxiwayPath(const juce::Point<int>& start, const juce::Point<int>& end)
 {
+    const int min_distance = 20; // TODO Move to the theme class?
+
     juce::Path path;
-    path.startNewSubPath(start);
-    float midpoint_x = start.getX() - end.getX() > -5.0f // FIXME: doesn't actually remove the midpoint for small differences like intended
-        ? (start.getX() + end.getX()) / 2.0f
-        : end.getX();
-    path.lineTo(midpoint_x, start.getY());
-    path.lineTo(midpoint_x, end.getY());
-    // Could improve this by making a vertical midpoint if the end is to the left of the start
-    path.lineTo(end);
+    path.startNewSubPath(start.toFloat());
+
+    const bool to_right = start.getX() - end.getX() > 2 * min_distance;
+
+    const int midpoint_x = to_right
+        ? (start.getX() + end.getX()) / 2
+        : start.getX() - min_distance;
+    const int midpoint_y = to_right
+        ? end.getY()
+        : (start.getY() + end.getY()) / 2; // could make this more skewed to the end for small distances
+
+    path.lineTo(float(midpoint_x), float(start.getY()));
+    path.lineTo(float(midpoint_x), float(midpoint_y));
+    if(!to_right)
+    {
+        path.lineTo(float(end.getX() + min_distance), float(midpoint_y));
+        path.lineTo(float(end.getX() + min_distance), float(end.getY()));
+    }
+    path.lineTo(end.toFloat());
     return path;
 }
 
@@ -98,8 +111,8 @@ void StructureEditor::paint (juce::Graphics& g)
             if(points.has_value())
             {
                 g.strokePath(taxiwayPath(
-                    getLocalPoint(nullptr,points.value().first).toFloat(),
-                    getLocalPoint(nullptr,points.value().second).toFloat()),
+                    getLocalPoint(nullptr,points.value().first),
+                    getLocalPoint(nullptr,points.value().second)),
                            juce::PathStrokeType(stroke_thickness));
             }
         }
@@ -110,8 +123,8 @@ void StructureEditor::paint (juce::Graphics& g)
         if(points.has_value())
         {
             g.strokePath(taxiwayPath(
-                    getLocalPoint(nullptr,points.value().first).toFloat(),
-                    getLocalPoint(nullptr,points.value().second).toFloat()),
+                    getLocalPoint(nullptr,points.value().first),
+                    getLocalPoint(nullptr,points.value().second)),
                            juce::PathStrokeType(stroke_thickness));
         }
     }
