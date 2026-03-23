@@ -10,7 +10,8 @@
 
 
 class MainContentComponent : public juce::AudioAppComponent,
-                             private juce::Timer
+                             private juce::Timer,
+                             private juce::MidiInputCallback
 {
 public:
     void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override;
@@ -25,12 +26,19 @@ public:
 
 private:
     void timerCallback() override;
+    void setMidiInput(int index);
+    void handleIncomingMidiMessage(juce::MidiInput* source, const juce::MidiMessage& message) override;
 
 private:
     juce::MidiKeyboardState keyboardState;
+    juce::AudioDeviceManager deviceManager;
     SynthAudioSource synthAudioSource;
     juce::MidiKeyboardComponent keyboardComponent;
+    juce::MidiMessageCollector midiCollector;
+    juce::ComboBox midiInputList;   
     std::unique_ptr<ui::StructureEditor> structure_editor;
+
+    int lastInputIndex = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainContentComponent)
 };

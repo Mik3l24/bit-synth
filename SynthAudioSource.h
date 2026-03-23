@@ -10,7 +10,7 @@
 class SynthAudioSource : public juce::AudioSource
 {
 public:
-    SynthAudioSource(juce::MidiKeyboardState& keyState);
+    SynthAudioSource(juce::MidiKeyboardState& keyState, juce::MidiMessageCollector& midiCollector);
     ~SynthAudioSource() override;
 
     void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override;
@@ -20,10 +20,11 @@ public:
     void setUsingBitSynthSound();
     BitSynthesizer* getBitSynth() { return &synth; }
 
-
+    
 
 private:
     juce::MidiKeyboardState& keyboardState;
+    juce::MidiMessageCollector& midiCollector;
     BitSynthesizer synth;
 };
 

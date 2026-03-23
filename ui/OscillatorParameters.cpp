@@ -289,6 +289,15 @@ void OscillatorParameters::mouseDrag(const juce::MouseEvent& e)
             parent->repaint();
 }
 
+void OscillatorParameters::mouseUp(const juce::MouseEvent& e)
+{
+    constexpr int quantisation = 2;
+    auto position = getPosition();
+    position.x = position.x >> quantisation << quantisation;
+    position.y = position.y >> quantisation << quantisation;
+    setTopLeftPosition(position);
+}
+
 inline double OscillatorParameters::getRatio() const
 {
     return numerator_slider->getValue() / denominator_slider->getValue();

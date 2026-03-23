@@ -154,6 +154,14 @@ void MixChannelParameters::mouseDrag(const juce::MouseEvent& e)
             parent->repaint();
 }
 
+void MixChannelParameters::mouseUp(const juce::MouseEvent& e)
+{
+    constexpr int quantisation = 2;
+    auto position = getPosition();
+    position.x = position.x >> quantisation << quantisation;
+    position.y = position.y >> quantisation << quantisation;
+    setTopLeftPosition(position);
+}
 
 void MixChannelParameters::connectionMade(TargetConnector* connector, ConnectionID source_id)
 {

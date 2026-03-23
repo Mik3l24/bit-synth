@@ -33,22 +33,6 @@
       <option name="INSERT_VIRTUAL_WITH_OVERRIDE" value="true" />
       <option name="HEADER_GUARD_STYLE_PATTERN" value="${FILE_NAME}_${EXT}" />
     </Objective-C>
-    <Objective-C-extensions>
-      <rules>
-        <rule entity="NAMESPACE" visibility="ANY" specifier="ANY" prefix="" style="PASCAL_CASE" suffix="" />
-        <rule entity="CLASS,ENUM,UNION,TYPEDEF" visibility="ANY" specifier="ANY" prefix="" style="PASCAL_CASE" suffix="" />
-        <rule entity="PARAMETER,LOCAL_VARIABLE" visibility="ANY" specifier="ANY" prefix="" style="SNAKE_CASE" suffix="" />
-        <rule entity="GLOBAL_FUNCTION,CLASS_MEMBER_FUNCTION,STRUCT_MEMBER_FUNCTION" visibility="ANY" specifier="ANY" prefix="" style="CAMEL_CASE" suffix="" />
-      </rules>
-    </Objective-C-extensions>
-    <Objective-C-extensions>
-      <rules>
-        <rule entity="NAMESPACE" visibility="ANY" specifier="ANY" prefix="" style="PASCAL_CASE" suffix="" />
-        <rule entity="CLASS,ENUM,UNION,TYPEDEF" visibility="ANY" specifier="ANY" prefix="" style="PASCAL_CASE" suffix="" />
-        <rule entity="PARAMETER,LOCAL_VARIABLE" visibility="ANY" specifier="ANY" prefix="" style="SNAKE_CASE" suffix="" />
-        <rule entity="GLOBAL_FUNCTION,CLASS_MEMBER_FUNCTION,STRUCT_MEMBER_FUNCTION" visibility="ANY" specifier="ANY" prefix="" style="CAMEL_CASE" suffix="" />
-      </rules>
-    </Objective-C-extensions>
     <RiderCodeStyleSettings>
       <option name="/Default/CodeStyle/CodeFormatting/CppClangFormat/EnableClangFormatSupport/@EntryValue" value="false" type="bool" />
       <option name="/Default/CodeStyle/EditorConfig/EnableClangFormatSupport/@EntryValue" value="false" type="bool" />
@@ -146,27 +130,6 @@
       </extensions>
     </files>
     <codeStyleSettings language="ObjectiveC">
-      <option name="KEEP_BLANK_LINES_IN_DECLARATIONS" value="1" />
-      <option name="KEEP_BLANK_LINES_BEFORE_RBRACE" value="1" />
-      <option name="BLANK_LINES_AFTER_IMPORTS" value="2" />
-      <option name="BLANK_LINES_AROUND_FIELD" value="1" />
-      <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="2" />
-      <option name="BRACE_STYLE" value="2" />
-      <option name="CLASS_BRACE_STYLE" value="2" />
-      <option name="ELSE_ON_NEW_LINE" value="true" />
-      <option name="WHILE_ON_NEW_LINE" value="true" />
-      <option name="CATCH_ON_NEW_LINE" value="true" />
-      <option name="INDENT_CASE_FROM_SWITCH" value="false" />
-      <option name="ALIGN_MULTILINE_BINARY_OPERATION" value="false" />
-      <option name="SPACE_BEFORE_IF_PARENTHESES" value="false" />
-      <option name="SPACE_BEFORE_WHILE_PARENTHESES" value="false" />
-      <option name="SPACE_BEFORE_FOR_PARENTHESES" value="false" />
-      <option name="SPACE_BEFORE_CATCH_PARENTHESES" value="false" />
-      <option name="SPACE_BEFORE_SWITCH_PARENTHESES" value="false" />
-      <option name="METHOD_CALL_CHAIN_WRAP" value="1" />
-      <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
-      <option name="FOR_STATEMENT_WRAP" value="1" />
-      <option name="ASSIGNMENT_WRAP" value="1" />
       <indentOptions>
         <option name="CONTINUATION_INDENT_SIZE" value="4" />
       </indentOptions>

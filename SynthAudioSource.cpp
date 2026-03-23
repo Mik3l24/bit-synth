@@ -5,8 +5,9 @@
 #include "synth_management/SynthManagementNames.h"
 
 
-SynthAudioSource::SynthAudioSource(juce::MidiKeyboardState& keyState)
-    : keyboardState(keyState), synth(8)
+SynthAudioSource::SynthAudioSource(juce::MidiKeyboardState& keyState, juce::MidiMessageCollector& midiCollector)
+    : keyboardState(keyState), synth(8),
+      midiCollector(midiCollector)
 {
     // Mock setup no longer necessary
 }
@@ -19,6 +20,7 @@ SynthAudioSource::~SynthAudioSource()
 void SynthAudioSource::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
     synth.setCurrentPlaybackSampleRate(sampleRate);
+    midiCollector.reset(sampleRate);
 }
 
 void SynthAudioSource::releaseResources()
@@ -30,8 +32,11 @@ void SynthAudioSource::getNextAudioBlock(const juce::AudioSourceChannelInfo& buf
     bufferToFill.clearActiveBufferRegion();
 
     juce::MidiBuffer incomingMidi;
+    
     keyboardState.processNextMidiBuffer(incomingMidi, bufferToFill.startSample,
                                         bufferToFill.numSamples, true);
+
+    midiCollector.removeNextBlockOfMessages(incomingMidi, bufferToFill.numSamples);
 
     synth.renderNextBlock(*bufferToFill.buffer, incomingMidi,
                           bufferToFill.startSample, bufferToFill.numSamples);

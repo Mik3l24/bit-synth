@@ -5,7 +5,7 @@
 #include <boost/dynamic_bitset.hpp>
 
 
-typedef boost::dynamic_bitset<> bitset;
+typedef boost::dynamic_bitset<unsigned short> bitset;
 
 //typedef int status;
 

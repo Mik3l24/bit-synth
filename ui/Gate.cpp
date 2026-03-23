@@ -255,7 +255,15 @@ void Gate::mouseDrag(const juce::MouseEvent &e)
     if(e.mouseWasDraggedSinceMouseDown())
         if(auto* parent = findParentComponentOfClass<StructureEditor>())
             parent->repaint();
+}
 
+void Gate::mouseUp(const juce::MouseEvent& e)
+{
+    constexpr int quantisation = 2;
+    auto position = getPosition();
+    position.x = position.x >> quantisation << quantisation;
+    position.y = position.y >> quantisation << quantisation;
+    setTopLeftPosition(position);
 }
 //[/MiscUserCode]
 

@@ -5,7 +5,7 @@
 
 enum DragSourceType
 {
-    ELEMENT_ADDER_BUTTON = 594,
+    ELEMENT_ADDER_BUTTON = 594, // number chosen arbitrarily
     SOURCE_CONNECTOR,
     TARGET_CONNECTOR,
 };

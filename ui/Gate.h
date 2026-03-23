@@ -64,6 +64,7 @@ public:
 
     void mouseDown(const juce::MouseEvent &e) override;
     void mouseDrag(const juce::MouseEvent &e) override;
+    void mouseUp(const juce::MouseEvent &e) override;
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
