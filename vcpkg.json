@@ -1,0 +1,11 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "dependencies": [
+    "juce",
+    {
+      "name": "boost",
+      "version>=": "1.83.0"
+    }
+  ],
+  "builtin-baseline": "ed8445dd2a9ba44e0e3ace4e952b2e33130082d9"
+}
