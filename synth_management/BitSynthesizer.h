@@ -16,10 +16,13 @@ public: // constructors
     explicit BitSynthesizer(int num_voices);
 
 protected: // Utility access methods
-    OscillatorRepresentation& getOscillator(ConnectionID id);
-    GateNodeRepresentation& getGate(ConnectionID id);
-    BitMixChannelRepresentation& getMixChannel(ConnectionID id);
-    SourceRepresentation* getSource(ConnectionID id);
+    juce::ValueTree getOscillator(ConnectionID id) const;
+
+    juce::ValueTree getGate(ConnectionID id) const;
+
+    juce::ValueTree getMixChannel(ConnectionID id) const;
+
+    juce::ValueTree getSource(ConnectionID id) const;
 
 public: // Voice parameter access methods // TODO: removal methods
     // Oscillators
@@ -40,9 +43,11 @@ public: // Voice parameter access methods // TODO: removal methods
 
 
 protected: // parameter members
+#if false
     std::vector<OscillatorRepresentation> oscillators;
     std::vector<GateNodeRepresentation> gates;
     std::vector<BitMixChannelRepresentation> mix_channels;
+#endif
     // Other per-voice parameters
     float master_level = .125f;
 

@@ -1,9 +1,12 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "dependencies": [
-    "juce",
     {
-      "name": "boost",
+      "name": "juce",
+      "version>=": "8.0.7"
+    },
+    {
+      "name": "boost-dynamic-bitset",
       "version>=": "1.83.0"
     }
   ],

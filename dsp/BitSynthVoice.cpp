@@ -3,10 +3,11 @@
 //
 #include "BitSynthVoice.h"
 
+#include "synth_management/BitSynthSound.h"
 
 bool BitSynthVoice::canPlaySound(juce::SynthesiserSound* sound)
 {
-    return dynamic_cast<BitSynthSound*> (sound) != nullptr;
+    return dynamic_cast<BitSynthSound*>(sound) != nullptr;
 }
 
 void BitSynthVoice::startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound*, int)

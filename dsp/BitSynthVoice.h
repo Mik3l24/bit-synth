@@ -13,16 +13,6 @@
 
 template <typename T> using ptr = std::unique_ptr<T>;
 
-class BitSynthSound : public juce::SynthesiserSound
-{
-public:
-    BitSynthSound() = default;
-
-    bool appliesToNote    (int) override        { return true; }
-    bool appliesToChannel (int) override        { return true; }
-};
-
-
 
 class BitSynthVoice : public juce::SynthesiserVoice
 {
