@@ -55,6 +55,7 @@ target_sources(bitprocessing
         ui/ElementAdderButton.cpp
         ui/ElementPicker.cpp
         ui/StructureEditor.cpp
+        ui/TopBar.cpp
         SynthAudioSource.cpp
         MainContentComponent.cpp
 )

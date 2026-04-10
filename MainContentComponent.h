@@ -7,16 +7,19 @@
 
 #include "SynthAudioSource.h"
 #include "ui/StructureEditor.h"
+#include "ui/TopBar.h"
 
 
 class MainContentComponent : public juce::AudioAppComponent,
                              private juce::Timer,
-                             private juce::MidiInputCallback
+                             private juce::MidiInputCallback,
+                             public juce::Button::Listener
 {
 public:
     void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override;
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override;
     void releaseResources() override;
+    void buttonClicked(juce::Button*) override;
 
     void resized() override;
 
@@ -37,6 +40,7 @@ private:
     juce::MidiMessageCollector midiCollector;
     juce::ComboBox midiInputList;   
     std::unique_ptr<ui::StructureEditor> structure_editor;
+    std::unique_ptr<ui::TopBar> top_bar;
 
     int lastInputIndex = 0;
 

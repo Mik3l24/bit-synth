@@ -40,6 +40,9 @@ public: // Voice parameter access methods // TODO: removal methods
     // Other
     void setMasterLevel(float level);
 
+    std::unique_ptr<juce::XmlElement> toXml() const;
+    void fromXml(const juce::XmlElement& xml);
+
 
 
 protected: // parameter members

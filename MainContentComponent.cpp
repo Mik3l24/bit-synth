@@ -3,6 +3,8 @@
 //
 #include "MainContentComponent.h"
 
+#include "ui/Theme.h"
+
 MainContentComponent::MainContentComponent()
     : keyboardComponent(keyboardState, juce::MidiKeyboardComponent::horizontalKeyboard),
       synthAudioSource(keyboardState, midiCollector)
@@ -39,6 +41,9 @@ MainContentComponent::MainContentComponent()
     structure_editor = std::make_unique<ui::StructureEditor>(synthAudioSource.getBitSynth());
     addAndMakeVisible(*structure_editor);
 
+    top_bar = std::make_unique<ui::TopBar>(this);
+    addAndMakeVisible(*top_bar);
+
     setSize(600, 830);
     setAudioChannels(0, 2);
     startTimer(400);
@@ -51,8 +56,9 @@ MainContentComponent::~MainContentComponent()
 
 void MainContentComponent::resized()
 {
+    top_bar->setBounds(0, 0, getWidth(), 20);
     keyboardComponent.setBounds(10, getHeight() - 120, getWidth() - 20, 100);
-    structure_editor->setBounds(0, 0, getWidth(), getHeight() - 120);
+    structure_editor->setBounds(0, 20, getWidth(), getHeight() - 140);
     midiInputList.setBounds(10, getHeight() - 25 , getWidth() - 20, 20);
 }
 
@@ -69,6 +75,58 @@ void MainContentComponent::getNextAudioBlock(const juce::AudioSourceChannelInfo&
 void MainContentComponent::releaseResources()
 {
     synthAudioSource.releaseResources();
+}
+
+void MainContentComponent::buttonClicked(juce::Button* button)
+{
+    static std::unique_ptr<juce::FileChooser> chooser;
+
+    if(button == top_bar->save_button.get())
+    {
+        std::cout << "Saving..." << std::endl;
+
+        chooser = std::make_unique<juce::FileChooser>(
+            TRANS("Select a location to save your synth preset"),
+            juce::File(), "*.xml"
+            );
+        constexpr auto chooser_flags = juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles;
+
+        chooser->launchAsync(chooser_flags, [this](const juce::FileChooser& chooser)
+        {
+            juce::File selected_file = chooser.getResult();
+            std::cout << selected_file.getFullPathName() << std::endl;
+            if(selected_file == juce::File()) return;
+
+            auto* synth = synthAudioSource.getBitSynth();
+            auto xml = synth->toXml();
+            jassert(xml != nullptr);
+            if(!xml->writeTo(selected_file, {}))
+                std::cerr << "Error: Failed to write synth preset to file\n";
+        });
+    }
+    else if(button == top_bar->load_button.get())
+    {
+        std::cout << "Loading..." << std::endl;
+
+        chooser = std::make_unique<juce::FileChooser>(
+            TRANS("Select a synth preset to load"),
+            juce::File(), "*.xml"
+            );
+        constexpr auto chooser_flags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles;
+
+        chooser->launchAsync(chooser_flags, [this](const juce::FileChooser& chooser)
+        {
+            juce::File selected_file = chooser.getResult();
+            std::cout << selected_file.getFullPathName() << std::endl;
+            if(selected_file == juce::File() || !selected_file.existsAsFile()) return;
+
+            auto xml = juce::XmlDocument::parse(selected_file);
+            jassert(xml != nullptr);
+
+            auto* synth = synthAudioSource.getBitSynth();
+            synth->fromXml(*xml);
+        });
+    }
 }
 
 void MainContentComponent::timerCallback()

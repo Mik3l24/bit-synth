@@ -242,6 +242,21 @@ void BitSynthesizer::setMasterLevel(float level)
     }
 }
 
+std::unique_ptr<juce::XmlElement> BitSynthesizer::toXml() const
+{
+    CAST_SOUND;
+    std::unique_ptr<juce::XmlElement> xml = bit_sound->parameters.createXml();
+    jassert(xml != nullptr);
+    return std::move(xml);
+}
+
+void BitSynthesizer::fromXml(const juce::XmlElement& xml)
+{
+    CAST_SOUND;
+    bit_sound->parameters.fromXml(xml);
+    // TODO - create the synth sound from it... uh, also what about graphical components? Though they are less crucial for testing.
+}
+
 
 
 
