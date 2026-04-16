@@ -15,7 +15,7 @@ ElementAdderButton::ElementAdderButton(ElementType element_type)
 }
 
 ElementAdderButton::ElementAdderButton(GateType gate_type)
-    : element_type(ElementType::GATE), gate_type(gate_type)
+    : element_type(ElementType::COMPONENT), gate_type(gate_type)
 {
 
 }

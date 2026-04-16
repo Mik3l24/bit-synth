@@ -30,7 +30,8 @@ namespace ui {
 //[/MiscUserDefs]
 
 //==============================================================================
-TargetConnector::TargetConnector (ConnectionID)
+TargetConnector::TargetConnector(ConnectionID id)
+    : id(id)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     setButtonText(">");

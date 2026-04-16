@@ -22,8 +22,8 @@
 //[Headers]     -- You can add your own extra header files here --
 #include <juce_gui_basics/juce_gui_basics.h>
 
-#include "../synth_management/SynthManagementNames.h"
-#include "../synth_management/SynthConnected.h"
+#include "synth_management/SynthManagementNames.h"
+#include "synth_management/SynthStateManager.h"
 
 #include "SourceConnector.h"
 #include "TargetConnector.h"
@@ -43,12 +43,11 @@ namespace ui {
 */
 class Gate:
     public juce::Component,
-    public SynthConnected,
     public TargetConnector::Listener
 {
 public:
     //==============================================================================
-    Gate(ConnectionID id, GateType type, BitSynthesizer* synth);
+    Gate(ElementID id, GateType type, SynthStateManager state_manager);
     ~Gate() override;
 
     //==============================================================================
@@ -68,8 +67,9 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+    SynthStateManager state_manager;
     GateType type = GateType::NONE;
-    ConnectionID id;
+    ElementID id;
     //[/UserVariables]
 
     //==============================================================================

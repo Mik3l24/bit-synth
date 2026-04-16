@@ -30,19 +30,19 @@ namespace ui {
 //[/MiscUserDefs]
 
 //==============================================================================
-Gate::Gate(ConnectionID id, GateType type, BitSynthesizer* synth)
-    : SynthConnected(synth), type(type), id(id)
+Gate::Gate(const ElementID id, const GateType type, const SynthStateManager state_manager)
+    : type(type), id(id), state_manager(state_manager)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    source.reset (new SourceConnector (id));
+    source.reset (new SourceConnector (createConnectionID(id, 0, SIGN_COMPONENT)));
     addAndMakeVisible (source.get());
     source->setName ("source");
 
     source->setCentrePosition(86, 50);
 
-    target0.reset (new TargetConnector(id));
+    target0.reset (new TargetConnector(createConnectionID(id, 0, SIGN_COMPONENT)));
     addAndMakeVisible (target0.get());
     target0->setName ("target0");
     target0->addListener(this);
@@ -51,7 +51,7 @@ Gate::Gate(ConnectionID id, GateType type, BitSynthesizer* synth)
     {
         target0->setCentrePosition(13, 41);
 
-        target1.reset(new TargetConnector(id));
+        target1.reset(new TargetConnector(createConnectionID(id, 1, SIGN_COMPONENT)));
         addAndMakeVisible(target1.get());
         target1->setName("target1");
         target1->addListener(this);
@@ -218,17 +218,9 @@ void Gate::resized()
     //[/UserResized]
 }
 
-void Gate::connectionMade(TargetConnector* connector, ConnectionID source_id)
+void Gate::connectionMade(TargetConnector* connector, const ConnectionID source_id)
 {
-    if(connector == target0.get())
-    {
-        synth->setGateInput(id, source_id, 0);
-    }
-    else if(connector == target1.get() && type != GateType::NOT)
-    {
-        synth->setGateInput(id, source_id, 1);
-    }
-
+    state_manager.setConnection(source_id, connector->id);
 }
 
 

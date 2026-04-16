@@ -23,7 +23,7 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 
 #include "SourceConnector.h"
-#include "../synth_management/SynthConnected.h"
+#include "synth_management/SynthStateManager.h"
 
 
 namespace ui {
@@ -41,12 +41,11 @@ namespace ui {
                                                                     //[/Comments]
 */
 class OscillatorParameters  : public juce::Component,
-                              public juce::Slider::Listener,
-                              public SynthConnected
+                              public juce::Slider::Listener
 {
 public:
     //==============================================================================
-    OscillatorParameters(ConnectionID id, BitSynthesizer* synth);
+    OscillatorParameters(ElementID id, SynthStateManager state_manager);
     ~OscillatorParameters() override;
 
     //==============================================================================
@@ -64,7 +63,12 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    const ConnectionID id;
+    const ElementID id;
+    SynthStateManager state_manager;
+
+    std::unique_ptr<juce::SliderParameterAttachment> pw_attachment;
+    std::unique_ptr<juce::SliderParameterAttachment> phase_attachment;
+    std::unique_ptr<juce::SliderParameterAttachment> ratio_attachment;
 
     juce::ComponentDragger dragger;
     //[/UserVariables]
@@ -72,15 +76,18 @@ private:
     //==============================================================================
     std::unique_ptr<juce::Slider> pw_slider;
     std::unique_ptr<juce::Label> ratio_label;
-    std::unique_ptr<juce::Slider> numerator_slider;
+    std::unique_ptr<juce::Slider> numerator_slider; // Deprecated
     std::unique_ptr<juce::Slider> phase_slider;
-    std::unique_ptr<juce::Slider> denominator_slider;
+    std::unique_ptr<juce::Slider> denominator_slider; // Deprecated
     std::unique_ptr<juce::Label> phase_label;
     std::unique_ptr<juce::Label> pw_label;
     std::unique_ptr<juce::Slider> transpose_slider;
     std::unique_ptr<juce::Label> transpose_label;
     std::unique_ptr<juce::Slider> fine_slider;
     std::unique_ptr<juce::Label> fine_label;
+
+    std::unique_ptr<juce::Slider> ratio_slider;
+
     std::unique_ptr<SourceConnector> source_connector;
     juce::Path internalPath1;
 

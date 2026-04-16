@@ -6,6 +6,15 @@
   ==============================================================================
 */
 
+#include <juce_audio_processors/juce_audio_processors.h>
+#include "SynthAudioProcessor.h"
+
+juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+{
+    return new SynthAudioProcessor();
+}
+
+#if FALSE
 #include <juce_gui_extra/juce_gui_extra.h>
 #include "MainContentComponent.h"
 
@@ -67,3 +76,4 @@ private:
 
 //==============================================================================
 START_JUCE_APPLICATION (Application)
+#endif

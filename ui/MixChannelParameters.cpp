@@ -29,8 +29,8 @@ namespace ui {
 //[/MiscUserDefs]
 
 //==============================================================================
-MixChannelParameters::MixChannelParameters (ConnectionID id, BitSynthesizer* synth)
-    : SynthConnected(synth), id(id)
+MixChannelParameters::MixChannelParameters (const ElementID id, const SynthStateManager state_manager)
+    : id(id), state_manager(state_manager)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -51,13 +51,19 @@ MixChannelParameters::MixChannelParameters (ConnectionID id, BitSynthesizer* syn
     level_label->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     level_label->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    target.reset (new TargetConnector (id));
+    target.reset (new TargetConnector (createConnectionID(id, 0, SIGN_SINK)));
     addAndMakeVisible (target.get());
     target->addListener(this);
     target->setBounds (0, 40, 10, 10);
 
 
     //[UserPreSize]
+    {
+        juce::ValueTree tree = state_manager.parameters.state.getChildWithName(name::SINKS).getChild(id-1);
+        jassert(tree.isValid());
+        const juce::String level_parameter_id = tree[name::LEVEL].toString();
+        level_attachment = std::make_unique<juce::SliderParameterAttachment>(*state_manager.parameters.getParameter(level_parameter_id), *level_slider);
+    }
     //[/UserPreSize]
 
     setSize (96, 96);
@@ -117,6 +123,7 @@ void MixChannelParameters::resized()
     //[/UserResized]
 }
 
+// No longer required with parameter attachments
 void MixChannelParameters::sliderValueChanged (juce::Slider* sliderThatWasMoved)
 {
     //[UsersliderValueChanged_Pre]
@@ -125,7 +132,7 @@ void MixChannelParameters::sliderValueChanged (juce::Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == level_slider.get())
     {
         //[UserSliderCode_level_slider] -- add your slider handling code here..
-        synth->setMixChannelLevel(id, float(level_slider->getValue()));
+        //synth->setMixChannelLevel(id, float(level_slider->getValue()));
         //[/UserSliderCode_level_slider]
     }
 
@@ -163,12 +170,10 @@ void MixChannelParameters::mouseUp(const juce::MouseEvent& e)
     setTopLeftPosition(position);
 }
 
-void MixChannelParameters::connectionMade(TargetConnector* connector, ConnectionID source_id)
+void MixChannelParameters::connectionMade(TargetConnector* connector, const ConnectionID source_id)
 {
-    if(connector == target.get())
-    {
-        synth->setMixChannelInput(id, source_id);
-    }
+    jassert(connector == target.get());
+    state_manager.setConnection(source_id, connector->id);
 }
 //[/MiscUserCode]
 

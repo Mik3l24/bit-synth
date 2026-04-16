@@ -62,7 +62,7 @@ public:
     void addListener(Listener* listener);
     void removeListener(Listener* listener);
 
-    void makeConnection(SourceConnector * source);
+    void makeConnection(SourceConnector* source);
 
     std::optional<std::pair<juce::Point<int>, juce::Point<int>>> getConnectionPoints() const;
 
@@ -72,11 +72,12 @@ public:
     void resized() override;
     void mouseDrag(const juce::MouseEvent& e) override;
 
-
+public:
+    const ConnectionID id;
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    ConnectionID id;
+
     juce::ListenerList<Listener> connectorListeners;
     SourceConnector* source = nullptr;
     //[/UserVariables]

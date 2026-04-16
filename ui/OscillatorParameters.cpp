@@ -29,8 +29,8 @@ namespace ui {
 //[/MiscUserDefs]
 
 //==============================================================================
-OscillatorParameters::OscillatorParameters(ConnectionID id, BitSynthesizer* synth)
-    : SynthConnected(synth), id(id)
+OscillatorParameters::OscillatorParameters(const ElementID id, const SynthStateManager state_manager)
+    : id(id), state_manager(state_manager)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -53,6 +53,13 @@ OscillatorParameters::OscillatorParameters(ConnectionID id, BitSynthesizer* synt
 
     ratio_label->setBounds (32, 32, 70, 16);
 
+    ratio_slider = std::make_unique<juce::Slider>("ratio_slider");
+    addAndMakeVisible(ratio_slider.get());
+    ratio_slider->setRange(0.125, 4, 0);
+
+    ratio_slider->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
+
+#if false
     numerator_slider.reset (new juce::Slider ("numerator_slider"));
     addAndMakeVisible (numerator_slider.get());
     numerator_slider->setRange (1, 64, 1);
@@ -62,6 +69,7 @@ OscillatorParameters::OscillatorParameters(ConnectionID id, BitSynthesizer* synt
     numerator_slider->setSkewFactor (0.5);
 
     numerator_slider->setBounds (24, 16, 32, 16);
+#endif
 
     phase_slider.reset (new juce::Slider ("phase_knob"));
     addAndMakeVisible (phase_slider.get());
@@ -70,6 +78,7 @@ OscillatorParameters::OscillatorParameters(ConnectionID id, BitSynthesizer* synt
     phase_slider->setTextBoxStyle (juce::Slider::NoTextBox, false, 80, 20);
     phase_slider->addListener (this);
 
+#if false
     denominator_slider.reset (new juce::Slider ("denominator_slider"));
     addAndMakeVisible (denominator_slider.get());
     denominator_slider->setRange (1, 64, 1);
@@ -79,6 +88,8 @@ OscillatorParameters::OscillatorParameters(ConnectionID id, BitSynthesizer* synt
     denominator_slider->setSkewFactor (0.5);
 
     denominator_slider->setBounds (80, 16, 32, 16);
+#endif
+
 
     phase_label.reset (new juce::Label ("phase_label",
                                         TRANS("Phase")));
@@ -137,7 +148,7 @@ OscillatorParameters::OscillatorParameters(ConnectionID id, BitSynthesizer* synt
 
     fine_label->setBounds (64, 80, 70, 16);
 
-    source_connector.reset (new SourceConnector (id));
+    source_connector.reset (new SourceConnector (createConnectionID(id, 0, SIGN_GENERATOR)));
     addAndMakeVisible (source_connector.get());
     internalPath1.startNewSubPath (72.0f, 16.0f);
     internalPath1.lineTo (64.0f, 32.0f);

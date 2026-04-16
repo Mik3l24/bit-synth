@@ -26,7 +26,7 @@
 #include "Gate.h"
 #include "OscillatorParameters.h"
 #include "MixChannelParameters.h"
-#include "../synth_management/SynthConnected.h"
+#include "synth_management/SynthStateManager.h"
 
 namespace ui {
 //[/Headers]
@@ -45,12 +45,11 @@ namespace ui {
 class StructureEditor:
     public juce::Component,
     public juce::DragAndDropTarget,
-    public juce::DragAndDropContainer,
-    public SynthConnected
+    public juce::DragAndDropContainer
 {
 public:
     //==============================================================================
-    StructureEditor(BitSynthesizer* synth);
+    explicit StructureEditor(SynthStateManager state_manager);
     ~StructureEditor() override;
 
     //==============================================================================
@@ -63,14 +62,23 @@ public:
     void paint (juce::Graphics& g) override;
     void resized() override;
 
+private: // Methods
+    void addNewElement(const juce::Point<int> position, const ElementType element_type, const GateType gate_type = GateType::NONE)
+    {
+        const ElementID id = state_manager.addElementRep(element_type, gate_type);
+        addElementComponent(id, position, element_type, gate_type);
+    }
+
+    void addElementComponent(ElementID id, juce::Point<int> position, ElementType element_type, GateType gate_type = GateType::NONE);
 
 
-private:
+private: // Members
     //[UserVariables]   -- You can add your own custom variables in this section.
     std::vector<std::unique_ptr<OscillatorParameters>> osc_components;
     std::vector<std::unique_ptr<Gate>> gate_components;
     std::vector<std::unique_ptr<MixChannelParameters>> mix_components;
 
+    SynthStateManager state_manager;
     //[/UserVariables]
 
     //==============================================================================

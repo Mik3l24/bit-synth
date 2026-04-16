@@ -13,13 +13,31 @@ find_package(JUCE CONFIG REQUIRED)
 
 
 
-juce_add_gui_app(bitprocessing
+#juce_add_gui_app(bitprocessing
+#    # VERSION ...                       # Set this if the app version is different to the project version
+#    # ICON_BIG ...                      # ICON_* arguments specify a path to an image file to use as an icon
+#    # ICON_SMALL ...
+#    # DOCUMENT_EXTENSIONS ...           # Specify file extensions that should be associated with this app
+#    COMPANY_NAME "Mik3l24"                  # Specify the name of the app's author
+#    PRODUCT_NAME "bitprocessing")
+
+juce_add_plugin(
+    bitprocessing
     # VERSION ...                       # Set this if the app version is different to the project version
     # ICON_BIG ...                      # ICON_* arguments specify a path to an image file to use as an icon
     # ICON_SMALL ...
     # DOCUMENT_EXTENSIONS ...           # Specify file extensions that should be associated with this app
     COMPANY_NAME "Mik3l24"                  # Specify the name of the app's author
-    PRODUCT_NAME "bitprocessing")
+    PRODUCT_NAME "bitprocessing"
+    PLUGIN_NAME "Bit Synth"
+    PLUGIN_CODE "Bool"
+    FORMATS "Standalone" "VST3"
+    IS_SYNTH TRUE
+    NEEDS_MIDI_INPUT TRUE
+    NEEDS_MIDI_OUTPUT FALSE
+    VST3_CATEGORIES "Synth"
+)
+
 
 # `juce_generate_juce_header` will create a JuceHeader.h for a given target, which will be generated
 # into your build tree. This should be included with `#include <JuceHeader.h>`. The include path for
@@ -46,6 +64,7 @@ target_sources(bitprocessing
         dsp/BitSynthVoice.cpp
         synth_management/BitSynthSound.cpp
         synth_management/BitSynthesizer.cpp
+        synth_management/SynthStateManager.cpp
         ui/Theme.cpp
         ui/SourceConnector.cpp
         ui/TargetConnector.cpp
@@ -57,6 +76,8 @@ target_sources(bitprocessing
         ui/StructureEditor.cpp
         ui/TopBar.cpp
         SynthAudioSource.cpp
+        SynthAudioProcessor.cpp
+        ui/SynthEditor.cpp
         MainContentComponent.cpp
 )
 

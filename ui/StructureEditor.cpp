@@ -59,8 +59,8 @@ juce::Path taxiwayPath(const juce::Point<int>& start, const juce::Point<int>& en
 //[/MiscUserDefs]
 
 //==============================================================================
-StructureEditor::StructureEditor(BitSynthesizer* synth)
-    : SynthConnected(synth)
+StructureEditor::StructureEditor(const SynthStateManager state_manager)
+    : state_manager(state_manager)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -143,6 +143,8 @@ void StructureEditor::resized()
 }
 
 
+
+
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 bool StructureEditor::isInterestedInDragSource(const juce::DragAndDropTarget::SourceDetails& dragSourceDetails)
 {
@@ -159,43 +161,43 @@ void StructureEditor::itemDropped(const juce::DragAndDropTarget::SourceDetails& 
     }
 
     juce::Component* component = nullptr;
-    switch(button->getElementType())
+    const ElementType element = button->getElementType();
+
+    //dragSourceDetails.localPosition
+
+    addNewElement(dragSourceDetails.localPosition.toInt(), element, button->getGateType());
+
+}
+
+void StructureEditor::addElementComponent(ElementID id, juce::Point<int> position, ElementType element_type, GateType gate_type)
+{
+    juce::Component* component = nullptr;
+    switch(element_type)
     {
-        ConnectionID id;
-        case ElementType::OSCILLATOR:
+        case ElementType::GENERATOR:
         {
-            id = synth->addOscillator();
-            osc_components.emplace_back(new OscillatorParameters(id, synth));
+            osc_components.emplace_back(new OscillatorParameters(id, state_manager));
             component = osc_components.back().get();
             break;
         }
-        case ElementType::GATE:
+        case ElementType::COMPONENT:
         {
-            GateType gate_type = button->getGateType();
-            id = synth->addGate(gate_type);
-            gate_components.emplace_back(new Gate(id, gate_type, synth));
+            gate_components.emplace_back(new Gate(id, gate_type, state_manager));
             component = gate_components.back().get();
             break;
         }
-        case ElementType::MIX_CHANNEL:
+        case ElementType::SINK:
         {
-            id = synth->addMixChannel();
-            mix_components.emplace_back(new MixChannelParameters(id, synth));
+            mix_components.emplace_back(new MixChannelParameters(id, state_manager));
             component = mix_components.back().get();
             break;
         }
-
     }
-    if(component == nullptr)
-    {
-        std::cout << "StructureEditor::itemDropped: component is nullptr" << std::endl;
-        return;
-    }
+    jassert(component != nullptr);
 
     // Add the component and place it at the mouse position
     addAndMakeVisible(component);
-    component->setCentrePosition(dragSourceDetails.localPosition);
-
+    component->setCentrePosition(position);
 }
 
 //[/MiscUserCode]
