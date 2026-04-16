@@ -81,6 +81,11 @@ inline ConnectionID createConnectionID(const ElementID element_id, const SubConn
     return applySign(combined, sign);
 }
 
+inline std::tuple<ElementID, SubConnectionID, ConnectionSign> decodeConnectionID(const ConnectionID connection_id)
+{
+    return std::make_tuple(toElementID(connection_id), toSubConnectionID(connection_id), isNegative(connection_id));
+}
+
 
 namespace name
 {

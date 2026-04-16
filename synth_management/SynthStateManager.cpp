@@ -58,10 +58,18 @@ juce::ValueTree SynthStateManager::newBitMixChannelRep(ElementID id)
         {
             {name::ID, id},
             {name::INDEX, id-1},
-            {name::CONNECTIONS, CONNECTION_NONE},
             {name::LEVEL,
             registerDynamicParameter(juce::String::formatted("BitMix Channel %d Level", id))},
+        },
+        {
+            {
+                name::CONNECTIONS, {},
+                {
+                    {name::CONNECTION, {{name::ID, CONNECTION_NONE}}}
+                }
+            }
         }
+
     );
 }
 
@@ -116,7 +124,25 @@ ElementID SynthStateManager::addElementRep(const ElementType element_type, const
 
 void SynthStateManager::setConnection(ConnectionID source_id, ConnectionID target_id)
 {
-    jassertfalse; // Not implemented yet
+    auto [target_element_id, target_subconnection_id, target_sign] = decodeConnectionID(target_id);
+    juce::ValueTree target_tree;
+    switch(target_sign)
+    {
+        case SIGN_COMPONENT:
+            target_tree = parameters.state.getChildWithName(name::COMPONENTS);
+            break;
+        case SIGN_SINK:
+            target_tree = parameters.state.getChildWithName(name::SINKS);
+            break;
+        default:
+            jassertfalse;
+    }
+    jassert(target_tree.isValid());
+    const auto& final =
+                target_tree.getChildWithProperty(name::ID, target_element_id)
+                .getChildWithName(name::CONNECTIONS).getChild(target_subconnection_id)
+                .setProperty(name::ID, source_id, nullptr);
+    jassert(final.isValid());
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout SynthStateManager::createParameterLayout()
@@ -134,7 +160,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout SynthStateManager::createPar
         const auto key = juce::String::formatted("#%04x",i);
         const auto friendly_name = "Unassigned " + key;
         params.add(std::make_unique<juce::AudioParameterFloat>(key, friendly_name, 0.0f, 1.0f, 0.0f));
-        std::cout << key << std::endl;
     }
     return params;
 }
