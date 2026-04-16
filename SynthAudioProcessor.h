@@ -17,7 +17,7 @@ public:
     SynthAudioProcessor();
 
     //==============================================================================
-    juce::AudioProcessorEditor* createEditor() override          { return new ui::SynthEditor(*this, parameters); }
+    juce::AudioProcessorEditor* createEditor() override          { return new ui::SynthEditor(*this, state_manager); }
     bool hasEditor() const override                              { return true; }
 
     //==============================================================================
@@ -44,7 +44,8 @@ public:
 
 private:
     juce::AudioProcessorValueTreeState parameters;
-
+    SynthStateManager state_manager;
+    SynthStateManager::ManagmentState state_manager_state;
 
     std::unique_ptr<BitSynthesizer> bit_synth;
 

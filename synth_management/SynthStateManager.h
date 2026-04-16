@@ -17,7 +17,7 @@ public:
     class ManagmentState
     {
     public:
-        size_t next_free_dynamic_parameter_id;
+        size_t next_free_dynamic_parameter_id = 0;
     };
 public:
     explicit SynthStateManager(juce::AudioProcessorValueTreeState& parameters, ManagmentState& state)

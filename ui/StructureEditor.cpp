@@ -59,7 +59,7 @@ juce::Path taxiwayPath(const juce::Point<int>& start, const juce::Point<int>& en
 //[/MiscUserDefs]
 
 //==============================================================================
-StructureEditor::StructureEditor(const SynthStateManager state_manager)
+StructureEditor::StructureEditor(const SynthStateManager& state_manager)
     : state_manager(state_manager)
 {
     //[Constructor_pre] You can add your own custom stuff here..

@@ -75,10 +75,10 @@ target_sources(bitprocessing
         ui/ElementPicker.cpp
         ui/StructureEditor.cpp
         ui/TopBar.cpp
-        SynthAudioSource.cpp
+        #SynthAudioSource.cpp
         SynthAudioProcessor.cpp
         ui/SynthEditor.cpp
-        MainContentComponent.cpp
+        #MainContentComponent.cpp
 )
 
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer

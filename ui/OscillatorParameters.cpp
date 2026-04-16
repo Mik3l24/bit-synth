@@ -55,9 +55,10 @@ OscillatorParameters::OscillatorParameters(const ElementID id, const SynthStateM
 
     ratio_slider = std::make_unique<juce::Slider>("ratio_slider");
     addAndMakeVisible(ratio_slider.get());
-    ratio_slider->setRange(0.125, 4, 0);
-
+    ratio_slider->setRange(0.125, 4, 0.01);
+    ratio_slider->setSliderStyle(juce::Slider::SliderStyle::IncDecButtons );
     ratio_slider->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
+    ratio_slider->setBounds(24, 16, 32 + 32, 16);
 
 #if false
     numerator_slider.reset (new juce::Slider ("numerator_slider"));
@@ -109,6 +110,7 @@ OscillatorParameters::OscillatorParameters(const ElementID id, const SynthStateM
     pw_label->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     pw_label->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
+#if false
     transpose_slider.reset (new juce::Slider ("transpose_slider"));
     addAndMakeVisible (transpose_slider.get());
     transpose_slider->setRange (-36, 36, 1);
@@ -147,6 +149,8 @@ OscillatorParameters::OscillatorParameters(const ElementID id, const SynthStateM
     fine_label->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
     fine_label->setBounds (64, 80, 70, 16);
+
+#endif
 
     source_connector.reset (new SourceConnector (createConnectionID(id, 0, SIGN_GENERATOR)));
     addAndMakeVisible (source_connector.get());
@@ -231,7 +235,7 @@ void OscillatorParameters::resized()
     phase_slider->setBounds (proportionOfWidth (0.5000f), getHeight() - 90, 64, 72);
     phase_label->setBounds (proportionOfWidth (0.5000f) + 64 / 2 - (48 / 2), (getHeight() - 90) + 62, 48, 16);
     pw_label->setBounds (proportionOfWidth (0.0368f) + 64 / 2 - (64 / 2), (getHeight() - 90) + 62, 64, 17);
-    fine_slider->setBounds (proportionOfWidth (0.4706f), getHeight() - 132, 64, 32);
+    //fine_slider->setBounds (proportionOfWidth (0.4706f), getHeight() - 132, 64, 32);
     source_connector->setBounds (getWidth() - 8, proportionOfHeight (0.5000f) - (10 / 2), 10, 10);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
@@ -241,17 +245,17 @@ void OscillatorParameters::sliderValueChanged (juce::Slider* sliderThatWasMoved)
 {
     //[UsersliderValueChanged_Pre]
     //[/UsersliderValueChanged_Pre]
-
+#if false
     if (sliderThatWasMoved == pw_slider.get())
     {
         //[UserSliderCode_pw_slider] -- add your slider handling code here..
-        synth->setOscillatorPulseWidth(id, float(pw_slider->getValue()) + .5f); // Ofset from slider's [-0.5, 0.5] to [0, 1]
+        //synth->setOscillatorPulseWidth(id, float(pw_slider->getValue()) + .5f); // Ofset from slider's [-0.5, 0.5] to [0, 1]
         //[/UserSliderCode_pw_slider]
     }
     else if (sliderThatWasMoved == numerator_slider.get())
     {
         //[UserSliderCode_numerator_slider] -- add your slider handling code here..
-        synth->setOscillatorRatio(id, getRatio());
+        //synth->setOscillatorRatio(id, getRatio());
         //[/UserSliderCode_numerator_slider]
     }
     else if (sliderThatWasMoved == phase_slider.get())
@@ -279,7 +283,7 @@ void OscillatorParameters::sliderValueChanged (juce::Slider* sliderThatWasMoved)
         // TODO: implement in Oscillator
         //[/UserSliderCode_fine_slider]
     }
-
+#endif
     //[UsersliderValueChanged_Post]
     //[/UsersliderValueChanged_Post]
 }

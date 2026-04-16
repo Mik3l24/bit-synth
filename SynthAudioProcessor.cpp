@@ -13,12 +13,14 @@
 SynthAudioProcessor::SynthAudioProcessor()
     : parameters(
         *this, nullptr, "BitSynth", SynthStateManager::createParameterLayout()
-    )
+    ),
+    state_manager(parameters, state_manager_state)
 {
+    // Perhaps should be moved to the state manager?
     // Add subtrees for the dynamic components of the synth. Warning - never add an undo manager here!
-    parameters.state.appendChild(juce::ValueTree("Sources"), nullptr);
-    parameters.state.appendChild(juce::ValueTree("Components"), nullptr);
-    parameters.state.appendChild(juce::ValueTree("Sinks"), nullptr);
+    parameters.state.appendChild(juce::ValueTree(name::GENERATORS), nullptr);
+    parameters.state.appendChild(juce::ValueTree(name::COMPONENTS), nullptr);
+    parameters.state.appendChild(juce::ValueTree(name::SINKS), nullptr);
 
 }
 

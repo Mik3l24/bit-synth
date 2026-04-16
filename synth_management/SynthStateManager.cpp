@@ -114,6 +114,11 @@ ElementID SynthStateManager::addElementRep(const ElementType element_type, const
     return new_id;
 }
 
+void SynthStateManager::setConnection(ConnectionID source_id, ConnectionID target_id)
+{
+    jassertfalse; // Not implemented yet
+}
+
 juce::AudioProcessorValueTreeState::ParameterLayout SynthStateManager::createParameterLayout()
 {
     juce::AudioProcessorValueTreeState::ParameterLayout params =

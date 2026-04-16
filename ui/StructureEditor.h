@@ -49,7 +49,7 @@ class StructureEditor:
 {
 public:
     //==============================================================================
-    explicit StructureEditor(SynthStateManager state_manager);
+    explicit StructureEditor(const SynthStateManager& state_manager);
     ~StructureEditor() override;
 
     //==============================================================================
