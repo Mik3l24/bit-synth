@@ -3,25 +3,27 @@
 //
 
 #include "BitSynthesizer.h"
+
 #include "dsp/BitSynthVoice.h"
 #include "BitSynthSound.h"
 #include "SynthManagementNames.h"
+#include "Errors.h"
 
 inline BitSynthVoice* castVoice(juce::SynthesiserVoice* voice)
 {
-    auto* bit_voice = static_cast<BitSynthVoice*>(voice); // Should be always correct, as only BitSynthVoices are added to the synthesizer
+    auto* bit_voice = dynamic_cast<BitSynthVoice*>(voice); // Should be always correct, as only BitSynthVoices are added to the synthesizer
     jassert(bit_voice != nullptr);
     return bit_voice;
 }
 
 inline BitSynthSound* castSound(juce::SynthesiserSound* sound)
 {
-    auto* bit_sound = static_cast<BitSynthSound*>(sound); // Should be always correct, as only BitSynthSounds are added to the synthesizer
+    auto* bit_sound = dynamic_cast<BitSynthSound*>(sound); // Should be always correct, as only BitSynthSounds are added to the synthesizer
     jassert(bit_sound != nullptr);
     return bit_sound;
 }
 
-#define CAST_VOICE(voice) auto* bit_voice = castVoice(voice)
+#define BIT_VOICE(voice) auto* bit_voice = castVoice(voice)
 #define CAST_SOUND jassert(sounds.size() == 1); auto* bit_sound = castSound(sounds.getFirst())
 
 
@@ -31,7 +33,8 @@ inline juce::Array<juce::var> connections(const juce::ValueTree& tree)
 }
 
 
-BitSynthesizer::BitSynthesizer(int num_voices)
+BitSynthesizer::BitSynthesizer(int num_voices, const SynthStateManager& state_manager)
+    : state_manager(state_manager)
 {
     addSound(new BitSynthSound());
     for(int i = 0; i < num_voices; i++)
@@ -73,189 +76,236 @@ juce::ValueTree BitSynthesizer::getSource(ConnectionID id) const
 }
 
 
-ConnectionID BitSynthesizer::addOscillator()
+void BitSynthesizer::addOscillator(const juce::ValueTree& tree)
 {
-    CAST_SOUND;
-    const ConnectionID id = -(ConnectionID(bit_sound->sources.getNumChildren()) + 1); // FUTURE May need to be handled differently for multi-output sources
-
-    bit_sound->sources.appendChild(newOscillatorRep(id), bit_sound->undo_manager);
+    throwassert(tree.isValid(),
+                InvalidTreeError("Invalid oscillator ValueTree"));
+    throwassert(tree.getType() == name::OSCILLATOR,
+                InvalidTreeError("Invalid type for oscillator"));
+    throwassert(tree.hasProperty(name::ID) && tree[name::ID].isInt64(),
+                InvalidTreeError("No valid ID in oscillator ValueTree"));
 
     for(const auto& voice : voices)
     {
-        CAST_VOICE(voice);
+        BIT_VOICE(voice);
         bit_voice->oscillators.emplace_back(new Oscillator());
-    }
-    return id;
-}
-
-void BitSynthesizer::setOscillatorRatio(ConnectionID id, double ratio)
-{
-    CAST_SOUND;
-    auto osc = getOscillator(id);
-    osc.setProperty(name::RATIO, ratio, bit_sound->undo_manager);
-
-    for(auto& voice : voices)
-    {
-        auto* bit_voice = castVoice(voice);
-
-        bit_voice->oscillators[ConnectionID(osc[name::INDEX])]->setRatio(osc[name::RATIO]);
+        // TODO connect parameters
     }
 }
 
-void BitSynthesizer::setOscillatorStartingPhase(ConnectionID id, double starting_phase)
-{
-    CAST_SOUND;
-    auto osc = getOscillator(id);
-    osc.setProperty(name::STARTING_PHASE, starting_phase, bit_sound->undo_manager);
-
-    for(auto& voice : voices)
-    {
-        auto* bit_voice = castVoice(voice);
-
-        bit_voice->oscillators[ConnectionID(osc[name::INDEX])]->setStartingPhase(osc[name::STARTING_PHASE]);
-    }
-}
-
-void BitSynthesizer::setOscillatorPulseWidth(ConnectionID id, float pulse_width)
-{
-    CAST_SOUND;
-    auto osc = getOscillator(id);
-    osc.setProperty(name::PULSE_WIDTH, pulse_width, bit_sound->undo_manager);
-
-    for(auto& voice : voices)
-    {
-        auto* bit_voice = castVoice(voice);
-
-        bit_voice->oscillators[ConnectionID(osc[name::INDEX])]->setPulseWidth(osc[name::PULSE_WIDTH]);
-    }
-}
-
-inline ptr<GateNode> selectNewGate(juce::ValueTree gate)
+inline ptr<GateNode> selectNewGate(const juce::ValueTree& gate)
 {
     const auto type = gate.getType();
     if(type == name::GATE_NOT) return ptr<GateNode>(new NotGate());
     if(type == name::GATE_AND) return ptr<GateNode>(new AndGate());
     if(type == name::GATE_OR)  return ptr<GateNode>(new OrGate());
     if(type == name::GATE_XOR) return ptr<GateNode>(new XorGate());
-    jassertfalse;
+    jassertfalse; return nullptr;
 }
 
-ConnectionID BitSynthesizer::addGate(GateType type)
+void BitSynthesizer::addGate(const juce::ValueTree& gate)
 {
-    CAST_SOUND;
-    const ConnectionID id = ConnectionID(bit_sound->components.getNumChildren()) + 1; // FUTURE May need to be handled differently for multi-output sources
-
-    bit_sound->components.appendChild(newGateRep(id, type), bit_sound->undo_manager);
-    const auto gate = getGate(id);
+    throwassert(gate.isValid(),
+                InvalidTreeError("Invalid gate ValueTree"));
+    throwassert(isIdentifierAGate(gate.getType()),
+                InvalidTreeError("Invalid type for gate"));
+    throwassert(gate.hasProperty(name::ID) && gate[name::ID].isInt64(),
+                InvalidTreeError("No valid ID in gate ValueTree"));
 
     for(const auto& voice : voices)
     {
-        CAST_VOICE(voice);
+        BIT_VOICE(voice);
         bit_voice->gates.emplace_back(selectNewGate(gate));
     }
-    return id;
 }
 
-void BitSynthesizer::setGateInput(ConnectionID id, ConnectionID input_id, size_t input_index)
+void BitSynthesizer::setInput(ElementID id, ConnectionID source_id, SubConnectionID sub_connection_id)
 {
-    auto gate = getGate(id);
-    jassert(input_index < gate[name::CONNECTIONS].getArray()->size());
-    // FUTURE FIXME wouldn't be undone by the undo manager if implemented!
-    // Option 1 - recreate the array
-    // Option 2 - use subtrees - though it wouldn't be xml-compatible then
-    connections(gate)[input_index] = input_id;
-    auto source = getSource(input_id);
-    const ConnectionID source_id = source[name::ID];
+
+    const auto [source_element_id, source_subconnection_id, source_sign] = decodeConnectionID(source_id);
+
     for(auto& voice : voices)
     {
-        auto* bit_voice = castVoice(voice);
+        BIT_VOICE(voice);
 
+        // FUTURE - Will need refactoring if multi-output elements are introduced
         BitSource* bit_source = nullptr;
-        if(source_id > 0)
-            bit_source = bit_voice->gates[ConnectionID(source[name::INDEX])].get();
-        else if(source_id < 0)
-            bit_source = bit_voice->oscillators[ConnectionID(source[name::INDEX])].get();
+        if(matchesSign(source_id, SIGN_GENERATOR))
+        {
+            jassert(source_id != 0);
+            bit_source = bit_voice->oscillators[getGeneratorIndex(source_element_id)].get();
+        }
+        else if(matchesSign(source_id, SIGN_COMPONENT))
+        {
+            jassert(source_id != 0);
+            bit_source = bit_voice->gates[getComponentIndex(source_element_id)].get();
+        }
+        else
+        {
+            jassert(source_id == 0); // if == 0, it's supposed to stay nullptr
+        }
 
-        bit_voice->gates[ConnectionID(gate[name::INDEX])]->setInput(bit_source, input_index);
+        if(matchesSign(id, SIGN_COMPONENT))
+            bit_voice->gates[getComponentIndex(id)]->setInput(bit_source, sub_connection_id);
+        else if(matchesSign(id, SIGN_SINK))
+            bit_voice->bit_inputs[getSinkIndex(id)]->setInput(bit_source);
+        else
+            jassertfalse;
     }
 }
 
-ConnectionID BitSynthesizer::addMixChannel()
+void BitSynthesizer::setInputs(const juce::ValueTree& element)
 {
-    CAST_SOUND;
-    const ConnectionID id = ConnectionID(bit_sound->sinks.getNumChildren()) + 1;
+    throwassert(isIdentifierAGate(element.getType()) || isIdentifierASink(element.getType()),
+                InvalidTreeError("Element must be a gate or a sink to set inputs"));
+    for(const auto& connection : element.getChildWithName(name::CONNECTIONS))
+    {
+        throwassert(connection.hasProperty(name::ID) && connection[name::ID].isInt64(),
+                    InvalidTreeError("Invalid connection ID in connection ValueTree"));
+        const ConnectionID source_id = connection[name::ID];
+        const SubConnectionID target_sub_id = element.getChildWithName(name::CONNECTIONS).indexOf(connection); // Kinda dumb
+        // Could get rid of the above, if I added the target ConnectionID to the Connection node... Hmmm...
 
-    bit_sound->sinks.appendChild(newBitMixChannelRep(id), bit_sound->undo_manager);
+        const ElementID element_id = element[name::ID];
+        throwassert(matchesSign(element_id, SIGN_COMPONENT) && isIdentifierAGate(element.getType())
+                || matchesSign(element_id, SIGN_SINK && isIdentifierASink(element.getType())),
+                InvalidTreeError("Invalid source or ID for connection"));
+        setInput(element_id, source_id, target_sub_id);
+    }
+}
+
+void BitSynthesizer::addMixChannel(const juce::ValueTree& mix)
+{
+    throwassert(mix.getType() == name::MIX_CHANNEL,
+                InvalidTreeError("Invalid type for mix channel"));
+    throwassert(mix.hasProperty(name::ID) && mix[name::ID].isInt64(),
+                InvalidTreeError("No valid ID in mix channel"));
+    throwassert(mix.hasProperty(name::CONNECTIONS) && mix[name::CONNECTIONS].isInt64(),
+                InvalidTreeError("No valid connection in mix channel"));
+    throwassert(mix.hasProperty(name::LEVEL),
+                InvalidTreeError("No level property in mix channel"));
 
     for(const auto& voice : voices)
     {
-        CAST_VOICE(voice);
+        BIT_VOICE(voice);
         bit_voice->bit_inputs.emplace_back(new BitMixChannel());
     }
-    return id;
 }
 
-void BitSynthesizer::setMixChannelInput(ConnectionID id, const ConnectionID input_id)
+void BitSynthesizer::reconstructSynthFromTree(juce::ValueTree& root)
 {
-    CAST_SOUND;
-    auto mix = getMixChannel(id);
-    mix.setProperty(name::CONNECTIONS, input_id, bit_sound->undo_manager);
-    auto source = getSource(mix[name::CONNECTIONS]);
-    const ConnectionID source_id = source[name::ID];
-    for(auto& voice : voices)
+    // Clear current voices
+    for(const auto& voice : voices)
     {
-        auto* bit_voice = castVoice(voice);
-
-        BitSource* bit_source = nullptr;
-        if(source_id > 0)
-            bit_source = bit_voice->gates[ConnectionID(source[name::INDEX])].get();
-        else if(source_id < 0)
-            bit_source = bit_voice->oscillators[ConnectionID(source[name::INDEX])].get();
-
-        bit_voice->bit_inputs[ConnectionID(mix[name::INDEX])]->setInput(bit_source);
+        BIT_VOICE(voice);
+        bit_voice->oscillators.clear();
+        bit_voice->gates.clear();
+        bit_voice->bit_inputs.clear();
     }
 
+    const auto generators = root.getChildWithName(name::GENERATORS);
+    const auto components = root.getChildWithName(name::COMPONENTS);
+    const auto sinks = root.getChildWithName(name::SINKS);
+    throwassert(generators.isValid() && components.isValid() && sinks.isValid(),
+                InvalidTreeError("Root tree must have generators, components and sinks subtrees"));
+
+    // Create the components
+    for(const auto& generator : generators)
+    {
+        throwassert(generator.getType() == name::OSCILLATOR,
+                    InvalidTreeError("Invalid child type in generators tree"));
+        addOscillator(generator);
+    }
+    for(const auto& component : components)
+    {
+        throwassert(isIdentifierAGate(component.getType()),
+                    InvalidTreeError("Invalid child type in components tree"));
+        addGate(component);
+    }
+    for(const auto& sink : sinks)
+    {
+        throwassert(isIdentifierASink(sink.getType()),
+                    InvalidTreeError("Invalid child type in sinks tree"));
+        addMixChannel(sink);
+    }
+
+    // Reestabilish connections
+    for(const auto& component : components)
+    {
+        setInputs(component);
+    }
+    for(const auto& sink : sinks)
+    {
+        setInputs(sink);
+    }
+
+    // I believe the synthesizer should be in a valid state now.
 }
 
-void BitSynthesizer::setMixChannelLevel(ConnectionID id, float level)
+
+void BitSynthesizer::valueTreePropertyChanged(juce::ValueTree& affected_tree, const juce::Identifier& property)
 {
-    CAST_SOUND;
-    auto mix = getMixChannel(id);
-    mix.setProperty(name::LEVEL, level, bit_sound->undo_manager);
-
-    for(auto& voice : voices)
+    if(affected_tree.getType() == name::CONNECTION)
     {
-        auto* bit_voice = castVoice(voice);
+        throwassert(property == name::ID && affected_tree[name::ID].isInt64(),
+                    InvalidTreeError("Invalid connection ID in connection ValueTree"));
+        const ConnectionID source_id = affected_tree[name::ID];
+        const SubConnectionID target_sub_id = affected_tree.getParent().indexOf(affected_tree); // Kinda dumb
+        // Backtracking from element/Connections/Connection
+        const juce::ValueTree element_tree = affected_tree.getParent().getParent();
+        throwassert(element_tree.isValid(),
+                    InvalidTreeError("No valid parent of set connection"));
+        // Could get rid of the above, if I added the target ConnectionID to the Connection node... Hmmm...
 
-        bit_voice->bit_inputs[ConnectionID(mix[name::INDEX])]->setLevel(mix[name::LEVEL]);
+        const ElementID element_id = element_tree[name::ID];
+        throwassert(matchesSign(element_id, SIGN_COMPONENT) && isIdentifierAGate(element_tree.getType())
+                || matchesSign(element_id, SIGN_SINK && isIdentifierASink(element_tree.getType())),
+                InvalidTreeError("Invalid source or ID for connection"));
+
+        setInput(element_id, source_id, target_sub_id);
     }
 }
 
-void BitSynthesizer::setMasterLevel(float level)
+void BitSynthesizer::valueTreeChildAdded(juce::ValueTree& parent_tree, juce::ValueTree& child_tree)
 {
-    master_level = level;
-    for(auto& voice : voices)
+    if(parent_tree.getType() == name::GENERATORS)
     {
-        auto* bit_voice = castVoice(voice);
-
-        bit_voice->setMasterLevel(master_level);
+        if(child_tree.getType() == name::OSCILLATOR)
+        {
+            addOscillator(child_tree);
+        }
+        else throw InvalidTreeError("Invalid child type added to generators tree");
     }
+    else if(parent_tree.getType() == name::COMPONENTS)
+    {
+        if(isIdentifierAGate(child_tree.getType()))
+        {
+            addGate(child_tree);
+        }
+        else throw InvalidTreeError("Invalid child type added to components tree");
+    }
+    else if(parent_tree.getType() == name::SINKS)
+    {
+        if(child_tree.getType() == name::MIX_CHANNEL)
+        {
+            addMixChannel(child_tree);
+        }
+        else throw InvalidTreeError("Invalid child type added to sinks tree");
+    }
+    // We don't care about any other additions I guess
 }
 
-std::unique_ptr<juce::XmlElement> BitSynthesizer::toXml() const
+void BitSynthesizer::valueTreeChildRemoved(juce::ValueTree& parent_tree, juce::ValueTree& child_tree, int removed_child_i)
 {
-    CAST_SOUND;
-    std::unique_ptr<juce::XmlElement> xml = bit_sound->parameters.createXml();
-    jassert(xml != nullptr);
-    return std::move(xml);
+    jassertfalse; // Not implemented yet, but will be needed for element removal
 }
 
-void BitSynthesizer::fromXml(const juce::XmlElement& xml)
+void BitSynthesizer::valueTreeRedirected(juce::ValueTree& affected_tree)
 {
-    CAST_SOUND;
-    bit_sound->parameters.fromXml(xml);
-    // TODO - create the synth sound from it... uh, also what about graphical components? Though they are less crucial for testing.
+
 }
+
+
 
 
 

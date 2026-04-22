@@ -41,9 +41,14 @@ inline ConnectionID applySign(const ConnectionID connection, const ConnectionSig
     return sign ? negate(connection) : connection;
 }
 
-inline ConnectionSign matchesSign(const ConnectionID connection, const ConnectionSign sign)
+inline bool matchesSign(const ConnectionID connection, const ConnectionSign sign)
 {
-    return isNegative(connection) == sign;
+    return connection != 0 && isNegative(connection) == sign;
+}
+
+inline bool matchesSign(const ElementID element_id, const ConnectionSign sign)
+{
+    return element_id != 0 && (element_id < 0) == sign;
 }
 
 inline ElementID toElementID(const ConnectionID id)
@@ -178,6 +183,16 @@ inline int gateMaxInputN(const GateType gate_type)
         case GateType::XOR: return 2;
         default: jassertfalse; return 0;
     }
+}
+
+inline bool isIdentifierAGate(const juce::Identifier& id)
+{
+    return id == name::GATE_NOT || id == name::GATE_AND || id == name::GATE_OR || id == name::GATE_XOR;
+}
+
+inline bool isIdentifierASink(const juce::Identifier& id)
+{
+    return id == name::MIX_CHANNEL;
 }
 
 
