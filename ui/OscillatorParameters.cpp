@@ -172,6 +172,10 @@ OscillatorParameters::OscillatorParameters(const ElementID id, const SynthStateM
 OscillatorParameters::~OscillatorParameters()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+    // Attachments must be deleted before sliders.
+    pw_attachment = nullptr;
+    phase_attachment = nullptr;
+    ratio_attachment = nullptr;
     //[/Destructor_pre]
 
     pw_slider = nullptr;
@@ -185,6 +189,8 @@ OscillatorParameters::~OscillatorParameters()
     transpose_label = nullptr;
     fine_slider = nullptr;
     fine_label = nullptr;
+    ratio_slider = nullptr;
+    ratio_label = nullptr;
     source_connector = nullptr;
 
 

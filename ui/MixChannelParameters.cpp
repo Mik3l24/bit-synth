@@ -76,6 +76,7 @@ MixChannelParameters::MixChannelParameters (const ElementID id, const SynthState
 MixChannelParameters::~MixChannelParameters()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+    level_attachment = nullptr; // Must be destroyed before the slider it is attached to.
     //[/Destructor_pre]
 
     level_slider = nullptr;
