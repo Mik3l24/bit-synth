@@ -13,6 +13,3 @@ float BitMixChannel::getSample(int sample_index)
     return float(getOutFromInput()[sample_index]) * level;
 }
 
-
-BitMixChannel::BitMixChannel()
-    : BitReceiver(1) {}

@@ -3,21 +3,23 @@
 //
 #pragma once
 #include "BitIO.h"
+#include <atomic>
 
 
 // Always one input
 class BitMixChannel : public BitReceiver
 {
 public:
-    float getSample(int sample_index);
-
-    void setLevel(float _level) { level = _level; }
+    explicit BitMixChannel(std::atomic<float>& _level)
+        : BitReceiver(1), level(_level) {}
 
 public:
-    BitMixChannel();
+    float getSample(int sample_index);
+
+    [[deprecated]] void setLevel(float _level) { level = _level; }
 
 protected: // Parameters
-    float level = .125f;
+    std::atomic<float>& level;
 };
 
 

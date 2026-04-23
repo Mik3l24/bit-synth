@@ -56,7 +56,7 @@ inline ElementID toElementID(const ConnectionID id)
     using namespace __SynthManagementNames_private;
     const auto abs = std::abs(id);
     const auto masked = abs & ELEMENT_MASK;
-    return ElementID(masked);
+    return isNegative(id) ? -ElementID(masked) : ElementID(masked);
 }
 
 inline SubConnectionID toSubConnectionID(const ConnectionID id)
@@ -98,6 +98,8 @@ namespace name
     const juce::Identifier GENERATORS("Generators");
     const juce::Identifier COMPONENTS("Components");
     const juce::Identifier SINKS     ("Sinks");
+    const juce::Identifier META_STATE("MetaState");
+
     // Element subtree names
     const juce::Identifier OSCILLATOR("Oscillator");
 
@@ -123,6 +125,8 @@ namespace name
     const juce::Identifier LEVEL("level");
 
     const juce::Identifier MASTER_LEVEL("master_level");
+
+    const juce::Identifier META_NEXT_FREE_DYNAMIC_PARAMETER_ID("next_free_dynamic_parameter_id");
 
 }
 

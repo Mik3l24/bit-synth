@@ -82,14 +82,21 @@ void BitSynthesizer::addOscillator(const juce::ValueTree& tree)
                 InvalidTreeError("Invalid oscillator ValueTree"));
     throwassert(tree.getType() == name::OSCILLATOR,
                 InvalidTreeError("Invalid type for oscillator"));
-    throwassert(tree.hasProperty(name::ID) && tree[name::ID].isInt64(),
+    throwassert(tree.hasProperty(name::ID),
                 InvalidTreeError("No valid ID in oscillator ValueTree"));
+
+    auto* const ratio_param = state_manager.parameters.getRawParameterValue(tree[name::RATIO].toString());
+    auto* const pw_param = state_manager.parameters.getRawParameterValue(tree[name::PULSE_WIDTH].toString());
+    auto* const starting_phase_param = state_manager.parameters.getRawParameterValue(tree[name::STARTING_PHASE].toString());
+    throwassert(pw_param != nullptr && ratio_param != nullptr && starting_phase_param != nullptr,
+                InvalidTreeError("Invalid dynamic parameter ID in oscillator"));
 
     for(const auto& voice : voices)
     {
         BIT_VOICE(voice);
-        bit_voice->oscillators.emplace_back(new Oscillator());
-        // TODO connect parameters
+        bit_voice->oscillators.emplace_back(
+                        new Oscillator(*ratio_param, *pw_param, *starting_phase_param)
+                   );
     }
 }
 
@@ -109,7 +116,7 @@ void BitSynthesizer::addGate(const juce::ValueTree& gate)
                 InvalidTreeError("Invalid gate ValueTree"));
     throwassert(isIdentifierAGate(gate.getType()),
                 InvalidTreeError("Invalid type for gate"));
-    throwassert(gate.hasProperty(name::ID) && gate[name::ID].isInt64(),
+    throwassert(gate.hasProperty(name::ID),
                 InvalidTreeError("No valid ID in gate ValueTree"));
 
     for(const auto& voice : voices)
@@ -160,7 +167,7 @@ void BitSynthesizer::setInputs(const juce::ValueTree& element)
                 InvalidTreeError("Element must be a gate or a sink to set inputs"));
     for(const auto& connection : element.getChildWithName(name::CONNECTIONS))
     {
-        throwassert(connection.hasProperty(name::ID) && connection[name::ID].isInt64(),
+        throwassert(connection.hasProperty(name::ID),
                     InvalidTreeError("Invalid connection ID in connection ValueTree"));
         const ConnectionID source_id = connection[name::ID];
         const SubConnectionID target_sub_id = element.getChildWithName(name::CONNECTIONS).indexOf(connection); // Kinda dumb
@@ -178,17 +185,21 @@ void BitSynthesizer::addMixChannel(const juce::ValueTree& mix)
 {
     throwassert(mix.getType() == name::MIX_CHANNEL,
                 InvalidTreeError("Invalid type for mix channel"));
-    throwassert(mix.hasProperty(name::ID) && mix[name::ID].isInt64(),
+    throwassert(mix.hasProperty(name::ID),
                 InvalidTreeError("No valid ID in mix channel"));
-    throwassert(mix.hasProperty(name::CONNECTIONS) && mix[name::CONNECTIONS].isInt64(),
+    throwassert(mix.getChildWithName(name::CONNECTIONS).isValid(),
                 InvalidTreeError("No valid connection in mix channel"));
     throwassert(mix.hasProperty(name::LEVEL),
                 InvalidTreeError("No level property in mix channel"));
 
+    auto* const level_param = state_manager.parameters.getRawParameterValue(mix[name::LEVEL].toString());
+    throwassert(level_param != nullptr,
+                InvalidTreeError("Invalid dynamic parameter ID in mix channel"));
+
     for(const auto& voice : voices)
     {
         BIT_VOICE(voice);
-        bit_voice->bit_inputs.emplace_back(new BitMixChannel());
+        bit_voice->bit_inputs.emplace_back(new BitMixChannel(*level_param));
     }
 }
 

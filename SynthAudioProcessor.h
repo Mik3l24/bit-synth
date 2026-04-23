@@ -39,8 +39,10 @@ public:
 
     void prepareToPlay (double, int) override;
     void releaseResources() override;
-    void processBlock (juce::AudioSampleBuffer& buffer, juce::MidiBuffer&) override;
+    void processBlock (juce::AudioSampleBuffer& buffer, juce::MidiBuffer& midi) override;
 
+private:
+    void initState();
 
 private:
     juce::AudioProcessorValueTreeState parameters;
@@ -48,6 +50,7 @@ private:
     SynthStateManager::ManagmentState state_manager_state;
 
     std::unique_ptr<BitSynthesizer> bit_synth;
+    const int num_voices = 8; // If we add settings for changing this, change to non-const.
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SynthAudioProcessor);

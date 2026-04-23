@@ -4,6 +4,8 @@
 
 #include "SynthStateManager.h"
 
+#include "Errors.h"
+
 constexpr size_t PLACEHOLDER_PARAMETER_N = 1024;
 
 
@@ -56,7 +58,7 @@ juce::ValueTree SynthStateManager::newBitMixChannelRep(ElementID id)
 {
     return juce::ValueTree(name::MIX_CHANNEL,
         {
-            {name::ID, id},
+            {name::ID, -id},
             {name::INDEX, id-1},
             {name::LEVEL,
             registerDynamicParameter(juce::String::formatted("BitMix Channel %d Level", id))},
@@ -75,19 +77,20 @@ juce::ValueTree SynthStateManager::newBitMixChannelRep(ElementID id)
 
 juce::String SynthStateManager::registerDynamicParameter(juce::String friendly_name)
 {
-    if(state.next_free_dynamic_parameter_id >= PLACEHOLDER_PARAMETER_N)
-        throw std::runtime_error("No more dynamic parameters can be registered");
-    const auto key = juce::String::formatted("#%04x", state.next_free_dynamic_parameter_id);
+    const size_t next_id = getNextDynamicParameterID();
+    throwassert(next_id < PLACEHOLDER_PARAMETER_N,
+                std::range_error("No more dynamic parameters can be registered"));
+    const auto key = juce::String::formatted("#%04x", next_id);
     auto dyn_param = parameters.getParameter(key);
-    if(dyn_param == nullptr)
-        throw std::runtime_error(("Parameter '"+key+"' does not exist").toStdString());
+    throwassert(dyn_param != nullptr,
+                InvalidTreeError(("Parameter '"+key+"' does not exist")));
 
     // dyn_param->name = friendly_name;
     //Ok, so it turns out that the built-in JUCE parameters' name cannot be changed after creation.
     // I guess I'm gonna have to TODO custom AudioProcessorParameter class that allows mutation
     // (though, this one is gonna work for now, it's just going to be obtuse for the user to set up automation)
 
-    state.next_free_dynamic_parameter_id++;
+    setNextFreeDynamicParameterID(next_id + 1);
     return key;
 }
 
@@ -162,4 +165,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout SynthStateManager::createPar
         params.add(std::make_unique<juce::AudioParameterFloat>(key, friendly_name, 0.0f, 1.0f, 0.0f));
     }
     return params;
+}
+
+size_t SynthStateManager::getNextDynamicParameterID()
+{
+    return size_t(juce::int64(parameters.state.getChildWithName(name::META_STATE)[name::META_NEXT_FREE_DYNAMIC_PARAMETER_ID]));
+}
+
+void SynthStateManager::setNextFreeDynamicParameterID(size_t id)
+{
+    parameters.state.getChildWithName(name::META_STATE).setProperty(name::META_NEXT_FREE_DYNAMIC_PARAMETER_ID, juce::int64(id), nullptr);
 }

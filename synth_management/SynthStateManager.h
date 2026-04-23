@@ -14,9 +14,10 @@
 class SynthStateManager
 {
 public:
-    class ManagmentState
+    class [[deprecated]] ManagmentState // May want to remove it, as we can and should store persistent meta info in the ValueTree itself
     {
     public:
+        [[deprecated]]
         size_t next_free_dynamic_parameter_id = 0;
     };
 public:
@@ -33,6 +34,10 @@ public:
 
 
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+
+private:
+    size_t getNextDynamicParameterID();
+    void setNextFreeDynamicParameterID(size_t id);
 
 private:
     juce::ValueTree newOscillatorRep(ElementID id);
