@@ -14,42 +14,48 @@
 class SynthStateManager
 {
 public:
-    class [[deprecated]] ManagmentState // May want to remove it, as we can and should store persistent meta info in the ValueTree itself
+    class Meta
     {
     public:
-        [[deprecated]]
-        size_t next_free_dynamic_parameter_id = 0;
+        Meta() = default;
+        Meta(juce::ValueTree&& _generators, juce::ValueTree&& _components, juce::ValueTree&& _sinks)
+            : generators(std::move(_generators)), components(std::move(_components)), sinks(std::move(_sinks)) {}
+    public:
+        // Turns out - these need to be here so BitSynthesiser can be persistently registered as a listener
+        juce::ValueTree generators;
+        juce::ValueTree components;
+        juce::ValueTree sinks;
     };
 public:
-    explicit SynthStateManager(juce::AudioProcessorValueTreeState& parameters, ManagmentState& state)
-        : parameters(parameters), state(state) {}
+    explicit SynthStateManager(juce::AudioProcessorValueTreeState& _parameters, Meta& _meta)
+        : parameters(_parameters), meta(_meta) {}
     SynthStateManager(const SynthStateManager&) = default;
     SynthStateManager(SynthStateManager&&) = default;
 
 
+    ElementID addElementRep(ElementType element_type, GateType gate_type = GateType::NONE) const;
 
-    ElementID addElementRep(ElementType element_type, GateType gate_type = GateType::NONE);
-
-    void setConnection(ConnectionID source_id, ConnectionID target_id);
+    void setConnection(ConnectionID source_id, ConnectionID target_id) const;
 
 
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
-private:
-    size_t getNextDynamicParameterID();
-    void setNextFreeDynamicParameterID(size_t id);
+private: // Internal methods
+    [[nodiscard]] size_t getNextDynamicParameterID() const;
+    void setNextFreeDynamicParameterID(size_t id) const;
 
-private:
-    juce::ValueTree newOscillatorRep(ElementID id);
-    juce::ValueTree newGateRep(ElementID id, GateType type);
-    juce::ValueTree newBitMixChannelRep(ElementID id);
+    [[nodiscard]] juce::ValueTree newOscillatorRep(ElementID id) const;
+    [[nodiscard]] juce::ValueTree newGateRep(ElementID id, GateType type) const;
+    [[nodiscard]] juce::ValueTree newBitMixChannelRep(ElementID id) const;
 
-    juce::String registerDynamicParameter(juce::String friendly_name);
+    [[nodiscard]] juce::String registerDynamicParameter(juce::String friendly_name) const;
+
+    [[nodiscard]] juce::ValueTree& getElementContainer(ElementType element_type) const;
 
 public:
     juce::AudioProcessorValueTreeState& parameters;
 
 private:
-    ManagmentState& state;
+    Meta& meta;
 };
 

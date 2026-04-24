@@ -19,11 +19,64 @@ constexpr ConnectionSign SIGN_GENERATOR = true;
 constexpr ConnectionSign SIGN_COMPONENT = false;
 constexpr ConnectionSign SIGN_SINK = true;
 
-namespace __SynthManagementNames_private
+namespace name
 {
-    constexpr ConnectionID ELEMENT_MASK = 0x00000000FFFFFFFF;
-    constexpr ConnectionID INDEX_MASK   = 0xFFFFFFFF00000000;
-    constexpr ConnectionID INDEX_SHIFT  = 32;
+    // Container subtree names
+    const juce::Identifier GENERATORS("Generators");
+    const juce::Identifier COMPONENTS("Components");
+    const juce::Identifier SINKS     ("Sinks");
+    const juce::Identifier META_STATE("MetaState");
+
+    // Element subtree names
+    const juce::Identifier OSCILLATOR("Oscillator");
+
+    const juce::Identifier GATE_OR  ("GateOR");
+    const juce::Identifier GATE_AND ("GateAND");
+    const juce::Identifier GATE_NOT ("GateNOT");
+    const juce::Identifier GATE_XOR ("GateXOR");
+
+    const juce::Identifier MIX_CHANNEL ("MixChannel");
+
+    const juce::Identifier CONNECTION("Connection");
+    const juce::Identifier CONNECTIONS("Connections");
+
+    // Parameter names
+    const juce::Identifier ID("id");
+    const juce::Identifier INDEX("index");
+    const juce::Identifier RATIO("ratio");
+    const juce::Identifier STARTING_PHASE("starting_phase");
+    const juce::Identifier PULSE_WIDTH("pulse_width");
+
+    const juce::Identifier INPUT_N("input_n");
+
+    const juce::Identifier LEVEL("level");
+
+    const juce::Identifier MASTER_LEVEL("master_level");
+
+    const juce::Identifier META_NEXT_FREE_DYNAMIC_PARAMETER_ID("next_free_dynamic_parameter_id");
+
+}
+
+enum class ElementType
+{
+    GENERATOR,
+    COMPONENT,
+    SINK,
+};
+
+enum class GateType
+{
+    NONE, // Only exists so non-gate ElementAdderButtons don't need to be assigned a gate type
+    NOT,
+    AND, OR, XOR,
+};
+
+
+namespace __SynthManagementNames_private // NOLINT(*-reserved-identifier)
+{
+    constexpr juce::uint64 ELEMENT_MASK = 0x00000000FFFFFFFF;
+    constexpr juce::uint64 INDEX_MASK   = 0xFFFFFFFF00000000;
+    constexpr auto INDEX_SHIFT  = 32;
 }
 
 inline ConnectionSign isNegative(const ConnectionID connection)
@@ -77,72 +130,37 @@ inline ConnectionID appendSubConnectionID(const SubConnectionID connection, cons
     return applySign(appended, sign);
 }
 
-inline ConnectionID createConnectionID(const ElementID element_id, const SubConnectionID sub_connection_id, const ConnectionSign sign)
+inline ConnectionID createConnectionID(ElementID element_id, const SubConnectionID sub_connection_id, const ConnectionSign sign)
 {
     using namespace __SynthManagementNames_private;
-    const auto masked_element_id = ConnectionID(element_id) & ELEMENT_MASK;
-    const auto masked_sub_connection_id = (ConnectionID(sub_connection_id) << INDEX_SHIFT) & INDEX_MASK;
+    element_id = std::abs(element_id);
+    const auto masked_element_id = juce::uint64(element_id) & ELEMENT_MASK;
+    const auto masked_sub_connection_id = (juce::uint64(sub_connection_id) << INDEX_SHIFT) & INDEX_MASK;
     const auto combined = masked_element_id | masked_sub_connection_id;
-    return applySign(combined, sign);
+    return applySign(ConnectionID(combined), sign);
+}
+
+inline ElementID createElementID(const int index, const ElementType element_type)
+{
+    switch(element_type)
+    {
+        case ElementType::GENERATOR: return -ElementID(index + 1);
+        case ElementType::COMPONENT: return ElementID(index + 1);
+        case ElementType::SINK:      return -ElementID(index + 1);
+        default: jassertfalse; return 0;
+    }
+}
+
+inline juce::int32 getElementIndex(const ElementID element_id)
+{
+    jassert(element_id != 0);
+    return std::abs(element_id) - 1;
 }
 
 inline std::tuple<ElementID, SubConnectionID, ConnectionSign> decodeConnectionID(const ConnectionID connection_id)
 {
     return std::make_tuple(toElementID(connection_id), toSubConnectionID(connection_id), isNegative(connection_id));
 }
-
-
-namespace name
-{
-    // Container subtree names
-    const juce::Identifier GENERATORS("Generators");
-    const juce::Identifier COMPONENTS("Components");
-    const juce::Identifier SINKS     ("Sinks");
-    const juce::Identifier META_STATE("MetaState");
-
-    // Element subtree names
-    const juce::Identifier OSCILLATOR("Oscillator");
-
-    const juce::Identifier GATE_OR  ("GateOR");
-    const juce::Identifier GATE_AND ("GateAND");
-    const juce::Identifier GATE_NOT ("GateNOT");
-    const juce::Identifier GATE_XOR ("GateXOR");
-
-    const juce::Identifier MIX_CHANNEL ("MixChannel");
-
-    const juce::Identifier CONNECTION("Connection");
-    const juce::Identifier CONNECTIONS("Connections");
-
-    // Parameter names
-    const juce::Identifier ID("id");
-    const juce::Identifier INDEX("index");
-    const juce::Identifier RATIO("ratio");
-    const juce::Identifier STARTING_PHASE("starting_phase");
-    const juce::Identifier PULSE_WIDTH("pulse_width");
-
-    const juce::Identifier INPUT_N("input_n");
-
-    const juce::Identifier LEVEL("level");
-
-    const juce::Identifier MASTER_LEVEL("master_level");
-
-    const juce::Identifier META_NEXT_FREE_DYNAMIC_PARAMETER_ID("next_free_dynamic_parameter_id");
-
-}
-
-enum class ElementType
-{
-    GENERATOR,
-    COMPONENT,
-    SINK,
-};
-
-enum class GateType
-{
-    NONE, // Only exists so non-gate ElementAdderButtons don't need to be assigned a gate type
-    NOT,
-    AND, OR, XOR,
-};
 
 inline const juce::Identifier& toContainerIdentifier(const ElementType element_type)
 {

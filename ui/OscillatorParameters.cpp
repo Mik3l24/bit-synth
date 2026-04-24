@@ -166,6 +166,16 @@ OscillatorParameters::OscillatorParameters(const ElementID id, const SynthStateM
 
 
     //[Constructor] You can add your own custom stuff here..
+    {
+        const juce::ValueTree tree = state_manager.parameters.state.getChildWithName(name::GENERATORS).getChild(getElementIndex(id));
+        jassert(tree.isValid());
+        const juce::String ratio_parameter_id = tree[name::RATIO].toString();
+        ratio_attachment = std::make_unique<juce::SliderParameterAttachment>(*state_manager.parameters.getParameter(ratio_parameter_id), *ratio_slider);
+        const juce::String pw_parameter_id = tree[name::PULSE_WIDTH].toString();
+        pw_attachment = std::make_unique<juce::SliderParameterAttachment>(*state_manager.parameters.getParameter(pw_parameter_id), *pw_slider);
+        const juce::String phase_parameter_id = tree[name::STARTING_PHASE].toString();
+        phase_attachment = std::make_unique<juce::SliderParameterAttachment>(*state_manager.parameters.getParameter(phase_parameter_id), *phase_slider);
+    }
     //[/Constructor]
 }
 

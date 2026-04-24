@@ -59,7 +59,7 @@ MixChannelParameters::MixChannelParameters (const ElementID id, const SynthState
 
     //[UserPreSize]
     {
-        juce::ValueTree tree = state_manager.parameters.state.getChildWithName(name::SINKS).getChild(id-1);
+        juce::ValueTree tree = state_manager.parameters.state.getChildWithName(name::SINKS).getChild(getElementIndex(id));
         jassert(tree.isValid());
         const juce::String level_parameter_id = tree[name::LEVEL].toString();
         level_attachment = std::make_unique<juce::SliderParameterAttachment>(*state_manager.parameters.getParameter(level_parameter_id), *level_slider);

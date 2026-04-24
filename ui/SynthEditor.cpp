@@ -18,14 +18,17 @@ SynthEditor::SynthEditor(juce::AudioProcessor& parent, SynthStateManager& state_
     structure_editor = std::make_unique<StructureEditor>(state_manager);
     addAndMakeVisible(*structure_editor);
 
-    setSize(600, 830);
+    setResizeLimits(600, 800,1920, 1080);
+    setResizable(true, true);
 
+    setSize(600, 800);
 }
 
 void SynthEditor::resized()
 {
     AudioProcessorEditor::resized();
     top_bar->setBounds(0, 0, getWidth(), 20);
+    structure_editor->setBounds(0, 20, getWidth(), getHeight() - 20);
 }
 
 void SynthEditor::saveStateToFile(const juce::File& file)
