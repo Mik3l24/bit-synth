@@ -23,6 +23,7 @@
 
 #include "TargetConnector.h"
 #include "StructureEditor.h"
+#include "juce_graphics/fonts/harfbuzz/hb.hh"
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
@@ -107,10 +108,11 @@ void TargetConnector::removeListener(TargetConnector::Listener* listener)
     connectorListeners.remove(listener);
 }
 
-void TargetConnector::makeConnection(SourceConnector* source)
+void TargetConnector::makeConnection(SourceConnector* source, const bool update)
 {
     this->source = source;
-    connectorListeners.call(&Listener::connectionMade, this, source->getConnectionID());
+    if(likely(update)) // Will only be false when remaking the editor ui
+        connectorListeners.call(&Listener::connectionMade, this, source->getConnectionID());
 
     if(auto* parent = findParentComponentOfClass<StructureEditor>())
         parent->repaint();

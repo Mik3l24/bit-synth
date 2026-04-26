@@ -8,10 +8,12 @@
 
 using namespace ui;
 
-SynthEditor::SynthEditor(juce::AudioProcessor& parent, SynthStateManager& state_manager)
-        : AudioProcessorEditor(parent),
+SynthEditor::SynthEditor(juce::AudioProcessor* _parent, SynthStateManager& state_manager, SynthStateManager::StateChangeSender* _sender)
+        : AudioProcessorEditor(_parent),
+          sender(_sender),
           state_manager(state_manager)
 {
+    jassert(_parent != nullptr);
     top_bar = std::make_unique<ui::TopBar>(this);
     addAndMakeVisible(*top_bar);
 
@@ -22,6 +24,15 @@ SynthEditor::SynthEditor(juce::AudioProcessor& parent, SynthStateManager& state_
     setResizable(true, true);
 
     setSize(600, 800);
+
+    if(sender != nullptr)
+        sender->addStateListener(this);
+}
+
+SynthEditor::~SynthEditor()
+{
+    if(sender != nullptr)
+        sender->removeStateListener(this);
 }
 
 void SynthEditor::resized()
@@ -30,31 +41,6 @@ void SynthEditor::resized()
     top_bar->setBounds(0, 0, getWidth(), 20);
     structure_editor->setBounds(0, 20, getWidth(), getHeight() - 20);
 }
-
-void SynthEditor::saveStateToFile(const juce::File& file)
-{
-    const auto state = state_manager.parameters.copyState();
-    if(file == juce::File())
-        return;
-    const auto xml(state.createXml());
-    jassert(xml != nullptr);
-    const bool _ = file.replaceWithText("");
-    jassert(_);
-    if(!xml->writeTo(file, {}))
-        std::cerr << "Error: Failed to write synth preset to file\n";
-}
-
-void SynthEditor::loadStateFromFile(const juce::File& file)
-{
-    if(file == juce::File() || !file.existsAsFile())
-        return;
-    const auto xml = juce::XmlDocument::parse(file);
-    if(xml.get() == nullptr || !xml->hasTagName(state_manager.parameters.state.getType()))
-        return;
-    state_manager.parameters.replaceState(juce::ValueTree::fromXml(*xml));
-}
-
-
 
 void SynthEditor::buttonClicked(juce::Button* button)
 {
@@ -92,4 +78,38 @@ void SynthEditor::buttonClicked(juce::Button* button)
             loadStateFromFile(selected_file);
         });
     }
+}
+
+void SynthEditor::saveStateToFile(const juce::File& file)
+{
+    const auto state = state_manager.parameters.copyState();
+    if(file == juce::File())
+        return;
+    const auto xml(state.createXml());
+    jassert(xml != nullptr);
+    const bool _ = file.replaceWithText("");
+    jassert(_);
+    if(!xml->writeTo(file, {}))
+        std::cerr << "Error: Failed to write synth preset to file\n";
+}
+
+void SynthEditor::loadStateFromFile(const juce::File& file)
+{
+    if(file == juce::File() || !file.existsAsFile())
+        return;
+    const auto xml = juce::XmlDocument::parse(file);
+    if(xml.get() == nullptr || !xml->hasTagName(state_manager.parameters.state.getType()))
+        return;
+    state_manager.parameters.replaceState(juce::ValueTree::fromXml(*xml));
+}
+
+void SynthEditor::stateReplaced()
+{
+    rebuildUI();
+}
+
+void SynthEditor::rebuildUI() const
+{
+
+    structure_editor->rebuildFromTree();
 }

@@ -66,9 +66,10 @@ public:
     void mouseUp(const juce::MouseEvent& e) override;
 
 
-private:
+public:
     //[UserVariables]   -- You can add your own custom variables in this section.
     const ElementID id;
+private:
     SynthStateManager state_manager;
 
     std::unique_ptr<juce::SliderParameterAttachment> level_attachment;
@@ -78,7 +79,9 @@ private:
     //==============================================================================
     std::unique_ptr<juce::Slider> level_slider;
     std::unique_ptr<juce::Label> level_label;
+public:
     std::unique_ptr<TargetConnector> target;
+private:
 
     juce::ComponentDragger dragger;
 

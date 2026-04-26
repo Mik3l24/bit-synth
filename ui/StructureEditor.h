@@ -62,6 +62,8 @@ public:
     void paint (juce::Graphics& g) override;
     void resized() override;
 
+    void rebuildFromTree();
+
 private: // Methods
     void addNewElement(const juce::Point<int> position, const ElementType element_type, const GateType gate_type = GateType::NONE)
     {
@@ -70,6 +72,12 @@ private: // Methods
     }
 
     void addElementComponent(ElementID id, juce::Point<int> position, ElementType element_type, GateType gate_type = GateType::NONE);
+
+    [[nodiscard]] OscillatorParameters* findGeneratorByID(ElementID id) const;
+    [[nodiscard]]                 Gate* findComponentByID(ElementID id) const;
+    [[nodiscard]] MixChannelParameters* findSinkByID(ElementID id) const;
+
+    [[nodiscard]] SourceConnector* findSourceByID(ConnectionID id) const;
 
 
 private: // Members

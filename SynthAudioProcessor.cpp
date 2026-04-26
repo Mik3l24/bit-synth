@@ -12,7 +12,7 @@
 
 SynthAudioProcessor::SynthAudioProcessor()
     : parameters(
-        *this, nullptr, "BitSynth", SynthStateManager::createParameterLayout()
+        *this, nullptr, name::ROOT, SynthStateManager::createParameterLayout()
     ),
     state_manager(parameters, internal_state)
 {
@@ -50,11 +50,13 @@ void SynthAudioProcessor::setStateInformation(const void* data, const int size_i
 #endif
 
     bit_synth->reconstructSynthFromTree(parameters.state);
-    // TODO - UI update (though, perhaps valueTreeRedirected() is what we need)
+    if(change_listener != nullptr)
+        change_listener->stateReplaced();
 }
 
-void SynthAudioProcessor::prepareToPlay(const double sample_rate, const int max_samples_per_block)
+void SynthAudioProcessor::prepareToPlay(const double _sample_rate, const int max_samples_per_block)
 {
+    sample_rate = _sample_rate;
     // TODO - add prepareToPlay() method to the BitSynthesizer
     bit_synth->setCurrentPlaybackSampleRate(sample_rate);
 }
@@ -67,6 +69,16 @@ void SynthAudioProcessor::releaseResources()
 void SynthAudioProcessor::processBlock(juce::AudioSampleBuffer& buffer, juce::MidiBuffer& midi)
 {
     bit_synth->renderNextBlock(buffer, midi, 0, buffer.getNumSamples());
+}
+
+void SynthAudioProcessor::addStateListener(SynthStateManager::Listener* new_listener)
+{
+    change_listener = new_listener;
+}
+
+void SynthAudioProcessor::removeStateListener(SynthStateManager::Listener* old_listener)
+{
+    change_listener = nullptr;
 }
 
 void SynthAudioProcessor::initState()
@@ -91,7 +103,15 @@ void SynthAudioProcessor::initState()
     internal_state.sinks = parameters.state.getChildWithName(name::SINKS);
     jassert(internal_state.sinks.isValid());
 
+    if(bit_synth != nullptr)
+    {
+        internal_state.generators.removeListener(bit_synth.get());
+        internal_state.components.removeListener(bit_synth.get());
+        internal_state.sinks.removeListener(bit_synth.get());
+    }
+
     bit_synth = std::make_unique<BitSynthesizer>(num_voices, state_manager);
+    bit_synth->setCurrentPlaybackSampleRate(sample_rate);
     internal_state.generators.addListener(bit_synth.get());
     internal_state.components.addListener(bit_synth.get());
     internal_state.sinks.addListener(bit_synth.get());

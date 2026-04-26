@@ -20,6 +20,7 @@
 //[Headers] You can add your own extra header files here...
 #include "DragSourceType.h"
 #include "Theme.h"
+#include "synth_management/Errors.h"
 //[/Headers]
 
 #include "StructureEditor.h"
@@ -142,7 +143,141 @@ void StructureEditor::resized()
     //[/UserResized]
 }
 
+void StructureEditor::rebuildFromTree()
+{
+    osc_components.clear();
+    gate_components.clear();
+    mix_components.clear();
 
+    jassert(state_manager.parameters.state.isValid());
+    const juce::ValueTree generators = state_manager.parameters.state.getChildWithName(name::GENERATORS);
+    const juce::ValueTree components = state_manager.parameters.state.getChildWithName(name::COMPONENTS);
+    const juce::ValueTree sinks      = state_manager.parameters.state.getChildWithName(name::SINKS);
+    if(!generators.isValid() || !components.isValid() || !sinks.isValid())
+    {
+        // Then we are almost definitely starting from a clean patch,
+        // where this callback is called before these trees are recreated.
+        // Just to be safe, the elements will still be cleared in case the editor wasn't also recreated.
+        // NOTE - this will lead to problems if the patch was in the invalid state of having only some of these trees.
+        // Though, that should be detected in the code for loading the patch
+        return;
+    }
+
+    // Let's start recreating!
+    for(const auto& generator : generators)
+    {
+        jassert(generator.isValid());
+        if(generator.getType() == name::OSCILLATOR)
+        {
+            throwassert(generator.hasProperty(name::ID),
+                        InvalidTreeError("No valid ID for generator in generators tree"));
+            const ElementID id = generator[name::ID];
+            throwassert(matchesSign(id, SIGN_GENERATOR),
+                        InvalidTreeError("Invalid ID for generator in generators tree"));
+
+            const juce::Point<int> position =
+                generator.hasProperty(name::META_UI_POSITION_X) && generator.hasProperty(name::META_UI_POSITION_Y)
+                ? juce::Point<int>(generator[name::META_UI_POSITION_X], generator[name::META_UI_POSITION_Y])
+                : juce::Point<int>(getWidth() / 2, getHeight() / 2); // Default position if not specified
+
+            addElementComponent(id, position, ElementType::GENERATOR);
+        }
+        else throw InvalidTreeError("Invalid child type in generators tree: "+generator.getType());
+    }
+    for(const auto& component : components)
+    {
+        jassert(component.isValid());
+        if(isIdentifierAGate(component.getType()))
+        {
+            throwassert(component.hasProperty(name::ID),
+                        InvalidTreeError("No valid ID for component in components tree"));
+            const ElementID id = component[name::ID];
+            throwassert(matchesSign(id, SIGN_COMPONENT),
+                        InvalidTreeError("Invalid ID for component in components tree"));
+
+            const juce::Point<int> position =
+                component.hasProperty(name::META_UI_POSITION_X) && component.hasProperty(name::META_UI_POSITION_Y)
+                ? juce::Point<int>(component[name::META_UI_POSITION_X], component[name::META_UI_POSITION_Y])
+                : juce::Point<int>(getWidth() / 2, getHeight() / 2); // Default position if not specified
+
+            addElementComponent(id, position, ElementType::COMPONENT, toGateEnum(component.getType()));
+        }
+        else throw InvalidTreeError("Invalid child type in components tree: "+component.getType());
+    }
+    for(const auto& sink : sinks)
+    {
+        jassert(sink.isValid());
+        if(sink.getType() == name::MIX_CHANNEL)
+        {
+            throwassert(sink.hasProperty(name::ID),
+                        InvalidTreeError("No valid ID for sink in sinks tree"));
+            const ElementID id = sink[name::ID];
+            throwassert(matchesSign(id, SIGN_SINK),
+                        InvalidTreeError("Invalid ID for sink in sinks tree"));
+
+            const juce::Point<int> position =
+                sink.hasProperty(name::META_UI_POSITION_X) && sink.hasProperty(name::META_UI_POSITION_Y)
+                ? juce::Point<int>(sink[name::META_UI_POSITION_X], sink[name::META_UI_POSITION_Y])
+                : juce::Point<int>(getWidth() / 2, getHeight() / 2); // Default position if not specified
+
+            addElementComponent(id, position, ElementType::SINK);
+        }
+        else throw InvalidTreeError("Invalid child type in sinks tree: "+sink.getType());
+    }
+
+    // Remaking connections
+    for(const auto& component : components)
+    {
+        jassert(component.isValid());
+        if(isIdentifierAGate(component.getType()))
+        {
+            const ElementID id = component[name::ID];
+            for(const auto& connection : component.getChildWithName(name::CONNECTIONS))
+            {
+                jassert(connection.isValid());
+                throwassert(connection.hasProperty(name::ID),
+                            InvalidTreeError("Invalid connection ID in component connections"));
+                const ConnectionID source_id = connection[name::ID];
+                const SubConnectionID target_sub_id = component.getChildWithName(name::CONNECTIONS).indexOf(connection); // Kinda dumb
+
+                const auto* const component_ptr = findComponentByID(id);
+                jassert(component_ptr != nullptr);
+                jassert(target_sub_id < gateMaxInputN(component_ptr->type));
+                auto* const target_connector = target_sub_id == 0 ? component_ptr->target0.get() : component_ptr->target1.get(); // Will need a refactor for different numbers of inputs
+                jassert(target_connector != nullptr);
+
+                if(auto* source = findSourceByID(source_id))
+                    target_connector->makeConnection(source, false);
+
+            }
+        }
+        else throw InvalidTreeError("Invalid child type in components tree: "+component.getType());
+    }
+    for(const auto& sink : sinks)
+    {
+        jassert(sink.isValid());
+        if(sink.getType() == name::MIX_CHANNEL)
+        {
+            const ElementID id = sink[name::ID];
+            for(const auto& connection : sink.getChildWithName(name::CONNECTIONS))
+            {
+                jassert(connection.isValid());
+                throwassert(connection.hasProperty(name::ID),
+                            InvalidTreeError("Invalid connection ID in sink connections"));
+                const ConnectionID source_id = connection[name::ID];
+
+                const auto* const sink_ptr = findSinkByID(id);
+                jassert(sink_ptr != nullptr);
+                auto* const target_connector = sink_ptr->target.get();
+                jassert(target_connector != nullptr);
+
+                if(auto* source = findSourceByID(source_id))
+                    target_connector->makeConnection(source, false);
+            }
+        }
+        else throw InvalidTreeError("Invalid child type in sinks tree: "+sink.getType());
+    }
+}
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
@@ -198,6 +333,64 @@ void StructureEditor::addElementComponent(ElementID id, juce::Point<int> positio
     // Add the component and place it at the mouse position
     addAndMakeVisible(component);
     component->setCentrePosition(position);
+}
+
+OscillatorParameters* StructureEditor::findGeneratorByID(const ElementID id) const
+{
+    jassert(matchesSign(id, SIGN_GENERATOR));
+    // Most likely, the ID corresponds to its index.
+    const auto index = getElementIndex(id);
+    if(auto* generator = osc_components[index].get(); generator != nullptr && generator->id == id)
+        return generator;
+
+    // Then we have to do the slow search...
+    for(const auto& generator : osc_components)
+        if(generator->id == id)
+            return generator.get();
+    return nullptr;
+}
+
+Gate* StructureEditor::findComponentByID(const ElementID id) const
+{
+    jassert(matchesSign(id, SIGN_COMPONENT));
+    // Most likely, the ID corresponds to its index.
+    const auto index = getElementIndex(id);
+    if(auto* component = gate_components[index].get(); component != nullptr && component->id == id)
+        return component;
+
+    // Then we have to do the slow search...
+    for(const auto& component : gate_components)
+        if(component->id == id)
+            return component.get();
+    return nullptr;
+}
+
+MixChannelParameters* StructureEditor::findSinkByID(ElementID id) const
+{
+    jassert(matchesSign(id, SIGN_SINK));
+    // Most likely, the ID corresponds to its index.
+    const auto index = getElementIndex(id);
+    if(auto* sink = mix_components[index].get(); sink != nullptr && sink->id == id)
+        return sink;
+
+    // Then we have to do the slow search...
+    for(const auto& sink : mix_components)
+        if(sink->id == id)
+            return sink.get();
+    return nullptr;
+}
+
+SourceConnector* StructureEditor::findSourceByID(const ConnectionID id) const
+{
+    auto [element_id, sub_id, sign] = decodeConnectionID(id);
+    jassert(sub_id == 0); // if we ever have multi-output elements, this will need to be updated
+    if(matchesSign(id, SIGN_GENERATOR))
+        if(const auto* generator = findGeneratorByID(element_id); generator != nullptr)
+            return generator->source_connector.get();
+    if(matchesSign(id, SIGN_COMPONENT))
+        if(const auto* component = findComponentByID(element_id); component != nullptr)
+            return component->source.get();
+    return nullptr;
 }
 
 //[/MiscUserCode]

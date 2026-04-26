@@ -21,6 +21,8 @@ constexpr ConnectionSign SIGN_SINK = true;
 
 namespace name
 {
+    const juce::Identifier ROOT("BitSynth");
+
     // Container subtree names
     const juce::Identifier GENERATORS("Generators");
     const juce::Identifier COMPONENTS("Components");
@@ -53,6 +55,8 @@ namespace name
 
     const juce::Identifier MASTER_LEVEL("master_level");
 
+    const juce::Identifier META_UI_POSITION_X("__ui_position_x");
+    const juce::Identifier META_UI_POSITION_Y("__ui_position_y");
     const juce::Identifier META_NEXT_FREE_DYNAMIC_PARAMETER_ID("next_free_dynamic_parameter_id");
 
 }
@@ -166,9 +170,9 @@ inline const juce::Identifier& toContainerIdentifier(const ElementType element_t
 {
     switch(element_type)
     {
-        case ElementType::GENERATOR:  return name::GENERATORS;
-        case ElementType::COMPONENT:        return name::COMPONENTS;
-        case ElementType::SINK: return name::SINKS;
+        case ElementType::GENERATOR: return name::GENERATORS;
+        case ElementType::COMPONENT: return name::COMPONENTS;
+        case ElementType::SINK:      return name::SINKS;
         default: jassertfalse; return juce::Identifier();
     }
 }

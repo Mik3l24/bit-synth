@@ -13,10 +13,12 @@
 namespace ui
 {
     class SynthEditor : public juce::AudioProcessorEditor,
-                        public juce::Button::Listener
+                        public juce::Button::Listener,
+                        public SynthStateManager::Listener
     {
     public:
-        SynthEditor(juce::AudioProcessor& parent, SynthStateManager& state_manager);
+        SynthEditor(juce::AudioProcessor* _parent, SynthStateManager& state_manager, SynthStateManager::StateChangeSender* _sender);
+        ~SynthEditor() override;
 
         void resized() override;
 
@@ -25,9 +27,11 @@ namespace ui
         void saveStateToFile(const juce::File& file);
         void loadStateFromFile(const juce::File& file);
 
-
+        void stateReplaced() override;
+        void rebuildUI() const;
 
     private:
+        SynthStateManager::StateChangeSender* const sender;
         SynthStateManager state_manager;
 
         std::unique_ptr<TopBar> top_bar;

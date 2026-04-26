@@ -11,14 +11,14 @@
 #include "synth_management/SynthStateManager.h"
 
 
-class SynthAudioProcessor : public juce::AudioProcessor
+class SynthAudioProcessor : public juce::AudioProcessor,  public SynthStateManager::StateChangeSender
 {
 public:
     SynthAudioProcessor();
     ~SynthAudioProcessor();
 
     // Graphical editor overrides
-    juce::AudioProcessorEditor* createEditor() override          { return new ui::SynthEditor(*this, state_manager); }
+    juce::AudioProcessorEditor* createEditor() override          { return new ui::SynthEditor(this, state_manager, this); }
     bool hasEditor() const override                              { return true; }
 
     // General information overrides
@@ -39,14 +39,18 @@ public:
     void setStateInformation(const void* data, int size_in_bytes) override;
 
     // Audio processing overrides
-    void prepareToPlay(double sample_rate, int max_samples_per_block) override;
+    void prepareToPlay(double _sample_rate, int max_samples_per_block) override;
     void releaseResources() override;
     void processBlock(juce::AudioSampleBuffer& buffer, juce::MidiBuffer& midi) override;
+
+    void addStateListener(SynthStateManager::Listener* new_listener) override;
+    void removeStateListener(SynthStateManager::Listener* old_listener) override;
 
 private: // Internal methods
     void initState();
 
 private: // Members
+    SynthStateManager::Listener* change_listener = nullptr; // Only 1 listener is expected at the moment
     juce::AudioProcessorValueTreeState parameters;
     SynthStateManager state_manager;
     SynthStateManager::Meta internal_state;
@@ -55,6 +59,7 @@ private: // Members
 
     std::unique_ptr<BitSynthesizer> bit_synth;
     const int num_voices = 8; // If we add settings for changing this, change to non-const.
+    double sample_rate = 0.0;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SynthAudioProcessor);

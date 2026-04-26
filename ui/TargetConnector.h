@@ -62,7 +62,7 @@ public:
     void addListener(Listener* listener);
     void removeListener(Listener* listener);
 
-    void makeConnection(SourceConnector* source);
+    void makeConnection(SourceConnector* source, bool update = true);
 
     std::optional<std::pair<juce::Point<int>, juce::Point<int>>> getConnectionPoints() const;
 

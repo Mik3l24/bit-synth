@@ -65,17 +65,22 @@ public:
     void mouseDrag(const juce::MouseEvent &e) override;
     void mouseUp(const juce::MouseEvent &e) override;
 
+
+public: // Members
+    const ElementID id;
+    const GateType type = GateType::NONE;
+
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     SynthStateManager state_manager;
-    GateType type = GateType::NONE;
-    ElementID id;
     //[/UserVariables]
 
     //==============================================================================
+public:
     std::unique_ptr<SourceConnector> source;
     std::unique_ptr<TargetConnector> target0;
     std::unique_ptr<TargetConnector> target1;
+private:
     juce::Path bodyPath;
     juce::Path connectorsPath;
 

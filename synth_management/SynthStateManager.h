@@ -26,6 +26,17 @@ public:
         juce::ValueTree components;
         juce::ValueTree sinks;
     };
+    class Listener
+    {
+    public:
+        virtual void stateReplaced() {}
+    };
+    class StateChangeSender
+    {
+    public:
+        virtual void addStateListener(SynthStateManager::Listener* new_listener) {};
+        virtual void removeStateListener(SynthStateManager::Listener* old_listener) {};
+    };
 public:
     explicit SynthStateManager(juce::AudioProcessorValueTreeState& _parameters, Meta& _meta)
         : parameters(_parameters), meta(_meta) {}
