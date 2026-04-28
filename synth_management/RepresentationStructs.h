@@ -10,13 +10,13 @@
 
 inline juce::ValueTree newOscillatorRep(ConnectionID id)
 {
-    return juce::ValueTree(name::OSCILLATOR,
+    return juce::ValueTree(Name::OSCILLATOR,
         {
-            {name::ID,             id},
-            {name::INDEX,          -id-1},
-            {name::RATIO,          1.0},
-            {name::STARTING_PHASE, 0.0},
-            {name::PULSE_WIDTH,    0.5f}
+            {Name::ID,             id},
+            {Name::INDEX,          -id-1},
+            {Name::RATIO,          1.0},
+            {Name::STARTING_PHASE, 0.0},
+            {Name::PULSE_WIDTH,    0.5f}
         }
     );
 }
@@ -27,25 +27,25 @@ inline juce::ValueTree newGateRep(ConnectionID id, GateType type)
     switch(type)
     {
         case GateType::NOT:
-            type_name = &name::GATE_NOT;
+            type_name = &Name::GATE_NOT;
             break;
         case GateType::AND:
-            type_name = &name::GATE_AND;
+            type_name = &Name::GATE_AND;
             break;
         case GateType::OR:
-             type_name = &name::GATE_OR;
+             type_name = &Name::GATE_OR;
              break;
         case GateType::XOR:
-            type_name = &name::GATE_XOR;
+            type_name = &Name::GATE_XOR;
             break;
         default:
             jassertfalse; // Invalid gate type
     }
     return juce::ValueTree(*type_name,
         {
-            {name::ID, id},
-            {name::INDEX, id-1},
-            {name::CONNECTIONS,
+            {Name::ID, id},
+            {Name::INDEX, id-1},
+            {Name::CONNECTIONS,
                 type == GateType::NOT
                 ? juce::Array<juce::var>(CONNECTION_NONE)
                 : juce::Array<juce::var>({CONNECTION_NONE, CONNECTION_NONE})
@@ -56,12 +56,12 @@ inline juce::ValueTree newGateRep(ConnectionID id, GateType type)
 
 inline juce::ValueTree newBitMixChannelRep(ConnectionID id)
 {
-    return juce::ValueTree(name::MIX_CHANNEL,
+    return juce::ValueTree(Name::MIX_CHANNEL,
         {
-            {name::ID, id},
-            {name::INDEX, id-1},
-            {name::CONNECTIONS, CONNECTION_NONE},
-            {name::LEVEL, 0.5f}
+            {Name::ID, id},
+            {Name::INDEX, id-1},
+            {Name::CONNECTIONS, CONNECTION_NONE},
+            {Name::LEVEL, 0.5f}
         }
     );
 }

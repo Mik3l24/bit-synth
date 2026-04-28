@@ -80,7 +80,7 @@ void SynthEditor::buttonClicked(juce::Button* button)
     }
 }
 
-void SynthEditor::saveStateToFile(const juce::File& file)
+void SynthEditor::saveStateToFile(const juce::File& file) const
 {
     const auto state = state_manager.parameters.copyState();
     if(file == juce::File())
@@ -110,6 +110,5 @@ void SynthEditor::stateReplaced()
 
 void SynthEditor::rebuildUI() const
 {
-
-    structure_editor->rebuildFromTree();
+    structure_editor->rebuildUI();
 }

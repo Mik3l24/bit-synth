@@ -11,19 +11,19 @@ namespace ui {
 class ElementAdderButton : public juce::TextButton
 {
 public:
-    explicit ElementAdderButton(ElementType element_type);
+    explicit ElementAdderButton(ElementCategory element_type);
     explicit ElementAdderButton(GateType gate_type);
     ~ElementAdderButton() override;
 
 public: // Access methods
-    [[nodiscard]] ElementType getElementType() const;
+    [[nodiscard]] ElementCategory getElementType() const;
     [[nodiscard]] GateType getGateType() const;
 
 public: // Overrides
     void mouseDrag(const juce::MouseEvent& event) override;
 
 protected:
-    ElementType element_type;
+    ElementCategory element_type;
     GateType gate_type;
 };
 

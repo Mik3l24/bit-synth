@@ -30,21 +30,21 @@ juce::String SynthStateManager::registerDynamicParameter(juce::String friendly_n
 void SynthStateManager::setConnection(const ConnectionID source_id, const ConnectionID target_id) const
 {
     auto [target_element_id, target_subconnection_id, target_sign] = decodeConnectionID(target_id);
-    juce::ValueTree& target_tree = matchesSign(target_element_id, SIGN_COMPONENT) ? meta.components : meta.sinks;
+    juce::ValueTree& target_tree = matchesSign(target_element_id, SIGN_PROCESSOR) ? meta.processors : meta.sinks;
     jassert(target_tree.isValid());
     const auto& final =
-                target_tree.getChildWithProperty(name::ID, target_element_id)
-                .getChildWithName(name::CONNECTIONS).getChild(target_subconnection_id)
-                .setProperty(name::ID, source_id, nullptr);
+                target_tree.getChildWithProperty(Name::ID, target_element_id)
+                .getChildWithName(Name::CONNECTIONS).getChild(target_subconnection_id)
+                .setProperty(Name::ID, source_id, nullptr);
     jassert(final.isValid());
 }
 
-void SynthStateManager::setElementPosition(ElementID id, ElementType element_type, juce::Point<int> position) const
+void SynthStateManager::setElementPosition(ElementID id, ElementCategory element_type, juce::Point<int> position) const
 {
-    juce::ValueTree element = getElementContainer(element_type).getChildWithProperty(name::ID, id);
+    juce::ValueTree element = getElementContainer(element_type).getChildWithProperty(Name::ID, id);
     jassert(element.isValid());
-    element.setProperty(name::META_UI_POSITION_X, position.x, nullptr);
-    element.setProperty(name::META_UI_POSITION_Y, position.y, nullptr);
+    element.setProperty(Name::META_UI_POSITION_X, position.x, nullptr);
+    element.setProperty(Name::META_UI_POSITION_Y, position.y, nullptr);
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout SynthStateManager::createParameterLayout()
@@ -53,7 +53,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout SynthStateManager::createPar
     {
         // Static parameters of the synth
         std::make_unique<juce::AudioParameterFloat>(
-            name::MASTER_LEVEL.getCharPointer(), "Master volume",
+            Name::MASTER_LEVEL.getCharPointer(), "Master volume",
             0.0f, 1.0f, 0.5f
             ),
     };
@@ -68,25 +68,25 @@ juce::AudioProcessorValueTreeState::ParameterLayout SynthStateManager::createPar
 
 size_t SynthStateManager::getNextDynamicParameterID() const
 {
-    return size_t(juce::int64(parameters.state.getChildWithName(name::META_STATE)[name::META_NEXT_FREE_DYNAMIC_PARAMETER_ID]));
+    return size_t(juce::int64(parameters.state.getChildWithName(Name::META_STATE)[Name::META_NEXT_FREE_DYNAMIC_PARAMETER_ID]));
 }
 
 void SynthStateManager::setNextFreeDynamicParameterID(const size_t id) const
 {
-    parameters.state.getChildWithName(name::META_STATE).setProperty(name::META_NEXT_FREE_DYNAMIC_PARAMETER_ID, juce::int64(id), nullptr);
+    parameters.state.getChildWithName(Name::META_STATE).setProperty(Name::META_NEXT_FREE_DYNAMIC_PARAMETER_ID, juce::int64(id), nullptr);
 }
 
 juce::ValueTree SynthStateManager::newOscillatorRep(ElementID id) const
 {
-    return juce::ValueTree(name::OSCILLATOR,
+    return juce::ValueTree(Name::OSCILLATOR,
         {
-            {name::ID,             id},
-            {name::INDEX,          -id-1},
-            {name::RATIO,
+            {Name::ID,             id},
+            {Name::INDEX,          -id-1},
+            {Name::RATIO,
                 registerDynamicParameter(juce::String::formatted("Oscillator %d Ratio", id))},
-            {name::STARTING_PHASE,
+            {Name::STARTING_PHASE,
                 registerDynamicParameter(juce::String::formatted("Oscillator %d Starting Phase", id))},
-            {name::PULSE_WIDTH,
+            {Name::PULSE_WIDTH,
                 registerDynamicParameter(juce::String::formatted("Oscillator %d Pulse Width", id))}
         }
     );
@@ -94,9 +94,9 @@ juce::ValueTree SynthStateManager::newOscillatorRep(ElementID id) const
 
 inline juce::ValueTree newConnectionRep(ConnectionID id)
 {
-    return juce::ValueTree(name::CONNECTION,
+    return juce::ValueTree(Name::CONNECTION,
        {
-           {name::ID, id},
+           {Name::ID, id},
        }
     );
 }
@@ -104,16 +104,16 @@ inline juce::ValueTree newConnectionRep(ConnectionID id)
 juce::ValueTree SynthStateManager::newGateRep(ElementID id, const GateType type) const
 {
     const auto input_n = gateMaxInputN(type);
-    juce::ValueTree connections_tree(name::CONNECTIONS);
+    juce::ValueTree connections_tree(Name::CONNECTIONS);
     for(size_t i = 0; i < input_n; i++)
         connections_tree.appendChild(newConnectionRep(CONNECTION_NONE), nullptr);
 
     const juce::Identifier type_name = toGateIdentifier(type);
     return juce::ValueTree(type_name,
         {
-            {name::ID, id},
-            {name::INDEX, id-1},
-            {name::INPUT_N, input_n},
+            {Name::ID, id},
+            {Name::INDEX, id-1},
+            {Name::INPUT_N, input_n},
         },
         {
             std::move(connections_tree)
@@ -123,18 +123,18 @@ juce::ValueTree SynthStateManager::newGateRep(ElementID id, const GateType type)
 
 juce::ValueTree SynthStateManager::newBitMixChannelRep(const ElementID id) const
 {
-    return juce::ValueTree(name::MIX_CHANNEL,
+    return juce::ValueTree(Name::MIX_CHANNEL,
         {
-            {name::ID, id},
-            {name::INDEX, -id-1},
-            {name::LEVEL,
+            {Name::ID, id},
+            {Name::INDEX, -id-1},
+            {Name::LEVEL,
             registerDynamicParameter(juce::String::formatted("BitMix Channel %d Level", id))},
         },
         {
             {
-                name::CONNECTIONS, {},
+                Name::CONNECTIONS, {},
                 {
-                    {name::CONNECTION, {{name::ID, CONNECTION_NONE}}}
+                    {Name::CONNECTION, {{Name::ID, CONNECTION_NONE}}}
                 }
             }
         }
@@ -142,7 +142,7 @@ juce::ValueTree SynthStateManager::newBitMixChannelRep(const ElementID id) const
     );
 }
 
-ElementID SynthStateManager::addElementRep(const ElementType element_type, const GateType gate_type) const
+ElementID SynthStateManager::addElementRep(const ElementCategory element_type, const GateType gate_type) const
 {
     juce::ValueTree& element_container = getElementContainer(element_type);
     jassert(element_container.isValid());
@@ -153,13 +153,13 @@ ElementID SynthStateManager::addElementRep(const ElementType element_type, const
     juce::ValueTree new_tree;
     switch(element_type)
     {
-        case ElementType::GENERATOR:
+        case ElementCategory::GENERATOR:
             new_tree = newOscillatorRep(new_id);
             break;
-        case ElementType::COMPONENT:
+        case ElementCategory::PROCESSOR:
             new_tree = newGateRep(new_id, gate_type);
             break;
-        case ElementType::SINK:
+        case ElementCategory::SINK:
             new_tree = newBitMixChannelRep(new_id);
             break;
         default:
@@ -170,15 +170,15 @@ ElementID SynthStateManager::addElementRep(const ElementType element_type, const
     return new_id;
 }
 
-juce::ValueTree& SynthStateManager::getElementContainer(const ElementType element_type) const
+juce::ValueTree& SynthStateManager::getElementContainer(const ElementCategory element_type) const
 {
     switch(element_type)
     {
-        case ElementType::GENERATOR:
+        case ElementCategory::GENERATOR:
             return meta.generators;
-        case ElementType::COMPONENT:
-            return meta.components;
-        case ElementType::SINK:
+        case ElementCategory::PROCESSOR:
+            return meta.processors;
+        case ElementCategory::SINK:
             return meta.sinks;
         default:
             jassertfalse;

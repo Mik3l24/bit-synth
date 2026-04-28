@@ -62,12 +62,12 @@ target_sources(bitprocessing
         dsp/bitprocessing/Oscillator.cpp
         dsp/bitprocessing/BitMixChannel.cpp
         dsp/BitSynthVoice.cpp
-        synth_management/BitSynthSound.cpp
         synth_management/BitSynthesizer.cpp
         synth_management/SynthStateManager.cpp
         ui/Theme.cpp
         ui/SourceConnector.cpp
         ui/TargetConnector.cpp
+        ui/SynthElement.cpp
         ui/OscillatorParameters.cpp
         ui/MixChannelParameters.cpp
         ui/Gate.cpp
@@ -75,10 +75,8 @@ target_sources(bitprocessing
         ui/ElementPicker.cpp
         ui/StructureEditor.cpp
         ui/TopBar.cpp
-        #SynthAudioSource.cpp
         SynthAudioProcessor.cpp
         ui/SynthEditor.cpp
-        #MainContentComponent.cpp
 )
 
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer

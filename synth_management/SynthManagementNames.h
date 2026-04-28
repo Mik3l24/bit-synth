@@ -16,16 +16,16 @@ typedef int32_t SubConnectionID;
 
 constexpr ConnectionID CONNECTION_NONE = 0;
 constexpr ConnectionSign SIGN_GENERATOR = true;
-constexpr ConnectionSign SIGN_COMPONENT = false;
+constexpr ConnectionSign SIGN_PROCESSOR = false;
 constexpr ConnectionSign SIGN_SINK = true;
 
-namespace name
+namespace Name
 {
     const juce::Identifier ROOT("BitSynth");
 
     // Container subtree names
     const juce::Identifier GENERATORS("Generators");
-    const juce::Identifier COMPONENTS("Components");
+    const juce::Identifier PROCESSORS("Processors");
     const juce::Identifier SINKS     ("Sinks");
     const juce::Identifier META_STATE("MetaState");
 
@@ -61,12 +61,13 @@ namespace name
 
 }
 
-enum class ElementType
+enum class ElementCategory
 {
     GENERATOR,
-    COMPONENT,
+    PROCESSOR,
     SINK,
 };
+
 
 enum class GateType
 {
@@ -144,13 +145,13 @@ inline ConnectionID createConnectionID(ElementID element_id, const SubConnection
     return applySign(ConnectionID(combined), sign);
 }
 
-inline ElementID createElementID(const int index, const ElementType element_type)
+inline ElementID createElementID(const int index, const ElementCategory element_type)
 {
     switch(element_type)
     {
-        case ElementType::GENERATOR: return -ElementID(index + 1);
-        case ElementType::COMPONENT: return ElementID(index + 1);
-        case ElementType::SINK:      return -ElementID(index + 1);
+        case ElementCategory::GENERATOR: return -ElementID(index + 1);
+        case ElementCategory::PROCESSOR: return ElementID(index + 1);
+        case ElementCategory::SINK:      return -ElementID(index + 1);
         default: jassertfalse; return 0;
     }
 }
@@ -166,13 +167,13 @@ inline std::tuple<ElementID, SubConnectionID, ConnectionSign> decodeConnectionID
     return std::make_tuple(toElementID(connection_id), toSubConnectionID(connection_id), isNegative(connection_id));
 }
 
-inline const juce::Identifier& toContainerIdentifier(const ElementType element_type)
+inline const juce::Identifier& toContainerIdentifier(const ElementCategory element_type)
 {
     switch(element_type)
     {
-        case ElementType::GENERATOR: return name::GENERATORS;
-        case ElementType::COMPONENT: return name::COMPONENTS;
-        case ElementType::SINK:      return name::SINKS;
+        case ElementCategory::GENERATOR: return Name::GENERATORS;
+        case ElementCategory::PROCESSOR: return Name::PROCESSORS;
+        case ElementCategory::SINK:      return Name::SINKS;
         default: jassertfalse; return juce::Identifier();
     }
 }
@@ -181,20 +182,20 @@ inline const juce::Identifier& toGateIdentifier(const GateType gate_type)
 {
     switch(gate_type)
     {
-        case GateType::NOT: return name::GATE_NOT;
-        case GateType::AND: return name::GATE_AND;
-        case GateType::OR:  return name::GATE_OR;
-        case GateType::XOR: return name::GATE_XOR;
+        case GateType::NOT: return Name::GATE_NOT;
+        case GateType::AND: return Name::GATE_AND;
+        case GateType::OR:  return Name::GATE_OR;
+        case GateType::XOR: return Name::GATE_XOR;
         default: jassertfalse; return juce::Identifier();
     }
 }
 
 inline GateType toGateEnum(const juce::Identifier& gate_identifier)
 {
-    if(gate_identifier == name::GATE_NOT) return GateType::NOT;
-    if(gate_identifier == name::GATE_AND) return GateType::AND;
-    if(gate_identifier == name::GATE_OR)  return GateType::OR;
-    if(gate_identifier == name::GATE_XOR) return GateType::XOR;
+    if(gate_identifier == Name::GATE_NOT) return GateType::NOT;
+    if(gate_identifier == Name::GATE_AND) return GateType::AND;
+    if(gate_identifier == Name::GATE_OR)  return GateType::OR;
+    if(gate_identifier == Name::GATE_XOR) return GateType::XOR;
     jassertfalse; return GateType::NONE;
 }
 
@@ -213,12 +214,12 @@ inline int gateMaxInputN(const GateType gate_type)
 
 inline bool isIdentifierAGate(const juce::Identifier& id)
 {
-    return id == name::GATE_NOT || id == name::GATE_AND || id == name::GATE_OR || id == name::GATE_XOR;
+    return id == Name::GATE_NOT || id == Name::GATE_AND || id == Name::GATE_OR || id == Name::GATE_XOR;
 }
 
 inline bool isIdentifierASink(const juce::Identifier& id)
 {
-    return id == name::MIX_CHANNEL;
+    return id == Name::MIX_CHANNEL;
 }
 
 

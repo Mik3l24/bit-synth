@@ -34,7 +34,7 @@ namespace ui
         //[Constructor_pre] You can add your own custom stuff here..
         //[/Constructor_pre]
 
-        osc_button = std::make_unique<ElementAdderButton>(ElementType::GENERATOR);
+        osc_button = std::make_unique<ElementAdderButton>(ElementCategory::GENERATOR);
         addAndMakeVisible(osc_button.get());
         osc_button->setButtonText(TRANS("Osc"));
         osc_button->addListener(this);
@@ -69,7 +69,7 @@ namespace ui
 
         xor_button->setBounds(192, 0, 48, 24);
 
-        mix_button = std::make_unique<ElementAdderButton>(ElementType::SINK);
+        mix_button = std::make_unique<ElementAdderButton>(ElementCategory::SINK);
         addAndMakeVisible(mix_button.get());
         mix_button->setButtonText(TRANS("Mix"));
         mix_button->addListener(this);

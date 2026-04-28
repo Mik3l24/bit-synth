@@ -18,12 +18,12 @@ public:
     {
     public:
         Meta() = default;
-        Meta(juce::ValueTree&& _generators, juce::ValueTree&& _components, juce::ValueTree&& _sinks)
-            : generators(std::move(_generators)), components(std::move(_components)), sinks(std::move(_sinks)) {}
+        Meta(juce::ValueTree&& _generators, juce::ValueTree&& _processors, juce::ValueTree&& _sinks)
+            : generators(std::move(_generators)), processors(std::move(_processors)), sinks(std::move(_sinks)) {}
     public:
         // Turns out - these need to be here so BitSynthesiser can be persistently registered as a listener
         juce::ValueTree generators;
-        juce::ValueTree components;
+        juce::ValueTree processors;
         juce::ValueTree sinks;
     };
     class Listener
@@ -44,10 +44,10 @@ public:
     SynthStateManager(SynthStateManager&&) = default;
 
 
-    ElementID addElementRep(ElementType element_type, GateType gate_type = GateType::NONE) const;
+    ElementID addElementRep(ElementCategory element_type, GateType gate_type = GateType::NONE) const;
 
     void setConnection(ConnectionID source_id, ConnectionID target_id) const;
-    void setElementPosition(ElementID id, ElementType element_type, juce::Point<int> position) const;
+    void setElementPosition(ElementID id, ElementCategory element_type, juce::Point<int> position) const;
 
 
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
@@ -62,7 +62,7 @@ private: // Internal methods
 
     [[nodiscard]] juce::String registerDynamicParameter(juce::String friendly_name) const;
 
-    [[nodiscard]] juce::ValueTree& getElementContainer(ElementType element_type) const;
+    [[nodiscard]] juce::ValueTree& getElementContainer(ElementCategory element_type) const;
 
 public:
     juce::AudioProcessorValueTreeState& parameters;

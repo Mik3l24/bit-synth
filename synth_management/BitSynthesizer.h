@@ -19,18 +19,10 @@ public: // constructors
     explicit BitSynthesizer(int num_voices, const SynthStateManager& state_manager);
 
 protected: // Utility access methods
-    juce::ValueTree getOscillator(ConnectionID id) const;
-
-    juce::ValueTree getGate(ConnectionID id) const;
-
-    juce::ValueTree getMixChannel(ConnectionID id) const;
-
-    juce::ValueTree getSource(ConnectionID id) const;
-
-    inline int getComponentIndex(ElementID id) const
+    inline int getProcessorIndex(ElementID id) const
     {
         // FUTURE - if we are to add sorting indirection this could be the place
-        jassert(matchesSign(id, SIGN_COMPONENT));
+        jassert(matchesSign(id, SIGN_PROCESSOR));
         id = std::abs(id);
         return id - 1;
     }

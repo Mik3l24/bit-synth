@@ -24,7 +24,7 @@ namespace ui
 
         void buttonClicked(juce::Button*) override;
 
-        void saveStateToFile(const juce::File& file);
+        void saveStateToFile(const juce::File& file) const;
         void loadStateFromFile(const juce::File& file);
 
         void stateReplaced() override;
