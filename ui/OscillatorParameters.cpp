@@ -176,6 +176,8 @@ OscillatorParameters::OscillatorParameters(const ElementID id, const SynthStateM
         const juce::String phase_parameter_id = tree[name::STARTING_PHASE].toString();
         phase_attachment = std::make_unique<juce::SliderParameterAttachment>(*state_manager.parameters.getParameter(phase_parameter_id), *phase_slider);
     }
+
+    snapAndSavePosition();
     //[/Constructor]
 }
 
@@ -322,11 +324,17 @@ void OscillatorParameters::mouseDrag(const juce::MouseEvent& e)
 
 void OscillatorParameters::mouseUp(const juce::MouseEvent& e)
 {
+    snapAndSavePosition();
+}
+
+void OscillatorParameters::snapAndSavePosition()
+{
     constexpr int quantisation = 2;
     auto position = getPosition();
     position.x = position.x >> quantisation << quantisation;
     position.y = position.y >> quantisation << quantisation;
     setTopLeftPosition(position);
+    state_manager.setElementPosition(id, ElementType::GENERATOR, position);
 }
 
 inline double OscillatorParameters::getRatio() const

@@ -180,7 +180,7 @@ void StructureEditor::rebuildFromTree()
                 ? juce::Point<int>(generator[name::META_UI_POSITION_X], generator[name::META_UI_POSITION_Y])
                 : juce::Point<int>(getWidth() / 2, getHeight() / 2); // Default position if not specified
 
-            addElementComponent(id, position, ElementType::GENERATOR);
+            addElementComponent(id, position, ElementType::GENERATOR, GateType::NONE, false);
         }
         else throw InvalidTreeError("Invalid child type in generators tree: "+generator.getType());
     }
@@ -200,7 +200,7 @@ void StructureEditor::rebuildFromTree()
                 ? juce::Point<int>(component[name::META_UI_POSITION_X], component[name::META_UI_POSITION_Y])
                 : juce::Point<int>(getWidth() / 2, getHeight() / 2); // Default position if not specified
 
-            addElementComponent(id, position, ElementType::COMPONENT, toGateEnum(component.getType()));
+            addElementComponent(id, position, ElementType::COMPONENT, toGateEnum(component.getType()), false);
         }
         else throw InvalidTreeError("Invalid child type in components tree: "+component.getType());
     }
@@ -220,7 +220,7 @@ void StructureEditor::rebuildFromTree()
                 ? juce::Point<int>(sink[name::META_UI_POSITION_X], sink[name::META_UI_POSITION_Y])
                 : juce::Point<int>(getWidth() / 2, getHeight() / 2); // Default position if not specified
 
-            addElementComponent(id, position, ElementType::SINK);
+            addElementComponent(id, position, ElementType::SINK, GateType::NONE, false);
         }
         else throw InvalidTreeError("Invalid child type in sinks tree: "+sink.getType());
     }
@@ -304,7 +304,7 @@ void StructureEditor::itemDropped(const juce::DragAndDropTarget::SourceDetails& 
 
 }
 
-void StructureEditor::addElementComponent(ElementID id, juce::Point<int> position, ElementType element_type, GateType gate_type)
+void StructureEditor::addElementComponent(ElementID id, juce::Point<int> position, ElementType element_type, GateType gate_type, const bool position_is_center)
 {
     juce::Component* component = nullptr;
     switch(element_type)
@@ -332,7 +332,10 @@ void StructureEditor::addElementComponent(ElementID id, juce::Point<int> positio
 
     // Add the component and place it at the mouse position
     addAndMakeVisible(component);
-    component->setCentrePosition(position);
+    if(position_is_center)
+        component->setCentrePosition(position);
+    else
+        component->setTopLeftPosition(position);
 }
 
 OscillatorParameters* StructureEditor::findGeneratorByID(const ElementID id) const

@@ -65,6 +65,9 @@ public:
     void mouseDrag(const juce::MouseEvent &e) override;
     void mouseUp(const juce::MouseEvent &e) override;
 
+private:
+    void snapAndSavePosition();
+
 
 public: // Members
     const ElementID id;

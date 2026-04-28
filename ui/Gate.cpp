@@ -159,6 +159,7 @@ Gate::Gate(const ElementID id, const GateType type, const SynthStateManager stat
 
 
     //[Constructor] You can add your own custom stuff here..
+    snapAndSavePosition();
     //[/Constructor]
 }
 
@@ -251,12 +252,19 @@ void Gate::mouseDrag(const juce::MouseEvent &e)
 
 void Gate::mouseUp(const juce::MouseEvent& e)
 {
+    snapAndSavePosition();
+}
+
+void Gate::snapAndSavePosition()
+{
     constexpr int quantisation = 2;
     auto position = getPosition();
     position.x = position.x >> quantisation << quantisation;
     position.y = position.y >> quantisation << quantisation;
     setTopLeftPosition(position);
+    state_manager.setElementPosition(id, ElementType::COMPONENT, position);
 }
+
 //[/MiscUserCode]
 
 

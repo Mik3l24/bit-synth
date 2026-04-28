@@ -47,6 +47,7 @@ public:
     ElementID addElementRep(ElementType element_type, GateType gate_type = GateType::NONE) const;
 
     void setConnection(ConnectionID source_id, ConnectionID target_id) const;
+    void setElementPosition(ElementID id, ElementType element_type, juce::Point<int> position) const;
 
 
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

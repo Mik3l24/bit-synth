@@ -39,6 +39,14 @@ void SynthStateManager::setConnection(const ConnectionID source_id, const Connec
     jassert(final.isValid());
 }
 
+void SynthStateManager::setElementPosition(ElementID id, ElementType element_type, juce::Point<int> position) const
+{
+    juce::ValueTree element = getElementContainer(element_type).getChildWithProperty(name::ID, id);
+    jassert(element.isValid());
+    element.setProperty(name::META_UI_POSITION_X, position.x, nullptr);
+    element.setProperty(name::META_UI_POSITION_Y, position.y, nullptr);
+}
+
 juce::AudioProcessorValueTreeState::ParameterLayout SynthStateManager::createParameterLayout()
 {
     juce::AudioProcessorValueTreeState::ParameterLayout params =

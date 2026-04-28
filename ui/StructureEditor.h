@@ -71,7 +71,7 @@ private: // Methods
         addElementComponent(id, position, element_type, gate_type);
     }
 
-    void addElementComponent(ElementID id, juce::Point<int> position, ElementType element_type, GateType gate_type = GateType::NONE);
+    void addElementComponent(ElementID id, juce::Point<int> position, ElementType element_type, GateType gate_type = GateType::NONE, bool position_is_center = true);
 
     [[nodiscard]] OscillatorParameters* findGeneratorByID(ElementID id) const;
     [[nodiscard]]                 Gate* findComponentByID(ElementID id) const;

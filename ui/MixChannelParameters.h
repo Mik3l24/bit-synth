@@ -65,6 +65,9 @@ public:
     void mouseDrag(const juce::MouseEvent& e) override;
     void mouseUp(const juce::MouseEvent& e) override;
 
+private:
+    void snapAndSavePosition();
+
 
 public:
     //[UserVariables]   -- You can add your own custom variables in this section.

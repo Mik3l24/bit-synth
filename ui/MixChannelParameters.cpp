@@ -70,6 +70,7 @@ MixChannelParameters::MixChannelParameters (const ElementID id, const SynthState
 
 
     //[Constructor] You can add your own custom stuff here..
+    snapAndSavePosition();
     //[/Constructor]
 }
 
@@ -164,11 +165,17 @@ void MixChannelParameters::mouseDrag(const juce::MouseEvent& e)
 
 void MixChannelParameters::mouseUp(const juce::MouseEvent& e)
 {
+    snapAndSavePosition();
+}
+
+void MixChannelParameters::snapAndSavePosition()
+{
     constexpr int quantisation = 2;
     auto position = getPosition();
     position.x = position.x >> quantisation << quantisation;
     position.y = position.y >> quantisation << quantisation;
     setTopLeftPosition(position);
+    state_manager.setElementPosition(id, ElementType::SINK, position);
 }
 
 void MixChannelParameters::connectionMade(TargetConnector* connector, const ConnectionID source_id)
