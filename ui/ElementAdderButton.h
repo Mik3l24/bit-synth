@@ -12,19 +12,19 @@ class ElementAdderButton : public juce::TextButton
 {
 public:
     explicit ElementAdderButton(ElementCategory element_type);
-    explicit ElementAdderButton(GateType gate_type);
+    explicit ElementAdderButton(ElementType gate_type);
     ~ElementAdderButton() override;
 
 public: // Access methods
     [[nodiscard]] ElementCategory getElementType() const;
-    [[nodiscard]] GateType getGateType() const;
+    [[nodiscard]] ElementType getGateType() const;
 
 public: // Overrides
     void mouseDrag(const juce::MouseEvent& event) override;
 
 protected:
     ElementCategory element_type;
-    GateType gate_type;
+    ElementType gate_type;
 };
 
 } // ui

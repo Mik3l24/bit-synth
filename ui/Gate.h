@@ -16,7 +16,7 @@ class Gate:
     public TargetConnector::Listener
 {
 public:
-    Gate(ElementID _id, GateType _type, SynthStateManager _state_manager);
+    Gate(ElementID _id, ElementType _type, SynthStateManager _state_manager);
     ~Gate() override;
 
     void connectionMade(TargetConnector* connector, ConnectionID source_id) override;
@@ -33,7 +33,7 @@ public:
 
 
 public: // Members
-    const GateType type = GateType::NONE;
+    const ElementType type = ElementType::NONE;
 
 public:
     std::unique_ptr<SourceConnector> source;

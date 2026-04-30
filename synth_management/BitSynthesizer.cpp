@@ -50,6 +50,15 @@ void BitSynthesizer::addOscillator(const juce::ValueTree& tree)
     throwassert(tree.hasProperty(Name::ID),
                 InvalidTreeError("No valid ID in oscillator ValueTree"));
 
+#ifdef DEBUG_VERBOSE
+    juce::XmlElement::TextFormat format;
+#ifndef _WIN32
+    format.newLineChars = "\n";
+#endif
+    std::cout << tree.toXmlString(format) << std::endl;
+    std::cout << state_manager.parameters.getParameter(tree[Name::RATIO].toString()) << std::endl;
+#endif
+
     auto* const ratio_param = state_manager.parameters.getRawParameterValue(tree[Name::RATIO].toString());
     auto* const pw_param = state_manager.parameters.getRawParameterValue(tree[Name::PULSE_WIDTH].toString());
     auto* const starting_phase_param = state_manager.parameters.getRawParameterValue(tree[Name::STARTING_PHASE].toString());

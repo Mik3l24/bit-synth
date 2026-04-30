@@ -44,23 +44,24 @@ public:
     SynthStateManager(SynthStateManager&&) = default;
 
 
-    ElementID addElementRep(ElementCategory element_type, GateType gate_type = GateType::NONE) const;
+    ElementID addElementRep(ElementCategory element_category, ElementType gate_type = ElementType::NONE);
 
-    void setConnection(ConnectionID source_id, ConnectionID target_id) const;
-    void setElementPosition(ElementID id, ElementCategory element_type, juce::Point<int> position) const;
+    void setConnection(ConnectionID source_id, ConnectionID target_id);
+    void setElementPosition(ElementID id, ElementCategory element_category, juce::Point<int> position);
 
 
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    void regenerateElementTrees();
 
 private: // Internal methods
-    [[nodiscard]] size_t getNextDynamicParameterID() const;
-    void setNextFreeDynamicParameterID(size_t id) const;
+    [[deprecated]] [[nodiscard]] size_t getNextDynamicParameterID() const;
+    [[deprecated]] void setNextFreeDynamicParameterID(size_t id);
 
-    [[nodiscard]] juce::ValueTree newOscillatorRep(ElementID id) const;
-    [[nodiscard]] juce::ValueTree newGateRep(ElementID id, GateType type) const;
-    [[nodiscard]] juce::ValueTree newBitMixChannelRep(ElementID id) const;
+    [[nodiscard]] juce::ValueTree newOscillatorRep(ElementID id);
+    [[nodiscard]] juce::ValueTree newGateRep(ElementID id, ElementType type);
+    [[nodiscard]] juce::ValueTree newBitMixChannelRep(ElementID id);
 
-    [[nodiscard]] juce::String registerDynamicParameter(juce::String friendly_name) const;
+    [[deprecated]] [[nodiscard]] juce::String registerDynamicParameter(juce::String friendly_name);
 
     [[nodiscard]] juce::ValueTree& getElementContainer(ElementCategory element_type) const;
 

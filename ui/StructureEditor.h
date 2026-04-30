@@ -30,13 +30,13 @@ public:
     void rebuildUI();
 
 private: // Methods
-    void addNewElement(const juce::Point<int> position, const ElementCategory element_type, const GateType gate_type = GateType::NONE)
+    void addNewElement(const juce::Point<int> position, const ElementCategory element_type, const ElementType gate_type = ElementType::NONE)
     {
         const ElementID id = state_manager.addElementRep(element_type, gate_type);
         addElementComponent(id, position, element_type, gate_type);
     }
 
-    void addElementComponent(ElementID id, juce::Point<int> position, ElementCategory element_type, GateType gate_type = GateType::NONE, bool position_is_center = true);
+    void addElementComponent(ElementID id, juce::Point<int> position, ElementCategory element_type, ElementType gate_type = ElementType::NONE, bool position_is_center = true);
 
     [[nodiscard]] OscillatorParameters* findGeneratorByID(ElementID id) const;
     [[nodiscard]]                 Gate* findProcessorByID(ElementID id) const;

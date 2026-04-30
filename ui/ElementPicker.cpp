@@ -41,28 +41,28 @@ namespace ui
 
         osc_button->setBounds(0, 0, 48, 24);
 
-        not_button = std::make_unique<ElementAdderButton>(GateType::NOT);
+        not_button = std::make_unique<ElementAdderButton>(ElementType::GATE_NOT);
         addAndMakeVisible(not_button.get());
         not_button->setButtonText(TRANS("NOT"));
         not_button->addListener(this);
 
         not_button->setBounds(48, 0, 48, 24);
 
-        and_button = std::make_unique<ElementAdderButton>(GateType::AND);
+        and_button = std::make_unique<ElementAdderButton>(ElementType::GATE_AND);
         addAndMakeVisible(and_button.get());
         and_button->setButtonText(TRANS("AND"));
         and_button->addListener(this);
 
         and_button->setBounds(96, 0, 48, 24);
 
-        or_button = std::make_unique<ElementAdderButton>(GateType::OR);
+        or_button = std::make_unique<ElementAdderButton>(ElementType::GATE_OR);
         addAndMakeVisible(or_button.get());
         or_button->setButtonText(TRANS("OR"));
         or_button->addListener(this);
 
         or_button->setBounds(144, 0, 48, 24);
 
-        xor_button = std::make_unique<ElementAdderButton>(GateType::XOR);
+        xor_button = std::make_unique<ElementAdderButton>(ElementType::GATE_XOR);
         addAndMakeVisible(xor_button.get());
         xor_button->setButtonText(TRANS("XOR"));
         xor_button->addListener(this);

@@ -9,12 +9,12 @@
 namespace ui
 {
 ElementAdderButton::ElementAdderButton(ElementCategory element_type)
-    : element_type(element_type), gate_type(GateType::NONE)
+    : element_type(element_type), gate_type(ElementType::NONE)
 {
     // Setting text is currently done in the constructor of the parent component
 }
 
-ElementAdderButton::ElementAdderButton(GateType gate_type)
+ElementAdderButton::ElementAdderButton(ElementType gate_type)
     : element_type(ElementCategory::PROCESSOR), gate_type(gate_type)
 {
 
@@ -28,7 +28,7 @@ ElementCategory ElementAdderButton::getElementType() const
     return element_type;
 }
 
-GateType ElementAdderButton::getGateType() const
+ElementType ElementAdderButton::getGateType() const
 {
     return gate_type;
 }

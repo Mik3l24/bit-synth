@@ -21,21 +21,21 @@ inline juce::ValueTree newOscillatorRep(ConnectionID id)
     );
 }
 
-inline juce::ValueTree newGateRep(ConnectionID id, GateType type)
+inline juce::ValueTree newGateRep(ConnectionID id, ElementType type)
 {
     const juce::Identifier* type_name = nullptr;
     switch(type)
     {
-        case GateType::NOT:
+        case ElementType::GATE_NOT:
             type_name = &Name::GATE_NOT;
             break;
-        case GateType::AND:
+        case ElementType::GATE_AND:
             type_name = &Name::GATE_AND;
             break;
-        case GateType::OR:
+        case ElementType::GATE_OR:
              type_name = &Name::GATE_OR;
              break;
-        case GateType::XOR:
+        case ElementType::GATE_XOR:
             type_name = &Name::GATE_XOR;
             break;
         default:
@@ -46,7 +46,7 @@ inline juce::ValueTree newGateRep(ConnectionID id, GateType type)
             {Name::ID, id},
             {Name::INDEX, id-1},
             {Name::CONNECTIONS,
-                type == GateType::NOT
+                type == ElementType::GATE_NOT
                 ? juce::Array<juce::var>(CONNECTION_NONE)
                 : juce::Array<juce::var>({CONNECTION_NONE, CONNECTION_NONE})
             }
@@ -102,16 +102,16 @@ struct OscillatorRepresentation : public SourceRepresentation
 
 struct GateNodeRepresentation : public SourceRepresentation
 {
-    const GateType type;
+    const ElementType type;
     const size_t num_inputs = 2;
     ConnectionID input_ids[2] = {0, 0};
 
-    GateNodeRepresentation(ConnectionID id, GateType type, size_t num_inputs)
+    GateNodeRepresentation(ConnectionID id, ElementType type, size_t num_inputs)
             : SourceRepresentation(id, id - 1), type(type), num_inputs(num_inputs) {}
-    GateNodeRepresentation(ConnectionID id, GateType type, ConnectionID input_ids[2])
+    GateNodeRepresentation(ConnectionID id, ElementType type, ConnectionID input_ids[2])
             : SourceRepresentation(id, id - 1), type(type), input_ids{input_ids[0], input_ids[1]} {}
     GateNodeRepresentation(ConnectionID id, ConnectionID input_id)  // Special case for NOT... until I add a buffer gate?
-            : SourceRepresentation(id, id - 1), type(GateType::NOT), num_inputs(1), input_ids{input_id} {}
+            : SourceRepresentation(id, id - 1), type(ElementType::GATE_NOT), num_inputs(1), input_ids{input_id} {}
 };
 
 

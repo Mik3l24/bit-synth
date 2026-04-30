@@ -17,8 +17,9 @@ public:
     explicit SynthElement(const ElementID _id, const ElementCategory _category, const SynthStateManager _state_manager)
         : id(_id), category(_category), state_manager(_state_manager) {}
 
-protected: // Methods
     void snapAndSavePosition();
+
+protected: // Methods
     void repaintEditor() const;
 
 public: // Members
@@ -28,8 +29,6 @@ public: // Members
 protected: // Members
     SynthStateManager state_manager;
 };
-
-
 
 
 } // ui

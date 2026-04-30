@@ -125,7 +125,7 @@ void StructureEditor::rebuildUI()
                 ? juce::Point<int>(generator[Name::META_UI_POSITION_X], generator[Name::META_UI_POSITION_Y])
                 : juce::Point<int>(getWidth() / 2, getHeight() / 2); // Default position if not specified
 
-            addElementComponent(id, position, ElementCategory::GENERATOR, GateType::NONE, false);
+            addElementComponent(id, position, ElementCategory::GENERATOR, ElementType::NONE, false);
         }
         else throw InvalidTreeError("Invalid child type in generators tree: "+generator.getType());
     }
@@ -165,7 +165,7 @@ void StructureEditor::rebuildUI()
                 ? juce::Point<int>(sink[Name::META_UI_POSITION_X], sink[Name::META_UI_POSITION_Y])
                 : juce::Point<int>(getWidth() / 2, getHeight() / 2); // Default position if not specified
 
-            addElementComponent(id, position, ElementCategory::SINK, GateType::NONE, false);
+            addElementComponent(id, position, ElementCategory::SINK, ElementType::NONE, false);
         }
         else throw InvalidTreeError("Invalid child type in sinks tree: "+sink.getType());
     }
@@ -248,9 +248,9 @@ void StructureEditor::itemDropped(const juce::DragAndDropTarget::SourceDetails& 
 
 }
 
-void StructureEditor::addElementComponent(ElementID id, juce::Point<int> position, ElementCategory element_type, GateType gate_type, const bool position_is_center)
+void StructureEditor::addElementComponent(ElementID id, juce::Point<int> position, ElementCategory element_type, ElementType gate_type, const bool position_is_center)
 {
-    juce::Component* component = nullptr;
+    SynthElement* component = nullptr;
     switch(element_type)
     {
         case ElementCategory::GENERATOR:
@@ -280,6 +280,7 @@ void StructureEditor::addElementComponent(ElementID id, juce::Point<int> positio
         component->setCentrePosition(position);
     else
         component->setTopLeftPosition(position);
+    component->snapAndSavePosition();
 }
 
 OscillatorParameters* StructureEditor::findGeneratorByID(const ElementID id) const

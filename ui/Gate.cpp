@@ -6,7 +6,7 @@
 
 namespace ui {
 
-Gate::Gate(const ElementID _id, const GateType _type, const SynthStateManager _state_manager)
+Gate::Gate(const ElementID _id, const ElementType _type, const SynthStateManager _state_manager)
     : SynthElement(_id, ElementCategory::PROCESSOR, _state_manager), type(_type)
 {
     source = std::make_unique<SourceConnector>(createConnectionID(id, 0, SIGN_PROCESSOR));
@@ -20,7 +20,7 @@ Gate::Gate(const ElementID _id, const GateType _type, const SynthStateManager _s
     target0->setName("target0");
     target0->addListener(this);
 
-    if(type != GateType::NOT)
+    if(type != ElementType::GATE_NOT)
     {
         target0->setCentrePosition(13, 41);
 
@@ -39,7 +39,7 @@ Gate::Gate(const ElementID _id, const GateType _type, const SynthStateManager _s
 
     switch(type) // Body
     {
-    case GateType::AND:
+    case ElementType::GATE_AND:
         bodyPath.startNewSubPath(30.0f, 30.0f);
         bodyPath.lineTo(54.0f, 30.0f);
         bodyPath.quadraticTo(72.0f, 30.0f, 72.0f, 50.0f);
@@ -47,12 +47,12 @@ Gate::Gate(const ElementID _id, const GateType _type, const SynthStateManager _s
         bodyPath.lineTo(30.0f, 70.0f);
         bodyPath.closeSubPath();
         break;
-    case GateType::XOR:
+    case ElementType::GATE_XOR:
         // The additional curve
         bodyPath.startNewSubPath(19.0f, 69.0f);
         bodyPath.quadraticTo(28.0f, 63.0f, 28.0f, 49.0f);
         bodyPath.quadraticTo(28.0f, 37.0f, 20.0f, 30.0f);
-    case GateType::OR:
+    case ElementType::GATE_OR:
         // The common _or body
         bodyPath.startNewSubPath(45.0f, 29.0f);
         bodyPath.quadraticTo(64.0f, 29.0f, 70.0f, 50.0f);
@@ -62,7 +62,7 @@ Gate::Gate(const ElementID _id, const GateType _type, const SynthStateManager _s
         bodyPath.quadraticTo(36.0f, 37.0f, 29.0f, 29.0f);
         bodyPath.closeSubPath();
         break;
-    case GateType::NOT:
+    case ElementType::GATE_NOT:
         bodyPath.startNewSubPath(28.0f, 33.0f);
         bodyPath.lineTo(63.0f, 50.0f);
         bodyPath.lineTo(28.0f, 67.0f);
@@ -81,8 +81,8 @@ Gate::Gate(const ElementID _id, const GateType _type, const SynthStateManager _s
 
     switch(type) // Target tips
     {
-    case GateType::AND:
-    case GateType::XOR:
+    case ElementType::GATE_AND:
+    case ElementType::GATE_XOR:
         // target1 tip
         connectorsPath.setUsingNonZeroWinding(false);
         connectorsPath.startNewSubPath(13.0f, 59.0f);
@@ -95,7 +95,7 @@ Gate::Gate(const ElementID _id, const GateType _type, const SynthStateManager _s
         connectorsPath.lineTo(27.0f, 41.0f);
         connectorsPath.closeSubPath();
         break;
-    case GateType::OR: // OR tips are slightly longer
+    case ElementType::GATE_OR: // OR tips are slightly longer
         connectorsPath.setUsingNonZeroWinding(false);
         connectorsPath.startNewSubPath(13.0f, 59.0f);
         connectorsPath.lineTo(34.0f, 59.0f);
@@ -106,7 +106,7 @@ Gate::Gate(const ElementID _id, const GateType _type, const SynthStateManager _s
         connectorsPath.lineTo(34.0f, 41.0f);
         connectorsPath.closeSubPath();
         break;
-    case GateType::NOT:
+    case ElementType::GATE_NOT:
         connectorsPath.setUsingNonZeroWinding(false);
         connectorsPath.startNewSubPath(13.0f, 50.0f);
         connectorsPath.lineTo(26.0f, 50.0f);
@@ -154,7 +154,7 @@ void Gate::paint(juce::Graphics& g)
                                       juce::PathStrokeType::EndCapStyle::rounded),
                  juce::AffineTransform::translation(0, 0));
 
-    if(type == GateType::NOT)
+    if(type == ElementType::GATE_NOT)
     {
         constexpr float x = 61.0f, y = 45.0f, width = 10.0f, height = 10.0f;
         g.setColour(fillColour);
@@ -175,7 +175,7 @@ std::optional<std::pair<juce::Point<int>, juce::Point<int>>> Gate::getConnection
 {
     if(target == 0)
         return target0->getConnectionPoints();
-    else if(target == 1 && type != GateType::NOT)
+    else if(target == 1 && type != ElementType::GATE_NOT)
         return target1->getConnectionPoints();
     else
         return std::nullopt;

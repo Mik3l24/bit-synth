@@ -27,6 +27,8 @@ SynthEditor::SynthEditor(juce::AudioProcessor* _parent, SynthStateManager& state
 
     if(sender != nullptr)
         sender->addStateListener(this);
+
+    rebuildUI();
 }
 
 SynthEditor::~SynthEditor()

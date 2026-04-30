@@ -17,6 +17,16 @@ public:
     explicit InvalidTreeError(const char* _Message) : _Mybase(_Message) {}
 };
 
+class LimitError : public std::runtime_error
+{
+public:
+    using _Mybase = std::runtime_error;
+
+    explicit LimitError(const juce::String& _Message) : _Mybase(_Message.getCharPointer()) {}
+    explicit LimitError(const char* _Message) : _Mybase(_Message) {}
+    explicit LimitError(const std::string& _Message) : _Mybase(_Message) {}
+};
+
 #define throwassert(condition, exc) \
 JUCE_BLOCK_WITH_FORCED_SEMICOLON( \
     if(!(condition)) \

@@ -68,12 +68,20 @@ enum class ElementCategory
     SINK,
 };
 
-
-enum class GateType
+// Used to be called GateType. TODO - make the places that call SynthStateManager::addElementRep provide this for oscillators and mix channels as well
+enum class ElementType
 {
-    NONE, // Only exists so non-gate ElementAdderButtons don't need to be assigned a gate type
-    NOT,
-    AND, OR, XOR,
+    NONE = 0,
+    // Processor types
+    GATE_NOT = 1,
+    GATE_AND, GATE_OR, GATE_XOR,
+
+    // Generator types
+    GEN_OSCILLATOR = 65,
+
+    // Sink types
+    SINK_BITMIX = 129,
+
 };
 
 
@@ -178,36 +186,36 @@ inline const juce::Identifier& toContainerIdentifier(const ElementCategory eleme
     }
 }
 
-inline const juce::Identifier& toGateIdentifier(const GateType gate_type)
+inline const juce::Identifier& toGateIdentifier(const ElementType gate_type)
 {
     switch(gate_type)
     {
-        case GateType::NOT: return Name::GATE_NOT;
-        case GateType::AND: return Name::GATE_AND;
-        case GateType::OR:  return Name::GATE_OR;
-        case GateType::XOR: return Name::GATE_XOR;
+        case ElementType::GATE_NOT: return Name::GATE_NOT;
+        case ElementType::GATE_AND: return Name::GATE_AND;
+        case ElementType::GATE_OR:  return Name::GATE_OR;
+        case ElementType::GATE_XOR: return Name::GATE_XOR;
         default: jassertfalse; return juce::Identifier();
     }
 }
 
-inline GateType toGateEnum(const juce::Identifier& gate_identifier)
+inline ElementType toGateEnum(const juce::Identifier& gate_identifier)
 {
-    if(gate_identifier == Name::GATE_NOT) return GateType::NOT;
-    if(gate_identifier == Name::GATE_AND) return GateType::AND;
-    if(gate_identifier == Name::GATE_OR)  return GateType::OR;
-    if(gate_identifier == Name::GATE_XOR) return GateType::XOR;
-    jassertfalse; return GateType::NONE;
+    if(gate_identifier == Name::GATE_NOT) return ElementType::GATE_NOT;
+    if(gate_identifier == Name::GATE_AND) return ElementType::GATE_AND;
+    if(gate_identifier == Name::GATE_OR)  return ElementType::GATE_OR;
+    if(gate_identifier == Name::GATE_XOR) return ElementType::GATE_XOR;
+    jassertfalse; return ElementType::NONE;
 }
 
 
-inline int gateMaxInputN(const GateType gate_type)
+inline int gateMaxInputN(const ElementType gate_type)
 {
     switch(gate_type)
     {
-        case GateType::NOT: return 1;
-        case GateType::AND:
-        case GateType::OR:
-        case GateType::XOR: return 2;
+        case ElementType::GATE_NOT: return 1;
+        case ElementType::GATE_AND:
+        case ElementType::GATE_OR:
+        case ElementType::GATE_XOR: return 2;
         default: jassertfalse; return 0;
     }
 }
