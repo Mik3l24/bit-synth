@@ -26,8 +26,7 @@ SynthAudioProcessor::~SynthAudioProcessor()
 
 void SynthAudioProcessor::getStateInformation(juce::MemoryBlock& dest_data)
 {
-    auto state = parameters.copyState();
-    const auto xml(state.createXml());
+    const auto xml = getStateAsXml();
     copyXmlToBinary(*xml, dest_data);
 }
 
@@ -36,7 +35,23 @@ void SynthAudioProcessor::setStateInformation(const void* data, const int size_i
     const auto xml_element(getXmlFromBinary(data, size_in_bytes));
     if(xml_element == nullptr || !xml_element->hasTagName(parameters.state.getType()))
         return;
-    parameters.replaceState(juce::ValueTree::fromXml(*xml_element));
+    setStateFromXml(*xml_element);
+}
+
+std::unique_ptr<juce::XmlElement> SynthAudioProcessor::getStateAsXml()
+{
+    const auto state = parameters.copyState();
+    return state.createXml();
+}
+
+void SynthAudioProcessor::setStateFromXml(const juce::XmlElement& xml_element)
+{
+    if(!xml_element.hasTagName(parameters.state.getType()))
+        return;
+
+    // TODO - need a better way of clearing the state if the loaded patch is invalid.
+    // Maybe prompt the user with a dialog?
+    parameters.replaceState(juce::ValueTree::fromXml(xml_element));
     initState();
 
 #ifdef DEBUG_VERBOSE

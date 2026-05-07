@@ -37,6 +37,9 @@ public:
     // State management overrides
     void getStateInformation(juce::MemoryBlock& dest_data) override;
     void setStateInformation(const void* data, int size_in_bytes) override;
+    // State management helper methods
+    std::unique_ptr<juce::XmlElement> getStateAsXml();
+    void setStateFromXml(const juce::XmlElement&);
 
     // Audio processing overrides
     void prepareToPlay(double _sample_rate, int max_samples_per_block) override;

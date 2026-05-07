@@ -54,29 +54,45 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # Finally, we supply a list of source files that will be built into the target. This is a standard
 # CMake command.
 
+set(BITPROCESSING_SOURCES_DSP
+    dsp/bitprocessing/BitIO.cpp
+    dsp/bitprocessing/GateNode.cpp
+    dsp/bitprocessing/Oscillator.cpp
+    dsp/bitprocessing/BitMixChannel.cpp
+    dsp/BitSynthVoice.cpp
+)
+
+set(BITPROCESSING_SOURCES_SYNTH
+    synth_management/BitSynthesizer.cpp
+    synth_management/SynthStateManager.cpp
+    SynthAudioProcessor.cpp
+)
+
+set(BITPROCESSING_SOURCES_UI
+    ui/Theme.cpp
+    ui/SourceConnector.cpp
+    ui/TargetConnector.cpp
+    ui/SynthElement.cpp
+    ui/OscillatorParameters.cpp
+    ui/MixChannelParameters.cpp
+    ui/Gate.cpp
+    ui/ElementAdderButton.cpp
+    ui/ElementPicker.cpp
+    ui/StructureEditor.cpp
+    ui/TopBar.cpp
+    ui/SynthEditor.cpp
+)
+
+set(BITPROCESSING_SOURCES
+    ${BITPROCESSING_SOURCES_DSP}
+    ${BITPROCESSING_SOURCES_SYNTH}
+    ${BITPROCESSING_SOURCES_UI}
+)
+
 target_sources(bitprocessing
     PRIVATE
         Main.cpp
-        dsp/bitprocessing/BitIO.cpp
-        dsp/bitprocessing/GateNode.cpp
-        dsp/bitprocessing/Oscillator.cpp
-        dsp/bitprocessing/BitMixChannel.cpp
-        dsp/BitSynthVoice.cpp
-        synth_management/BitSynthesizer.cpp
-        synth_management/SynthStateManager.cpp
-        ui/Theme.cpp
-        ui/SourceConnector.cpp
-        ui/TargetConnector.cpp
-        ui/SynthElement.cpp
-        ui/OscillatorParameters.cpp
-        ui/MixChannelParameters.cpp
-        ui/Gate.cpp
-        ui/ElementAdderButton.cpp
-        ui/ElementPicker.cpp
-        ui/StructureEditor.cpp
-        ui/TopBar.cpp
-        SynthAudioProcessor.cpp
-        ui/SynthEditor.cpp
+        ${BITPROCESSING_SOURCES}
 )
 
 # `target_compile_definitions` adds some preprocessor definitions to our target. In a Projucer
@@ -115,7 +131,7 @@ target_compile_definitions(bitprocessing
 target_link_libraries(bitprocessing
     PRIVATE
         # GuiAppData            # If we'd created a binary data target, we'd link to it here
-        juce::juce_gui_extra
+        juce::juce_gui_basics
         juce::juce_audio_utils
     PUBLIC
         juce::juce_recommended_config_flags
@@ -126,3 +142,70 @@ target_link_libraries(bitprocessing
     LINK_PUBLIC
         ${Boost_LIBRARIES}
 )
+
+# --- Benchmark executable section ---
+
+juce_add_console_app(bitprocessing_benchmark
+    COMPANY_NAME "Mik3l24"
+    PRODUCT_NAME "Bit Synth Benchmark"
+)
+
+target_sources(bitprocessing_benchmark
+    PRIVATE
+        "benchmark/Main.cpp"
+        "benchmark/Benchmark.cpp"
+        ${BITPROCESSING_SOURCES}
+)
+
+
+include_directories(bitprocessing_benchmark
+    ${Boost_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_compile_definitions(bitprocessing_benchmark
+    PRIVATE
+        JUCE_WEB_BROWSER=0
+        JUCE_USE_CURL=0
+        JUCE_APPLICATION_NAME_STRING="$<TARGET_PROPERTY:bitprocessing_benchmark,JUCE_PRODUCT_NAME>"
+        JUCE_APPLICATION_VERSION_STRING="$<TARGET_PROPERTY:bitprocessing_benchmark,JUCE_VERSION>"
+        JUCE_USE_FLAC=0
+        JUCE_USE_OGGVORBIS=0
+        ${DEBUG_DEFS}
+)
+
+target_link_libraries(bitprocessing_benchmark
+    PRIVATE
+        juce::juce_audio_utils
+    PUBLIC
+        juce::juce_recommended_config_flags
+        juce::juce_recommended_lto_flags
+        juce::juce_recommended_warning_flags
+        ${Boost_LIBRARIES}
+)
+
+# Run benchmarks:
+enable_testing()
+
+set(BENCHMARK_PATCH_DIR ${CMAKE_CURRENT_SOURCE_DIR}/benchmark/patches)
+set(BENCHMARK_PATCH_FILES
+    "basic_xor.xml"
+    "lattice_forward_4_4x4_4_xor.xml"
+)
+
+add_custom_target(run_benchmarks)
+add_dependencies(run_benchmarks bitprocessing_benchmark)
+
+
+foreach(PATCH_FILE IN LISTS BENCHMARK_PATCH_FILES)
+    add_test(NAME "Benchmark_${PATCH_FILE}"
+        COMMAND $<TARGET_FILE:bitprocessing_benchmark> ${BENCHMARK_PATCH_DIR}/${PATCH_FILE}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    )
+    add_custom_command(TARGET run_benchmarks
+        POST_BUILD
+        COMMAND $<TARGET_FILE:bitprocessing_benchmark> ${BENCHMARK_PATCH_DIR}/${PATCH_FILE}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    )
+endforeach(PATCH_FILE)
+
