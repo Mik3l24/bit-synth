@@ -107,6 +107,11 @@ inline ConnectionID applySign(const ConnectionID connection, const ConnectionSig
     return sign ? negate(connection) : connection;
 }
 
+inline ElementID applySignElement(const ElementID connection, const ConnectionSign sign)
+{
+    return sign ? negate(connection) : connection;
+}
+
 inline bool matchesSign(const ConnectionID connection, const ConnectionSign sign)
 {
     return connection != 0 && isNegative(connection) == sign;
@@ -143,14 +148,22 @@ inline ConnectionID appendSubConnectionID(const SubConnectionID connection, cons
     return applySign(appended, sign);
 }
 
-inline ConnectionID createConnectionID(ElementID element_id, const SubConnectionID sub_connection_id, const ConnectionSign sign)
+inline ConnectionID createConnectionID(ElementID element_id, const SubConnectionID sub_connection_id)
 {
     using namespace __SynthManagementNames_private;
+    jassert(element_id != 0);
+    const auto sign = element_id < 0;
     element_id = std::abs(element_id);
     const auto masked_element_id = juce::uint64(element_id) & ELEMENT_MASK;
     const auto masked_sub_connection_id = (juce::uint64(sub_connection_id) << INDEX_SHIFT) & INDEX_MASK;
     const auto combined = masked_element_id | masked_sub_connection_id;
     return applySign(ConnectionID(combined), sign);
+}
+
+inline ConnectionID createConnectionIDWithSign(ElementID element_id, const SubConnectionID sub_connection_id, const ConnectionSign sign)
+{
+    jassert(matchesSign(element_id, sign));
+    return createConnectionID(element_id, sub_connection_id);
 }
 
 inline ElementID createElementID(const int index, const ElementCategory element_type)

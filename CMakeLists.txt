@@ -143,6 +143,46 @@ target_link_libraries(bitprocessing
         ${Boost_LIBRARIES}
 )
 
+# --- Lattice generator executable section ---
+
+juce_add_console_app(bitprocessing_lattice
+    COMPANY_NAME "Mik3l24"
+    PRODUCT_NAME "Bit Synth Lattice Generator"
+)
+
+target_sources(bitprocessing_lattice
+    PRIVATE
+        benchmark/LatticeGenerator.cpp
+        synth_management/SynthStateManager.cpp
+)
+
+include_directories(bitprocessing_lattice
+    ${Boost_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_compile_definitions(bitprocessing_lattice
+    PRIVATE
+        JUCE_WEB_BROWSER=0
+        JUCE_USE_CURL=0
+        JUCE_APPLICATION_NAME_STRING="$<TARGET_PROPERTY:bitprocessing_lattice,JUCE_PRODUCT_NAME>"
+        JUCE_APPLICATION_VERSION_STRING="$<TARGET_PROPERTY:bitprocessing_lattice,JUCE_VERSION>"
+        JUCE_USE_FLAC=0
+        JUCE_USE_OGGVORBIS=0
+        ${DEBUG_DEFS}
+)
+
+target_link_libraries(bitprocessing_lattice
+    PRIVATE
+        juce::juce_audio_utils
+    PUBLIC
+        juce::juce_recommended_config_flags
+        juce::juce_recommended_lto_flags
+        juce::juce_recommended_warning_flags
+        ${Boost_LIBRARIES}
+)
+
+
 # --- Benchmark executable section ---
 
 juce_add_console_app(bitprocessing_benchmark
@@ -192,6 +232,8 @@ set(BENCHMARK_PATCH_FILES
     "basic_xor.xml"
     "lattice_forward_4_4x4_4_xor.xml"
     "lattice_backward_4_4x4_4_xor.xml"
+    "lattice_forward_16x32_xor.xml"
+    "lattice_backward_16x32_xor.xml"
 )
 
 add_custom_target(run_benchmarks)

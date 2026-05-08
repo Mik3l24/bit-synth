@@ -21,7 +21,7 @@ MixChannelParameters::MixChannelParameters(const ElementID _id, const SynthState
     level_label->setColour(juce::TextEditor::textColourId, juce::Colours::black);
     level_label->setColour(juce::TextEditor::backgroundColourId, juce::Colour(0x00000000));
 
-    target.reset(new TargetConnector(createConnectionID(id, 0, SIGN_SINK)));
+    target.reset(new TargetConnector(createConnectionIDWithSign(id, 0, SIGN_SINK)));
     addAndMakeVisible(target.get());
     target->addListener(this);
     target->setBounds(0, 40, 10, 10);

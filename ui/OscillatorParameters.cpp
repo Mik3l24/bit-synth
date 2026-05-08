@@ -117,7 +117,7 @@ OscillatorParameters::OscillatorParameters(const ElementID _id, const SynthState
 
 #endif
 
-    source_connector = std::make_unique<SourceConnector>(createConnectionID(id, 0, SIGN_GENERATOR));
+    source_connector = std::make_unique<SourceConnector>(createConnectionIDWithSign(id, 0, SIGN_GENERATOR));
     addAndMakeVisible(source_connector.get());
     internalPath1.startNewSubPath(72.0f, 16.0f);
     internalPath1.lineTo(64.0f, 32.0f);

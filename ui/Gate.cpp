@@ -9,13 +9,13 @@ namespace ui {
 Gate::Gate(const ElementID _id, const ElementType _type, const SynthStateManager _state_manager)
     : SynthElement(_id, ElementCategory::PROCESSOR, _state_manager), type(_type)
 {
-    source = std::make_unique<SourceConnector>(createConnectionID(id, 0, SIGN_PROCESSOR));
+    source = std::make_unique<SourceConnector>(createConnectionIDWithSign(id, 0, SIGN_PROCESSOR));
     addAndMakeVisible(source.get());
     source->setName("source");
 
     source->setCentrePosition(86, 50);
 
-    target0 = std::make_unique<TargetConnector>(createConnectionID(id, 0, SIGN_PROCESSOR));
+    target0 = std::make_unique<TargetConnector>(createConnectionIDWithSign(id, 0, SIGN_PROCESSOR));
     addAndMakeVisible(target0.get());
     target0->setName("target0");
     target0->addListener(this);
@@ -24,7 +24,7 @@ Gate::Gate(const ElementID _id, const ElementType _type, const SynthStateManager
     {
         target0->setCentrePosition(13, 41);
 
-        target1 = std::make_unique<TargetConnector>(createConnectionID(id, 1, SIGN_PROCESSOR));
+        target1 = std::make_unique<TargetConnector>(createConnectionIDWithSign(id, 1, SIGN_PROCESSOR));
         addAndMakeVisible(target1.get());
         target1->setName("target1");
         target1->addListener(this);
