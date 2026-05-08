@@ -191,6 +191,7 @@ set(BENCHMARK_PATCH_DIR ${CMAKE_CURRENT_SOURCE_DIR}/benchmark/patches)
 set(BENCHMARK_PATCH_FILES
     "basic_xor.xml"
     "lattice_forward_4_4x4_4_xor.xml"
+    "lattice_backward_4_4x4_4_xor.xml"
 )
 
 add_custom_target(run_benchmarks)
