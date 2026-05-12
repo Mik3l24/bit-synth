@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(Boost_NO_SYSTEM_PATHS ON)
 set(Boost_NO_BOOST_CMAKE  ON) # additional set this one]]
 
-find_package(Boost 1.83 REQUIRED)
+find_package(Boost CONFIG REQUIRED)
 find_package(JUCE CONFIG REQUIRED)
 
 

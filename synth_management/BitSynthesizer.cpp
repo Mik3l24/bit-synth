@@ -9,9 +9,9 @@
 #include "SynthManagementNames.h"
 #include "Errors.h"
 
-inline BitSynthVoice* castVoice(juce::SynthesiserVoice* voice)
+inline dsp::BitSynthVoice* castVoice(juce::SynthesiserVoice* voice)
 {
-    auto* bit_voice = dynamic_cast<BitSynthVoice*>(voice); // Should be always correct, as only BitSynthVoices are added to the synthesizer
+    auto* bit_voice = dynamic_cast<dsp::BitSynthVoice*>(voice); // Should be always correct, as only BitSynthVoices are added to the synthesizer
     jassert(bit_voice != nullptr);
     return bit_voice;
 }
@@ -33,12 +33,12 @@ inline juce::Array<juce::var> connections(const juce::ValueTree& tree)
 }
 
 
-BitSynthesizer::BitSynthesizer(int num_voices, const SynthStateManager& state_manager)
-    : state_manager(state_manager)
+BitSynthesizer::BitSynthesizer(int num_voices, const SynthStateManager& _state_manager)
+    : state_manager(_state_manager)
 {
     addSound(new BitSynthSound());
     for(int i = 0; i < num_voices; i++)
-        addVoice(new BitSynthVoice());
+        addVoice(new dsp::BitSynthVoice());
 }
 
 void BitSynthesizer::addOscillator(const juce::ValueTree& tree)
@@ -69,18 +69,18 @@ void BitSynthesizer::addOscillator(const juce::ValueTree& tree)
     {
         BIT_VOICE(voice);
         bit_voice->oscillators.emplace_back(
-            new Oscillator(*ratio_param, *pw_param, *starting_phase_param)
+            new dsp::Oscillator(*ratio_param, *pw_param, *starting_phase_param)
         );
     }
 }
 
-inline ptr<GateNode> selectNewGate(const juce::ValueTree& gate)
+inline dsp::ptr<dsp::GateNode> selectNewGate(const juce::ValueTree& gate)
 {
     const auto type = gate.getType();
-    if(type == Name::GATE_NOT) return ptr<GateNode>(new NotGate());
-    if(type == Name::GATE_AND) return ptr<GateNode>(new AndGate());
-    if(type == Name::GATE_OR)  return ptr<GateNode>(new OrGate());
-    if(type == Name::GATE_XOR) return ptr<GateNode>(new XorGate());
+    if(type == Name::GATE_NOT) return dsp::ptr<dsp::GateNode>(new dsp::NotGate());
+    if(type == Name::GATE_AND) return dsp::ptr<dsp::GateNode>(new dsp::AndGate());
+    if(type == Name::GATE_OR)  return dsp::ptr<dsp::GateNode>(new dsp::OrGate());
+    if(type == Name::GATE_XOR) return dsp::ptr<dsp::GateNode>(new dsp::XorGate());
     jassertfalse; return nullptr;
 }
 
@@ -110,7 +110,7 @@ void BitSynthesizer::setInput(ElementID id, ConnectionID source_id, SubConnectio
         BIT_VOICE(voice);
 
         // FUTURE - Will need refactoring if multi-output elements are introduced
-        BitSource* bit_source = nullptr;
+        dsp::BitSource* bit_source = nullptr;
         if(matchesSign(source_id, SIGN_GENERATOR))
         {
             jassert(source_id != 0);
@@ -173,7 +173,7 @@ void BitSynthesizer::addMixChannel(const juce::ValueTree& mix)
     for(const auto& voice : voices)
     {
         BIT_VOICE(voice);
-        bit_voice->bit_inputs.emplace_back(new BitMixChannel(*level_param));
+        bit_voice->bit_inputs.emplace_back(new dsp::BitMixChannel(*level_param));
     }
 }
 
@@ -282,12 +282,13 @@ void BitSynthesizer::valueTreeChildAdded(juce::ValueTree& parent_tree, juce::Val
 
 void BitSynthesizer::valueTreeChildRemoved(juce::ValueTree& parent_tree, juce::ValueTree& child_tree, int removed_child_i)
 {
+    juce::ignoreUnused(parent_tree, child_tree, removed_child_i);
     jassertfalse; // Not implemented yet, but will be needed for element removal
 }
 
 void BitSynthesizer::valueTreeRedirected(juce::ValueTree& affected_tree)
 {
-
+    juce::ignoreUnused(affected_tree);
 }
 
 

@@ -6,15 +6,18 @@
 #include <juce_core/juce_core.h>
 #include <atomic>
 
+namespace dsp
+{
+
 class Oscillator : public BitSource
 {
 public: // Constructors, destructors
-    // Oscillators are all processed first, so they're always ready
     Oscillator(std::atomic<float>& _ratio, std::atomic<float>& _pulse_width, std::atomic<float>& _starting_phase)
-        : ratio(_ratio), pulse_width(_pulse_width), starting_phase(_starting_phase) { ready = true; }
+        : ratio(_ratio), pulse_width(_pulse_width), starting_phase(_starting_phase)
+    { ready = true; } // Oscillators are all processed first, so they're always ready
 
 public: // DSP setup and processing methods
-    void prepareToPlay(int samplesPerBlockExpected, double sampleRate);
+    void prepareToPlay(int _samples_per_block, double _sample_rate);
     void prepareVoice(double pitch);
     void processSample(int sample_index);
 
@@ -36,3 +39,4 @@ private: // Internal processing variables
     double width_threshold = juce::MathConstants<double>::pi;
 };
 
+}

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="CidrCTestProjectState">
-    <ctestState>
-      <lineNumber testId="path:CMakeLists.txt test:Benchmark_basic_xor.xml" value="200" />
-      <lineNumber testId="path:CMakeLists.txt test:Benchmark_lattice_forward_4_4x4_4_xor.xml" value="200" />
-    </ctestState>
-  </component>
-</project>

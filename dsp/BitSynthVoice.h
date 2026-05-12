@@ -11,8 +11,10 @@
 #include "bitprocessing/GateNode.h"
 #include "bitprocessing/BitMixChannel.h"
 
-template <typename T> using ptr = std::unique_ptr<T>;
+namespace dsp
+{
 
+template <typename T> using ptr = std::unique_ptr<T>;
 
 class BitSynthVoice : public juce::SynthesiserVoice
 {
@@ -21,7 +23,7 @@ public:
 
     bool canPlaySound(juce::SynthesiserSound* sound) override;
 
-    void startNote(int midiNoteNumber, float velocity,
+    void startNote(int midi_note_number, float velocity,
                    juce::SynthesiserSound*, int /*currentPitchWheelPosition*/) override;
 
     void stopNote(float /*velocity*/, bool allowTailOff) override;
@@ -30,7 +32,7 @@ public:
 
     void controllerMoved(int, int) override {};
 
-    void renderNextBlock(juce::AudioSampleBuffer& outputBuffer, int startSample, int numSamples) override;
+    void renderNextBlock(juce::AudioSampleBuffer& output_buffer, int start_sample, int sample_n) override;
 
 public: // Parameter access methods
     void setMasterLevel(float level);
@@ -51,3 +53,4 @@ private:
     bool voice_active = false;
 };
 
+}

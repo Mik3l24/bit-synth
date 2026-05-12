@@ -2,8 +2,14 @@
 // Created by micha on 06.11.2023.
 //
 #pragma once
-#include "DspNames.h"
 #include <vector>
+
+#include "DspNames.h"
+#include "synth_management/SynthManagementNames.h"
+
+
+namespace dsp
+{
 
 class Connectable
 {
@@ -32,14 +38,14 @@ public: // Constructors, destructors
     explicit BitReceiver(size_t num_inputs = 1);
 
 public: // DSP setup and processing methods
-    virtual void prepareToPlay(size_t samplesPerBlockExpected);
+    virtual void prepareToPlay(size_t _samples_per_block);
 
 public: // Parameter setters, getters
-    void setInput(const BitSource* input, size_t index = 0);
+    void setInput(const BitSource* input, SubConnectionID index = 0);
 
 protected: // Internal interfaces for subclasses
     status checkConnections();
-    [[nodiscard]] const bitset& getOutFromInput(size_t index = 0) const; // TODO: change to const bitset& to avoid copying
+    [[nodiscard]] const bitset& getOutFromInput(SubConnectionID index = 0) const; // TODO: change to const bitset& to avoid copying
 
 protected: // Fields
     const std::size_t num_inputs = 1;
@@ -59,3 +65,4 @@ private: // Fields
     bitset zeroes;
 };
 
+}

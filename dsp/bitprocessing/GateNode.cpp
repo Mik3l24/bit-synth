@@ -4,6 +4,8 @@
 
 #include "GateNode.h"
 
+using namespace dsp;
+
 status GateNode::processBlock()
 {
     switch(checkConnections())

@@ -4,7 +4,8 @@
 #pragma once
 #include "BitIO.h"
 
-
+namespace dsp
+{
 
 class GateNode : public BitSource, public BitReceiver
 {
@@ -56,3 +57,5 @@ class XorGate : public BinaryGate
 private:
     bitset operation() override;
 };
+
+}

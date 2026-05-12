@@ -4,6 +4,7 @@
 #include "BitIO.h"
 #include <juce_core/juce_core.h>
 
+using namespace dsp;
 
 BitReceiver::BitReceiver(size_t num_inputs)
     : num_inputs(num_inputs)
@@ -11,9 +12,9 @@ BitReceiver::BitReceiver(size_t num_inputs)
     inputs.assign(num_inputs, nullptr);
 }
 
-void BitReceiver::prepareToPlay(size_t samplesPerBlockExpected)
+void BitReceiver::prepareToPlay(size_t _samples_per_block)
 {
-    num_samples = samplesPerBlockExpected;
+    num_samples = _samples_per_block;
     zeroes = bitset(num_samples);
 }
 
@@ -37,7 +38,7 @@ status BitReceiver::checkConnections()
     return status::SUCCESS;
 }
 
-const bitset& BitReceiver::getOutFromInput(size_t index) const
+const bitset& BitReceiver::getOutFromInput(SubConnectionID index) const
 {
     // getOut() and getOutFromInput() used to have to construct a new bitset every call,
     // which wasn't ideal to be called for every sample, like in BitMixChannel.
@@ -49,7 +50,7 @@ const bitset& BitReceiver::getOutFromInput(size_t index) const
         return zeroes;
 }
 
-void BitReceiver::setInput(const BitSource* input, size_t index)
+void BitReceiver::setInput(const BitSource* input, SubConnectionID index)
 {
     jassert(index < num_inputs);
     inputs[index] = input;

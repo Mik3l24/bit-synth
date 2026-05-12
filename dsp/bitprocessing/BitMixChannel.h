@@ -5,6 +5,8 @@
 #include "BitIO.h"
 #include <atomic>
 
+namespace dsp
+{
 
 // Always one input
 class BitMixChannel : public BitReceiver
@@ -22,5 +24,4 @@ protected: // Parameters
     std::atomic<float>& level;
 };
 
-
-
+}

@@ -4,6 +4,8 @@
 #pragma once
 #include <boost/dynamic_bitset.hpp>
 
+namespace dsp
+{
 
 typedef boost::dynamic_bitset<unsigned short> bitset;
 
@@ -16,4 +18,4 @@ enum class status
     UNCONNECTED,
 };
 
-
+}

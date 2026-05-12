@@ -4,11 +4,12 @@
 
 #include "Oscillator.h"
 
+using namespace dsp;
 
-void Oscillator::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
+void Oscillator::prepareToPlay(int _samples_per_block, double _sample_rate)
 {
-    sample_rate = sampleRate;
-    samples_per_block = samplesPerBlockExpected;
+    sample_rate = _sample_rate;
+    samples_per_block = _samples_per_block;
     out = bitset(samples_per_block);
 }
 

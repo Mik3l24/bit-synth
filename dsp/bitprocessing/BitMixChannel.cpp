@@ -3,6 +3,8 @@
 //
 #include "BitMixChannel.h"
 
+using namespace dsp;
+
 float BitMixChannel::getSample(int sample_index)
 {
     // Should be skipped if not connected, but just in case

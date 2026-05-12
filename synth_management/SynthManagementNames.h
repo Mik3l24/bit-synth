@@ -59,6 +59,8 @@ namespace Name
     const juce::Identifier META_UI_POSITION_Y("__ui_position_y");
     const juce::Identifier META_NEXT_FREE_DYNAMIC_PARAMETER_ID("next_free_dynamic_parameter_id");
 
+
+    const juce::Identifier INVALID_IDENTIFIER;
 }
 
 enum class ElementCategory
@@ -102,6 +104,11 @@ inline ConnectionID negate(const ConnectionID connection)
     return -connection;
 }
 
+inline ElementID negate(const ElementID element_id)
+{
+    return -element_id;
+}
+
 inline ConnectionID applySign(const ConnectionID connection, const ConnectionSign sign)
 {
     return sign ? negate(connection) : connection;
@@ -125,7 +132,7 @@ inline bool matchesSign(const ElementID element_id, const ConnectionSign sign)
 inline ElementID toElementID(const ConnectionID id)
 {
     using namespace __SynthManagementNames_private;
-    const auto abs = std::abs(id);
+    const auto abs = juce::uint64(std::abs(id));
     const auto masked = abs & ELEMENT_MASK;
     return isNegative(id) ? -ElementID(masked) : ElementID(masked);
 }
@@ -133,7 +140,7 @@ inline ElementID toElementID(const ConnectionID id)
 inline SubConnectionID toSubConnectionID(const ConnectionID id)
 {
     using namespace __SynthManagementNames_private;
-    const auto abs = std::abs(id);
+    const auto abs = juce::uint64(std::abs(id));
     const auto masked = abs & INDEX_MASK;
     return SubConnectionID(masked >> INDEX_SHIFT);
 }
@@ -142,9 +149,9 @@ inline ConnectionID appendSubConnectionID(const SubConnectionID connection, cons
 {
     using namespace __SynthManagementNames_private;
     const ConnectionSign sign = isNegative(connection);
-    const auto abs = std::abs(id);
+    const auto abs = juce::uint64(std::abs(id));
     const auto masked = abs & ELEMENT_MASK; // To clear previous connection
-    const auto appended = masked | ConnectionID(connection) << INDEX_SHIFT;
+    const auto appended = ConnectionID(masked) | ConnectionID(connection) << INDEX_SHIFT;
     return applySign(appended, sign);
 }
 
@@ -195,7 +202,7 @@ inline const juce::Identifier& toContainerIdentifier(const ElementCategory eleme
         case ElementCategory::GENERATOR: return Name::GENERATORS;
         case ElementCategory::PROCESSOR: return Name::PROCESSORS;
         case ElementCategory::SINK:      return Name::SINKS;
-        default: jassertfalse; return juce::Identifier();
+        default: jassertfalse; return Name::INVALID_IDENTIFIER;
     }
 }
 
@@ -207,7 +214,11 @@ inline const juce::Identifier& toGateIdentifier(const ElementType gate_type)
         case ElementType::GATE_AND: return Name::GATE_AND;
         case ElementType::GATE_OR:  return Name::GATE_OR;
         case ElementType::GATE_XOR: return Name::GATE_XOR;
-        default: jassertfalse; return juce::Identifier();
+
+        case ElementType::GEN_OSCILLATOR:
+        case ElementType::SINK_BITMIX:
+        case ElementType::NONE:
+        default: jassertfalse; return Name::INVALID_IDENTIFIER;
     }
 }
 
@@ -229,6 +240,10 @@ inline int gateMaxInputN(const ElementType gate_type)
         case ElementType::GATE_AND:
         case ElementType::GATE_OR:
         case ElementType::GATE_XOR: return 2;
+
+        case ElementType::NONE:
+        case ElementType::GEN_OSCILLATOR:
+        case ElementType::SINK_BITMIX:
         default: jassertfalse; return 0;
     }
 }

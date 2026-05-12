@@ -5,48 +5,51 @@
 
 #include "synth_management/BitSynthSound.h"
 
+using namespace dsp;
+
 bool BitSynthVoice::canPlaySound(juce::SynthesiserSound* sound)
 {
     return dynamic_cast<BitSynthSound*>(sound) != nullptr;
 }
 
-void BitSynthVoice::startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound*, int)
+void BitSynthVoice::startNote(int midi_note_number, float velocity, juce::SynthesiserSound*, int)
 {
     voice_active = true;
-    double pitch = juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber);
+    double pitch = juce::MidiMessage::getMidiNoteInHertz(midi_note_number);
     for(auto& osc : oscillators)
         osc->prepareVoice(pitch);
 }
 
 void BitSynthVoice::stopNote(float, bool allowTailOff)
 {
+    juce::ignoreUnused(allowTailOff);
     clearCurrentNote();
     voice_active = false;
 }
 
-void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& outputBuffer, int startSample, int numSamples)
+void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& output_buffer, int start_sample, int sample_n)
 {
     // Stopping processing effectively functions as a gate envelope
     if(!voice_active)
         return;
 
-    const int endSample = startSample + numSamples;
+    const int endSample = start_sample + sample_n;
 
     // Prepare
     // Should be preferably done in prepareToPlay(), but neither SynthesiserVoice nor Synthesiser provides that.
     // TODO: Make a custom Synthesiser class with prepareToPlay().
     for(auto& osc : oscillators)
-        osc->prepareToPlay(outputBuffer.getNumSamples(), getSampleRate());
+        osc->prepareToPlay(output_buffer.getNumSamples(), getSampleRate());
 
     for(auto& gate : gates)
-        gate->prepareToPlay(outputBuffer.getNumSamples());
+        gate->prepareToPlay(output_buffer.getNumSamples());
 
     for(auto& mix_channel : bit_inputs)
-        mix_channel->prepareToPlay(outputBuffer.getNumSamples());
+        mix_channel->prepareToPlay(output_buffer.getNumSamples());
 
     //// Bit processing ////
     // Process oscillators
-    for(auto sample_index = startSample; sample_index < endSample; sample_index++)
+    for(auto sample_index = start_sample; sample_index < endSample; sample_index++)
         for(auto& osc : oscillators)
             osc->processSample(sample_index);
 
@@ -107,7 +110,7 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& outputBuffer, int s
 
     // Process mix channels to get floating point samples
     // This sample-wise loop is unavoidable, as floats need to be processed sample by sample.
-    for(auto sample_index = startSample; sample_index < endSample; sample_index++)
+    for(auto sample_index = start_sample; sample_index < endSample; sample_index++)
     {
         float sample = 0.0f;
         for(auto& mix_channel: bit_inputs)
@@ -126,8 +129,8 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& outputBuffer, int s
         sample *= master_level;
 
         // Saving to buffer
-        for(auto channel_index = outputBuffer.getNumChannels(); --channel_index >= 0;)
-            outputBuffer.addSample(channel_index, sample_index, sample);
+        for(auto channel_index = output_buffer.getNumChannels(); --channel_index >= 0;)
+            output_buffer.addSample(channel_index, sample_index, sample);
     }
 
     // Reset gates
