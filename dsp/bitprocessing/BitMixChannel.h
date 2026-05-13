@@ -12,8 +12,8 @@ namespace dsp
 class BitMixChannel : public BitReceiver
 {
 public:
-    explicit BitMixChannel(std::atomic<float>& _level)
-        : BitReceiver(1), level(_level) {}
+    explicit BitMixChannel(const bitset& _zeroes, std::atomic<float>& _level)
+        : BitReceiver(_zeroes, 1), level(_level) {}
 
 public:
     float getSample(int sample_index);

@@ -21,6 +21,8 @@ class BitSynthVoice : public juce::SynthesiserVoice
 public:
     BitSynthVoice() = default;
 
+    void prepareToPlay(double sample_rate, int samples_per_block);
+
     bool canPlaySound(juce::SynthesiserSound* sound) override;
 
     void startNote(int midi_note_number, float velocity,

@@ -6,11 +6,11 @@
 
 using namespace dsp;
 
-void Oscillator::prepareToPlay(int _samples_per_block, double _sample_rate)
+void Oscillator::prepareToPlay(double _sample_rate, int _samples_per_block)
 {
     sample_rate = _sample_rate;
     samples_per_block = _samples_per_block;
-    out = bitset(samples_per_block);
+    BitSource::prepareToPlay(sample_rate, samples_per_block);
 }
 
 void Oscillator::prepareVoice(double pitch)

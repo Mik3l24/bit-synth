@@ -62,7 +62,8 @@ private: // Members
 
     std::unique_ptr<BitSynthesizer> bit_synth;
     const int num_voices = 8; // If we add settings for changing this, change to non-const.
-    double sample_rate = 0.0;
+    double sample_rate = 44100.0;
+    int samples_per_block = 512;
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SynthAudioProcessor);

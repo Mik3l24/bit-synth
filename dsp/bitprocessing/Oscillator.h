@@ -17,7 +17,7 @@ public: // Constructors, destructors
     { ready = true; } // Oscillators are all processed first, so they're always ready
 
 public: // DSP setup and processing methods
-    void prepareToPlay(int _samples_per_block, double _sample_rate);
+    void prepareToPlay(double _sample_rate, int _samples_per_block);
     void prepareVoice(double pitch);
     void processSample(int sample_index);
 

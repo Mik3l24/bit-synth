@@ -13,17 +13,20 @@ namespace dsp
 
 class Connectable
 {
-public:
-    [[nodiscard]] bool isUnconnected() const { return unconnected; }
 public: // Constructors, destructors
     virtual ~Connectable() = default;
-protected:
-    bool unconnected = false;
+
+public: // DSP setup and processing methods
+    virtual void prepareToPlay(double _sample_rate, int _samples_per_block)
+    {
+        juce::ignoreUnused(_sample_rate, _samples_per_block);
+    }
 };
 
-class BitSource : public virtual Connectable
+class BitSource : public Connectable
 {
-public:
+public: // DSP setup and processing methods
+    void prepareToPlay(double _sample_rate, int _samples_per_block) override;
     [[nodiscard]] const bitset& getOut() const { return out; }
     [[nodiscard]] bool isReady() const { return ready; }
 
@@ -32,37 +35,34 @@ protected:
     bool ready = false;
 };
 
-class BitReceiver : public virtual Connectable
+class BitReceiver : public Connectable
 {
 public: // Constructors, destructors
-    explicit BitReceiver(size_t num_inputs = 1);
+    explicit BitReceiver(const bitset& _zeroes, SubConnectionID _num_inputs = 1);
 
 public: // DSP setup and processing methods
-    virtual void prepareToPlay(size_t _samples_per_block);
+    void prepareToPlay(double _sample_rate, int _samples_per_block) override;
 
 public: // Parameter setters, getters
     void setInput(const BitSource* input, SubConnectionID index = 0);
 
 protected: // Internal interfaces for subclasses
     status checkConnections();
-    [[nodiscard]] const bitset& getOutFromInput(SubConnectionID index = 0) const; // TODO: change to const bitset& to avoid copying
+    [[nodiscard]] const bitset& getOutFromInput(SubConnectionID index = 0) const;
 
 protected: // Fields
-    const std::size_t num_inputs = 1;
+    const SubConnectionID num_inputs = 1;
 
 private: // Fields
     std::vector<const BitSource*> inputs;
 
-    size_t num_samples = 0;
+    int num_samples = 0;
 
     /** Bitset containing only zeroes, used for unconnected inputs.
      *
      *  Size is equal to num_samples, which should be the same as the block size.
-     *  @see BitReceiver::prepareToPlay()
-     *
-     *  Might be modified to be static, since all BitReceivers will very likely be using the same block size anyway.
      */
-    bitset zeroes;
+    const bitset& zeroes;
 };
 
 }

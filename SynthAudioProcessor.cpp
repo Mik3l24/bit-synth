@@ -72,8 +72,8 @@ void SynthAudioProcessor::setStateFromXml(const juce::XmlElement& xml_element)
 void SynthAudioProcessor::prepareToPlay(const double _sample_rate, const int max_samples_per_block)
 {
     sample_rate = _sample_rate;
-    // TODO - add prepareToPlay() method to the BitSynthesizer
-    bit_synth->setCurrentPlaybackSampleRate(sample_rate);
+    samples_per_block = max_samples_per_block;
+    bit_synth->prepareToPlay(sample_rate, samples_per_block);
 }
 
 void SynthAudioProcessor::releaseResources()
@@ -108,7 +108,7 @@ void SynthAudioProcessor::initState()
     }
 
     bit_synth = std::make_unique<BitSynthesizer>(num_voices, state_manager);
-    bit_synth->setCurrentPlaybackSampleRate(sample_rate);
+    bit_synth->prepareToPlay(sample_rate, samples_per_block);
     internal_state.generators.addListener(bit_synth.get());
     internal_state.processors.addListener(bit_synth.get());
     internal_state.sinks.addListener(bit_synth.get());

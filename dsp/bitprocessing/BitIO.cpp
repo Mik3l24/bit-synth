@@ -6,16 +6,22 @@
 
 using namespace dsp;
 
-BitReceiver::BitReceiver(size_t num_inputs)
-    : num_inputs(num_inputs)
+void BitSource::prepareToPlay(double _sample_rate, int _samples_per_block)
 {
-    inputs.assign(num_inputs, nullptr);
+    juce::ignoreUnused(_sample_rate);
+    out.resize(size_t(_samples_per_block), 0);
 }
 
-void BitReceiver::prepareToPlay(size_t _samples_per_block)
+BitReceiver::BitReceiver(const bitset& _zeroes, const SubConnectionID _num_inputs)
+    : num_inputs(_num_inputs), zeroes(_zeroes)
 {
+    inputs.assign(size_t(_num_inputs), nullptr);
+}
+
+void BitReceiver::prepareToPlay(double _sample_rate, const int _samples_per_block)
+{
+    juce::ignoreUnused(_sample_rate);
     num_samples = _samples_per_block;
-    zeroes = bitset(num_samples);
 }
 
 // Not really necessary for checking for being unconnected now that getOutFromInput() handles that...
@@ -26,7 +32,6 @@ status BitReceiver::checkConnections()
     {
         if(in == nullptr)
         {
-            unconnected = true;
             return status::UNCONNECTED;
         }
         else if(!in->isReady())
@@ -34,7 +39,6 @@ status BitReceiver::checkConnections()
             return status::POSTPONED;
         }
     }
-    unconnected = false;
     return status::SUCCESS;
 }
 
@@ -54,5 +58,4 @@ void BitReceiver::setInput(const BitSource* input, SubConnectionID index)
 {
     jassert(index < num_inputs);
     inputs[index] = input;
-    unconnected = false; // FIXME: Does not propagate to children
 }

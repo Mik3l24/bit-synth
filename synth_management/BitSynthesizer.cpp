@@ -41,6 +41,24 @@ BitSynthesizer::BitSynthesizer(int num_voices, const SynthStateManager& _state_m
         addVoice(new dsp::BitSynthVoice());
 }
 
+void BitSynthesizer::prepareToPlay(double _sample_rate, int _samples_per_block)
+{
+    sample_rate = _sample_rate;
+    samples_per_block = _samples_per_block;
+    zeroes.resize(size_t(samples_per_block), 0);
+    setCurrentPlaybackSampleRate(sample_rate);
+    prepareToPlayVoices();
+}
+
+void BitSynthesizer::prepareToPlayVoices()
+{
+    for(const auto& voice : voices)
+    {
+        BIT_VOICE(voice);
+        bit_voice->prepareToPlay(sample_rate, samples_per_block);
+    }
+}
+
 void BitSynthesizer::addOscillator(const juce::ValueTree& tree)
 {
     throwassert(tree.isValid(),
@@ -70,17 +88,17 @@ void BitSynthesizer::addOscillator(const juce::ValueTree& tree)
         BIT_VOICE(voice);
         bit_voice->oscillators.emplace_back(
             new dsp::Oscillator(*ratio_param, *pw_param, *starting_phase_param)
-        );
+        )->prepareToPlay(sample_rate, samples_per_block);
     }
 }
 
-inline dsp::ptr<dsp::GateNode> selectNewGate(const juce::ValueTree& gate)
+dsp::ptr<dsp::GateNode> BitSynthesizer::selectNewGate(const juce::ValueTree& gate)
 {
     const auto type = gate.getType();
-    if(type == Name::GATE_NOT) return dsp::ptr<dsp::GateNode>(new dsp::NotGate());
-    if(type == Name::GATE_AND) return dsp::ptr<dsp::GateNode>(new dsp::AndGate());
-    if(type == Name::GATE_OR)  return dsp::ptr<dsp::GateNode>(new dsp::OrGate());
-    if(type == Name::GATE_XOR) return dsp::ptr<dsp::GateNode>(new dsp::XorGate());
+    if(type == Name::GATE_NOT) return dsp::ptr<dsp::GateNode>(new dsp::NotGate(zeroes));
+    if(type == Name::GATE_AND) return dsp::ptr<dsp::GateNode>(new dsp::AndGate(zeroes));
+    if(type == Name::GATE_OR)  return dsp::ptr<dsp::GateNode>(new dsp::OrGate(zeroes));
+    if(type == Name::GATE_XOR) return dsp::ptr<dsp::GateNode>(new dsp::XorGate(zeroes));
     jassertfalse; return nullptr;
 }
 
@@ -96,7 +114,8 @@ void BitSynthesizer::addGate(const juce::ValueTree& gate)
     for(const auto& voice : voices)
     {
         BIT_VOICE(voice);
-        bit_voice->gates.emplace_back(selectNewGate(gate));
+        bit_voice->gates.emplace_back(selectNewGate(gate))
+            ->prepareToPlay(sample_rate, samples_per_block);
     }
 }
 
@@ -173,7 +192,8 @@ void BitSynthesizer::addMixChannel(const juce::ValueTree& mix)
     for(const auto& voice : voices)
     {
         BIT_VOICE(voice);
-        bit_voice->bit_inputs.emplace_back(new dsp::BitMixChannel(*level_param));
+        bit_voice->bit_inputs.emplace_back(new dsp::BitMixChannel(zeroes, *level_param))
+            ->prepareToPlay(sample_rate, samples_per_block);
     }
 }
 

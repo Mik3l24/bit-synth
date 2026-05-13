@@ -9,6 +9,9 @@
 
 #include "SynthManagementNames.h"
 #include "SynthStateManager.h"
+#include "dsp/BitSynthVoice.h"
+#include "dsp/bitprocessing/DspNames.h"
+#include "dsp/bitprocessing/GateNode.h"
 
 
 class BitSynthesizer : public juce::Synthesiser,
@@ -16,6 +19,12 @@ class BitSynthesizer : public juce::Synthesiser,
 {
 public: // constructors
     explicit BitSynthesizer(int num_voices, const SynthStateManager& _state_manager);
+
+public: // DSP-related methods
+    void prepareToPlay(double sample_rate, int samples_per_block);
+
+private:
+    void prepareToPlayVoices();
 
 protected: // Utility access methods
     inline size_t getProcessorIndex(ElementID id) const
@@ -39,6 +48,7 @@ protected: // Utility access methods
     }
 
 protected: // Utility addition methods
+    dsp::ptr<dsp::GateNode> selectNewGate(const juce::ValueTree& gate);
     void addOscillator(const juce::ValueTree& tree);
     void addGate(const juce::ValueTree& gate);
     void addMixChannel(const juce::ValueTree& tree);
@@ -60,7 +70,9 @@ public: // Overrides
 
 protected: // parameter members
     SynthStateManager state_manager;
-
+    dsp::bitset zeroes; // Used for unconnected inputs, so that they don't have to check for that every time
+    double sample_rate = 44100.0;
+    int samples_per_block = 512;
 };
 
 

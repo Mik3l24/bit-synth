@@ -7,6 +7,16 @@
 
 using namespace dsp;
 
+void BitSynthVoice::prepareToPlay(double sample_rate, int samples_per_block)
+{
+    for(auto& osc : oscillators)
+        osc->prepareToPlay(sample_rate, samples_per_block);
+    for(auto& gate : gates)
+        gate->prepareToPlay(sample_rate, samples_per_block);
+    for(auto& mix_channel : bit_inputs)
+        mix_channel->prepareToPlay(sample_rate, samples_per_block);
+}
+
 bool BitSynthVoice::canPlaySound(juce::SynthesiserSound* sound)
 {
     return dynamic_cast<BitSynthSound*>(sound) != nullptr;
@@ -34,18 +44,6 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& output_buffer, int 
         return;
 
     const int endSample = start_sample + sample_n;
-
-    // Prepare
-    // Should be preferably done in prepareToPlay(), but neither SynthesiserVoice nor Synthesiser provides that.
-    // TODO: Make a custom Synthesiser class with prepareToPlay().
-    for(auto& osc : oscillators)
-        osc->prepareToPlay(output_buffer.getNumSamples(), getSampleRate());
-
-    for(auto& gate : gates)
-        gate->prepareToPlay(output_buffer.getNumSamples());
-
-    for(auto& mix_channel : bit_inputs)
-        mix_channel->prepareToPlay(output_buffer.getNumSamples());
 
     //// Bit processing ////
     // Process oscillators
@@ -87,24 +85,11 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& output_buffer, int 
         // Feedback could be interesting if delay was implemented, but for now, let's disallow this.
         if(!any_processing_done)
         {
-            if(std::all_of( // the gates are unconnected
-                gates.begin(), gates.end(),
-                [](const auto& gate)->bool
-                    { return gate->isUnconnected(); }))
-            {
-                // Gates being unconnected isn't harmful and might not even warrant a warning if an oscillator
-                // is connected directly to a mix channel, as the synth will still be audible.
-                // However, it could be a sign of a mistake, so let's warn the user.
-                std::clog << "Warning: BitSynthVoice::renderNextBlock() : All gates are unconnected\n";
-            }
-            else
-            {
-                // However, a feedback loop can cause a crash, most likely from accessing the feedbacked gate's
-                // uninitialized output by the mix channel, thereby processing of the block should be terminated.
-                // Exceptions aren't used, because they seem to permanently disable audio till program restart.
-                std::clog << "Error: BitSynthVoice::renderNextBlock() : Gate feedback loop\n";
-                return;
-            }
+            // However, a feedback loop can cause a crash, most likely from accessing the feedbacked gate's
+            // uninitialized output by the mix channel, thereby processing of the block should be terminated.
+            // Exceptions aren't used, because they seem to permanently disable audio till program restart.
+            std::clog << "Error: BitSynthVoice::renderNextBlock() : Gate feedback loop\n";
+            return;
         }
     }
 
