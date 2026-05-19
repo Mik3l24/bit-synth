@@ -56,7 +56,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 set(BITPROCESSING_SOURCES_DSP
     dsp/bitprocessing/BitIO.cpp
-    dsp/bitprocessing/GateNode.cpp
+    dsp/bitprocessing/Gate.cpp
     dsp/bitprocessing/Oscillator.cpp
     dsp/bitprocessing/BitMixChannel.cpp
     dsp/BitSynthVoice.cpp

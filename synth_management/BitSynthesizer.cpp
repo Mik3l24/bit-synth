@@ -92,13 +92,13 @@ void BitSynthesizer::addOscillator(const juce::ValueTree& tree)
     }
 }
 
-dsp::ptr<dsp::GateNode> BitSynthesizer::selectNewGate(const juce::ValueTree& gate)
+dsp::ptr<dsp::Gate> BitSynthesizer::selectNewGate(const juce::ValueTree& gate)
 {
     const auto type = gate.getType();
-    if(type == Name::GATE_NOT) return dsp::ptr<dsp::GateNode>(new dsp::NotGate(zeroes));
-    if(type == Name::GATE_AND) return dsp::ptr<dsp::GateNode>(new dsp::AndGate(zeroes));
-    if(type == Name::GATE_OR)  return dsp::ptr<dsp::GateNode>(new dsp::OrGate(zeroes));
-    if(type == Name::GATE_XOR) return dsp::ptr<dsp::GateNode>(new dsp::XorGate(zeroes));
+    if(type == Name::GATE_NOT) return dsp::ptr<dsp::Gate>(new dsp::NotGate(zeroes));
+    if(type == Name::GATE_AND) return dsp::ptr<dsp::Gate>(new dsp::AndGate(zeroes));
+    if(type == Name::GATE_OR)  return dsp::ptr<dsp::Gate>(new dsp::OrGate(zeroes));
+    if(type == Name::GATE_XOR) return dsp::ptr<dsp::Gate>(new dsp::XorGate(zeroes));
     jassertfalse; return nullptr;
 }
 

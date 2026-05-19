@@ -8,7 +8,7 @@
 #include <memory>
 
 #include "bitprocessing/Oscillator.h"
-#include "bitprocessing/GateNode.h"
+#include "bitprocessing/Gate.h"
 #include "bitprocessing/BitMixChannel.h"
 
 namespace dsp
@@ -42,7 +42,7 @@ public: // Parameter access methods
 public:
     // Bit processing
     std::vector<ptr<Oscillator>> oscillators;
-    std::vector<ptr<GateNode>> gates;
+    std::vector<ptr<Gate>> gates;
     std::vector<ptr<BitMixChannel>> bit_inputs;
 
 protected:

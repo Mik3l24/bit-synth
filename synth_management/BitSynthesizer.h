@@ -11,7 +11,7 @@
 #include "SynthStateManager.h"
 #include "dsp/BitSynthVoice.h"
 #include "dsp/bitprocessing/DspNames.h"
-#include "dsp/bitprocessing/GateNode.h"
+#include "dsp/bitprocessing/Gate.h"
 
 
 class BitSynthesizer : public juce::Synthesiser,
@@ -48,7 +48,7 @@ protected: // Utility access methods
     }
 
 protected: // Utility addition methods
-    dsp::ptr<dsp::GateNode> selectNewGate(const juce::ValueTree& gate);
+    dsp::ptr<dsp::Gate> selectNewGate(const juce::ValueTree& gate);
     void addOscillator(const juce::ValueTree& tree);
     void addGate(const juce::ValueTree& gate);
     void addMixChannel(const juce::ValueTree& tree);
