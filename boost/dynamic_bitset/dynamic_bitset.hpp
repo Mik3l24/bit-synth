@@ -10,7 +10,7 @@
 // Copyright (c) 2014 Riccardo Marcangelo
 //             Copyright (c) 2018 Evgeny Shulgin
 //
-// TODO - my copyright
+// Copyright (c) 2026 Michał Wolniak
 //
 // Distributed under the Boost Software License, Version 1.0.
 //    (See accompanying file LICENSE_1_0.txt or copy at
@@ -1797,5 +1797,5 @@ from_block_range( BlockIterator first, BlockIterator last, dynamic_bitset< Block
 
 }
 
-#include "dynamic_bitset.ipp"
+#include "impl/dynamic_bitset.ipp"
 #endif // include guard

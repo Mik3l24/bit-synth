@@ -2,7 +2,7 @@
 // Created by micha on 06.11.2023.
 //
 #pragma once
-#include "dynamic_bitset.hpp"
+#include "boost/dynamic_bitset.hpp"
 
 namespace dsp
 {
