@@ -14,6 +14,8 @@ typedef bool ConnectionSign;
 typedef int32_t ElementID;
 typedef int32_t SubConnectionID;
 
+typedef int32_t ElementOrder;
+
 constexpr ConnectionID CONNECTION_NONE = 0;
 constexpr ConnectionSign SIGN_GENERATOR = true;
 constexpr ConnectionSign SIGN_PROCESSOR = false;
@@ -39,8 +41,10 @@ namespace Name
 
     const juce::Identifier MIX_CHANNEL ("MixChannel");
 
-    const juce::Identifier CONNECTION("Connection");
-    const juce::Identifier CONNECTIONS("Connections");
+    const juce::Identifier DEPENDENCY("Connection");
+    const juce::Identifier DEPENDENCIES("Connections");
+    const juce::Identifier DEPENDENT("Dependent");
+    const juce::Identifier DEPENDENTS("Dependents");
 
     // Parameter names
     const juce::Identifier ID("id");

@@ -29,7 +29,7 @@ inline BitSynthSound* castSound(juce::SynthesiserSound* sound)
 
 inline juce::Array<juce::var> connections(const juce::ValueTree& tree)
 {
-    return *tree[Name::CONNECTIONS].getArray();
+    return *tree[Name::DEPENDENCIES].getArray();
 }
 
 
@@ -59,7 +59,7 @@ void BitSynthesizer::prepareToPlayVoices()
     }
 }
 
-void BitSynthesizer::addOscillator(const juce::ValueTree& tree)
+void BitSynthesizer::appendOscillator(const juce::ValueTree& tree)
 {
     throwassert(tree.isValid(),
                 InvalidTreeError("Invalid oscillator ValueTree"));
@@ -102,7 +102,7 @@ dsp::ptr<dsp::Gate> BitSynthesizer::selectNewGate(const juce::ValueTree& gate)
     jassertfalse; return nullptr;
 }
 
-void BitSynthesizer::addGate(const juce::ValueTree& gate)
+void BitSynthesizer::appendGate(const juce::ValueTree& gate)
 {
     throwassert(gate.isValid(),
                 InvalidTreeError("Invalid gate ValueTree"));
@@ -110,11 +110,43 @@ void BitSynthesizer::addGate(const juce::ValueTree& gate)
                 InvalidTreeError("Invalid type for gate"));
     throwassert(gate.hasProperty(Name::ID),
                 InvalidTreeError("No valid ID in gate ValueTree"));
+    throwassert(gate.hasProperty(Name::INDEX),
+                InvalidTreeError("No index in gate ValueTree"));
+
+    const ElementID id = gate[Name::ID];
+    const ElementOrder index = gate[Name::INDEX];
+    jassert(index == id - 1);
+    processor_order.push_back(index);
 
     for(const auto& voice : voices)
     {
         BIT_VOICE(voice);
         bit_voice->gates.emplace_back(selectNewGate(gate))
+            ->prepareToPlay(sample_rate, samples_per_block);
+    }
+}
+
+void BitSynthesizer::placeGate(const juce::ValueTree& gate)
+{
+    throwassert(gate.isValid(),
+                InvalidTreeError("Invalid gate ValueTree"));
+    throwassert(isIdentifierAGate(gate.getType()),
+                InvalidTreeError("Invalid type for gate"));
+    throwassert(gate.hasProperty(Name::ID),
+                InvalidTreeError("No valid ID in gate ValueTree"));
+    throwassert(gate.hasProperty(Name::INDEX),
+                InvalidTreeError("No index in gate ValueTree"));
+
+    const ElementID id = gate[Name::ID];
+    const ElementOrder index = gate[Name::INDEX];
+    jassert(size_t(id - 1) < processor_order.size());
+    processor_order[size_t(id - 1)] = index;
+
+    for(const auto& voice : voices)
+    {
+        BIT_VOICE(voice);
+        jassert(size_t(index) < bit_voice->gates.size());
+        (bit_voice->gates[index] = dsp::ptr(selectNewGate(gate)))
             ->prepareToPlay(sample_rate, samples_per_block);
     }
 }
@@ -158,12 +190,12 @@ void BitSynthesizer::setInputs(const juce::ValueTree& element)
 {
     throwassert(isIdentifierAGate(element.getType()) || isIdentifierASink(element.getType()),
                 InvalidTreeError("Element must be a gate or a sink to set inputs"));
-    for(const auto& connection : element.getChildWithName(Name::CONNECTIONS))
+    for(const auto& connection : element.getChildWithName(Name::DEPENDENCIES))
     {
         throwassert(connection.hasProperty(Name::ID),
                     InvalidTreeError("Invalid connection ID in connection ValueTree"));
         const ConnectionID source_id = connection[Name::ID];
-        const SubConnectionID target_sub_id = element.getChildWithName(Name::CONNECTIONS).indexOf(connection); // Kinda dumb
+        const SubConnectionID target_sub_id = element.getChildWithName(Name::DEPENDENCIES).indexOf(connection); // Kinda dumb
         // Could get rid of the above, if I added the target ConnectionID to the Connection node... Hmmm...
 
         const ElementID element_id = element[Name::ID];
@@ -174,13 +206,23 @@ void BitSynthesizer::setInputs(const juce::ValueTree& element)
     }
 }
 
-void BitSynthesizer::addMixChannel(const juce::ValueTree& mix)
+void BitSynthesizer::replaceProcessors(const std::vector<juce::ValueTree>& processors_to_replace)
+{
+    for(const auto& processor : processors_to_replace)
+    {
+        jassert(processor.isValid());
+        jassert(isIdentifierAGate(processor.getType())); // For now, until other types are introduced
+        placeGate(processor);
+    }
+}
+
+void BitSynthesizer::appendMixChannel(const juce::ValueTree& mix)
 {
     throwassert(mix.getType() == Name::MIX_CHANNEL,
                 InvalidTreeError("Invalid type for mix channel"));
     throwassert(mix.hasProperty(Name::ID),
                 InvalidTreeError("No valid ID in mix channel"));
-    throwassert(mix.getChildWithName(Name::CONNECTIONS).isValid(),
+    throwassert(mix.getChildWithName(Name::DEPENDENCIES).isValid(),
                 InvalidTreeError("No valid connection in mix channel"));
     throwassert(mix.hasProperty(Name::LEVEL),
                 InvalidTreeError("No level property in mix channel"));
@@ -197,42 +239,58 @@ void BitSynthesizer::addMixChannel(const juce::ValueTree& mix)
     }
 }
 
-void BitSynthesizer::reconstructSynthFromTree(juce::ValueTree& root)
+void BitSynthesizer::reconstructSynthFromTree(const juce::ValueTree& root)
 {
-    // Clear current voices
-    for(const auto& voice : voices)
-    {
-        BIT_VOICE(voice);
-        bit_voice->oscillators.clear();
-        bit_voice->gates.clear();
-        bit_voice->bit_inputs.clear();
-    }
-
     const auto generators = root.getChildWithName(Name::GENERATORS);
     const auto processors = root.getChildWithName(Name::PROCESSORS);
     const auto sinks = root.getChildWithName(Name::SINKS);
     throwassert(generators.isValid() && processors.isValid() && sinks.isValid(),
                 InvalidTreeError("Root tree must have generators, components and sinks subtrees"));
 
+    // Clear current voices
+    processor_order.clear();
+    processor_order.resize(size_t(processors.getNumChildren()));
+    for(const auto& voice : voices)
+    {
+        BIT_VOICE(voice);
+        bit_voice->oscillators.clear();
+        bit_voice->gates.clear();
+        bit_voice->gates.resize(size_t(processors.getNumChildren()));
+        bit_voice->bit_inputs.clear();
+    }
+
     // Create the components
     for(const auto& generator : generators)
     {
         throwassert(generator.getType() == Name::OSCILLATOR,
                     InvalidTreeError("Invalid child type in generators tree"));
-        addOscillator(generator);
+        appendOscillator(generator);
     }
     for(const auto& processor : processors)
     {
         throwassert(isIdentifierAGate(processor.getType()),
                     InvalidTreeError("Invalid child type in components tree"));
-        addGate(processor);
+        placeGate(processor);
     }
     for(const auto& sink : sinks)
     {
         throwassert(isIdentifierASink(sink.getType()),
                     InvalidTreeError("Invalid child type in sinks tree"));
-        addMixChannel(sink);
+        appendMixChannel(sink);
     }
+
+    reconstructConnectionsFromTree(root);
+
+    // I believe the synthesizer should be in a valid state now.
+}
+
+void BitSynthesizer::reconstructConnectionsFromTree(const juce::ValueTree& root)
+{
+    const auto generators = root.getChildWithName(Name::GENERATORS);
+    const auto processors = root.getChildWithName(Name::PROCESSORS);
+    const auto sinks = root.getChildWithName(Name::SINKS);
+    throwassert(generators.isValid() && processors.isValid() && sinks.isValid(),
+                InvalidTreeError("Root tree must have generators, components and sinks subtrees"));
 
     // Reestabilish connections
     for(const auto& processor : processors)
@@ -243,31 +301,49 @@ void BitSynthesizer::reconstructSynthFromTree(juce::ValueTree& root)
     {
         setInputs(sink);
     }
-
-    // I believe the synthesizer should be in a valid state now.
 }
 
 
 void BitSynthesizer::valueTreePropertyChanged(juce::ValueTree& affected_tree, const juce::Identifier& property)
 {
-    if(affected_tree.getType() == Name::CONNECTION)
+    if(affected_tree.getType() == Name::DEPENDENCY)
     {
-        throwassert(property == Name::ID && affected_tree[Name::ID].isInt64(),
-                    InvalidTreeError("Invalid connection ID in connection ValueTree"));
-        const ConnectionID source_id = affected_tree[Name::ID];
-        const SubConnectionID target_sub_id = affected_tree.getParent().indexOf(affected_tree); // Kinda dumb
-        // Backtracking from element/Connections/Connection
-        const juce::ValueTree element_tree = affected_tree.getParent().getParent();
-        throwassert(element_tree.isValid(),
-                    InvalidTreeError("No valid parent of set connection"));
-        // Could get rid of the above, if I added the target ConnectionID to the Connection node... Hmmm...
+        if(state_manager.meta.temp.sorting_affected_processors.empty())
+        { // Ordering did not change, we can do a simple input setting
+            throwassert(property == Name::ID && affected_tree[Name::ID].isInt64(),
+                        InvalidTreeError("Invalid connection ID in connection ValueTree"));
+            const ConnectionID source_id = affected_tree[Name::ID];
+            const SubConnectionID target_sub_id = affected_tree.getParent().indexOf(affected_tree); // Kinda dumb
+            // Backtracking from element/Connections/Connection
+            const juce::ValueTree element_tree = affected_tree.getParent().getParent();
+            throwassert(element_tree.isValid(),
+                        InvalidTreeError("No valid parent of set connection"));
+            // Could get rid of the above, if I added the target ConnectionID to the Connection node... Hmmm...
 
-        const ElementID element_id = element_tree[Name::ID];
-        throwassert(matchesSign(element_id, SIGN_PROCESSOR) && isIdentifierAGate(element_tree.getType())
-                || matchesSign(element_id, SIGN_SINK && isIdentifierASink(element_tree.getType())),
-                InvalidTreeError("Invalid source or ID for connection"));
+            const ElementID element_id = element_tree[Name::ID];
+            throwassert(matchesSign(element_id, SIGN_PROCESSOR) && isIdentifierAGate(element_tree.getType())
+                    || matchesSign(element_id, SIGN_SINK && isIdentifierASink(element_tree.getType())),
+                    InvalidTreeError("Invalid source or ID for connection"));
 
-        setInput(element_id, source_id, target_sub_id);
+            setInput(element_id, source_id, target_sub_id);
+        }
+        else
+        { // We need to change the order
+            replaceProcessors(state_manager.meta.temp.sorting_affected_processors);
+            state_manager.meta.temp.sorting_affected_processors.clear();
+            // Elements that weren't in the affected processors might depend on those that were moved,
+            // so we need to remake ALL connections just in case
+            reconstructConnectionsFromTree(state_manager.parameters.state);
+        }
+        // debug print
+#ifdef DEBUG_VERBOSE
+        std::cout << "Processor order: \n\t";
+        for(const auto ord : processor_order) std::cout << ord << "\t";
+        std::cout << std::endl;
+        std::cout << "@\t";
+        for(size_t i = 0; i < processor_order.size(); i++) std::cout << i << "\t";
+        std::cout << std::endl;
+#endif
     }
 }
 
@@ -277,7 +353,7 @@ void BitSynthesizer::valueTreeChildAdded(juce::ValueTree& parent_tree, juce::Val
     {
         if(child_tree.getType() == Name::OSCILLATOR)
         {
-            addOscillator(child_tree);
+            appendOscillator(child_tree);
         }
         else throw InvalidTreeError("Invalid child type added to generators tree");
     }
@@ -285,7 +361,7 @@ void BitSynthesizer::valueTreeChildAdded(juce::ValueTree& parent_tree, juce::Val
     {
         if(isIdentifierAGate(child_tree.getType()))
         {
-            addGate(child_tree);
+            appendGate(child_tree);
         }
         else throw InvalidTreeError("Invalid child type added to components tree");
     }
@@ -293,7 +369,7 @@ void BitSynthesizer::valueTreeChildAdded(juce::ValueTree& parent_tree, juce::Val
     {
         if(child_tree.getType() == Name::MIX_CHANNEL)
         {
-            addMixChannel(child_tree);
+            appendMixChannel(child_tree);
         }
         else throw InvalidTreeError("Invalid child type added to sinks tree");
     }
@@ -303,7 +379,7 @@ void BitSynthesizer::valueTreeChildAdded(juce::ValueTree& parent_tree, juce::Val
 void BitSynthesizer::valueTreeChildRemoved(juce::ValueTree& parent_tree, juce::ValueTree& child_tree, int removed_child_i)
 {
     juce::ignoreUnused(parent_tree, child_tree, removed_child_i);
-    jassertfalse; // Not implemented yet, but will be needed for element removal
+    // Not implemented yet, but will be needed for element removal
 }
 
 void BitSynthesizer::valueTreeRedirected(juce::ValueTree& affected_tree)

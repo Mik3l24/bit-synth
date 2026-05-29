@@ -45,7 +45,7 @@ inline juce::ValueTree newGateRep(ConnectionID id, ElementType type)
         {
             {Name::ID, id},
             {Name::INDEX, id-1},
-            {Name::CONNECTIONS,
+            {Name::DEPENDENCIES,
                 type == ElementType::GATE_NOT
                 ? juce::Array<juce::var>(CONNECTION_NONE)
                 : juce::Array<juce::var>({CONNECTION_NONE, CONNECTION_NONE})
@@ -60,7 +60,7 @@ inline juce::ValueTree newBitMixChannelRep(ConnectionID id)
         {
             {Name::ID, id},
             {Name::INDEX, id-1},
-            {Name::CONNECTIONS, CONNECTION_NONE},
+            {Name::DEPENDENCIES, CONNECTION_NONE},
             {Name::LEVEL, 0.5f}
         }
     );

@@ -27,6 +27,16 @@ public:
     explicit LimitError(const std::string& _Message) : _Mybase(_Message) {}
 };
 
+class CycleError : public std::runtime_error
+{
+public:
+    using _Mybase = std::runtime_error;
+
+    explicit CycleError(const juce::String& _Message) : _Mybase(_Message.getCharPointer()) {}
+    explicit CycleError(const char* _Message) : _Mybase(_Message) {}
+    explicit CycleError(const std::string& _Message) : _Mybase(_Message) {}
+};
+
 #define throwassert(condition, exc) \
 JUCE_BLOCK_WITH_FORCED_SEMICOLON( \
     if(!(condition)) \

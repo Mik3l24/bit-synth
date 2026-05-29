@@ -5,6 +5,8 @@
 #include "SynthStateManager.h"
 
 #include "Errors.h"
+#include <boost/range/join.hpp>
+#include <boost/range/adaptor/reversed.hpp>
 
 constexpr size_t DYNAMIC_PARAMETER_SET_N = 32;
 
@@ -33,6 +35,11 @@ const std::map<juce::Identifier, std::vector<ParamInfo>> param_map =
 [[nodiscard]] static inline juce::String getDynamicParameterNameID(const juce::Identifier& type, const juce::Identifier& param_name, ElementID element_id);
 [[nodiscard]] static inline juce::String getDynamicParameterNameStr(const juce::Identifier& type, const juce::Identifier& param_name, juce::StringRef element_id);
 [[nodiscard]] static inline juce::String formatID(ElementID id);
+[[nodiscard]] static inline juce::ValueTree newConnectionRep(ConnectionID id, bool is_a_dependent = false);
+/// Comparison operation used in topological sorting.
+/// Specified as a function rather than an operator to provide a layer of abstraction
+/// between the algorithm and the ordering actually needed by the project.
+inline bool precedes(ElementOrder target, ElementOrder source);
 
 
 juce::String SynthStateManager::registerDynamicParameter(juce::String friendly_name)
@@ -59,11 +66,61 @@ juce::String SynthStateManager::registerDynamicParameter(juce::String friendly_n
 void SynthStateManager::setConnection(const ConnectionID source_id, const ConnectionID target_id)
 {
     auto [target_element_id, target_subconnection_id, target_sign] = decodeConnectionID(target_id);
-    juce::ValueTree& target_tree = matchesSign(target_element_id, SIGN_PROCESSOR) ? meta.processors : meta.sinks;
-    jassert(target_tree.isValid());
+    juce::ValueTree& container_tree = matchesSign(target_element_id, SIGN_PROCESSOR) ? meta.processors : meta.sinks;
+    jassert(container_tree.isValid());
+
+    auto target_element = container_tree.getChildWithProperty(Name::ID, target_element_id);
+    jassert(target_element.isValid());
+    ConnectionID old_source_id = target_element.getChildWithName(Name::DEPENDENCIES).getChild(target_subconnection_id)[Name::ID];
+    if(matchesSign(old_source_id, SIGN_PROCESSOR))
+    { // We need to handle removing the old dependency.
+        auto old_source_element = meta.processors.getChildWithProperty(Name::ID, toElementID(old_source_id));
+        jassert(old_source_element.isValid());
+        auto old_dependents_container = old_source_element.getChildWithName(Name::DEPENDENTS);
+        jassert(old_dependents_container.isValid());
+        auto old_dependent = old_dependents_container.getChildWithProperty(Name::ID, target_id);
+        jassert(old_dependent.isValid());
+        old_dependents_container.removeChild(old_dependent, nullptr);
+    }
+
+    if(matchesSign(source_id, SIGN_PROCESSOR) && matchesSign(target_id, SIGN_PROCESSOR))
+    {
+        auto source_element = meta.processors.getChildWithProperty(Name::ID, toElementID(source_id));
+        // Topological sort
+        const ElementOrder cur_source_order = source_element[Name::INDEX];
+        const ElementOrder cur_target_order = target_element[Name::INDEX];
+        if(precedes(cur_source_order, cur_target_order))
+        { // So we do need to perform the sort
+            // Assumptions
+            jassert(meta.temp.sorting_affected_processors.empty()); // If this fails the BitSynthesizer hasn't properly consumed and applied the previous changes
+
+            // Preparation
+            AffectedVerticesList dependencies, outputs;
+            // A JUCE dynamic array for once instead of `std::vector<bool>`
+            // as that specialization is a bitset, not an array.
+            // Though, I don't think it would cause problems for this particular use case
+            // other than trading away a few CPU cycles for memory use.
+            juce::Array<bool> visited_elements; visited_elements.resize(meta.processors.getNumChildren());
+
+            // Discovery
+            try { dfsDependencies(source_element, dependencies, visited_elements, cur_target_order); }
+            catch(CycleError& e) { jassertfalse; throw e; } // Graceful error handling to prevent the user from doing this is not yet implemented.
+            dfsDependents(target_element, outputs, visited_elements, cur_source_order);
+
+            // Reassignment
+            reorder(dependencies, outputs);
+        }
+
+        // Adding a new dependency
+        auto source_element_dependents = source_element.getChildWithName(Name::DEPENDENTS);
+        jassert(source_element_dependents.isValid());
+        source_element_dependents.appendChild(newConnectionRep(target_id, true),nullptr);
+    }
+
+
     const auto& final =
-                target_tree.getChildWithProperty(Name::ID, target_element_id)
-                .getChildWithName(Name::CONNECTIONS).getChild(target_subconnection_id)
+                target_element
+                .getChildWithName(Name::DEPENDENCIES).getChild(target_subconnection_id)
                 .setProperty(Name::ID, source_id, nullptr);
     jassert(final.isValid());
 }
@@ -175,9 +232,9 @@ juce::ValueTree SynthStateManager::newOscillatorRep(ElementID id)
     );
 }
 
-inline juce::ValueTree newConnectionRep(ConnectionID id)
+inline juce::ValueTree newConnectionRep(ConnectionID id, bool is_a_dependent)
 {
-    return juce::ValueTree(Name::CONNECTION,
+    return juce::ValueTree(is_a_dependent ? Name::DEPENDENT :Name::DEPENDENCY,
        {
            {Name::ID, id},
        }
@@ -187,7 +244,7 @@ inline juce::ValueTree newConnectionRep(ConnectionID id)
 juce::ValueTree SynthStateManager::newGateRep(ElementID id, const ElementType type)
 {
     const auto input_n = gateMaxInputN(type);
-    juce::ValueTree connections_tree(Name::CONNECTIONS);
+    juce::ValueTree connections_tree(Name::DEPENDENCIES);
     for(size_t i = 0; i < input_n; i++)
         connections_tree.appendChild(newConnectionRep(CONNECTION_NONE), nullptr);
 
@@ -199,7 +256,8 @@ juce::ValueTree SynthStateManager::newGateRep(ElementID id, const ElementType ty
             {Name::INPUT_N, input_n},
         },
         {
-            std::move(connections_tree)
+            std::move(connections_tree),
+            juce::ValueTree(Name::DEPENDENTS)
         }
      );
 }
@@ -216,9 +274,9 @@ juce::ValueTree SynthStateManager::newBitMixChannelRep(const ElementID id)
         },
         {
             {
-                Name::CONNECTIONS, {},
+                Name::DEPENDENCIES, {},
                 {
-                    {Name::CONNECTION, {{Name::ID, CONNECTION_NONE}}}
+                    {Name::DEPENDENCY, {{Name::ID, CONNECTION_NONE}}}
                 }
             }
         }
@@ -276,6 +334,110 @@ juce::ValueTree& SynthStateManager::getElementContainer(const ElementCategory el
         default:
             jassertfalse;
             return meta.generators; // To silence compiler warning
+    }
+}
+
+/// Comparison operation used in topological sorting.
+/// Specified as a function rather than an operator to provide a layer of abstraction
+/// between the algorithm and the ordering actually needed by the project.
+inline bool precedes(const ElementOrder target, const ElementOrder source)
+{
+    return target > source; // Order is inverted - as edges represent dependencies rather than outputs
+}
+
+void SynthStateManager::dfsDependencies(const juce::ValueTree& cur_element, AffectedVerticesList& dependencies,
+                                        juce::Array<bool>& visited_elements, const ElementOrder start_point) const
+{
+    jassert(cur_element.isValid());
+    const ElementID cur_id = cur_element[Name::ID];
+    const ElementOrder cur_order = cur_element[Name::INDEX];
+
+    visited_elements.set(cur_order, true);
+    dependencies.emplace_back(cur_order, cur_element);
+
+    for(const auto connection : cur_element.getChildWithName(Name::DEPENDENCIES))
+    {
+        jassert(connection.isValid());
+        const ElementID next_id = toElementID(connection[Name::ID]);
+        if(!matchesSign(next_id, SIGN_PROCESSOR))
+            continue; // Connections to generators can be treated as leaf nodes, as they are always processed before processors.
+        // FUTURE - processors that introduce a delay need to stop iteration to allow a cycle
+        const auto next_element = meta.processors.getChildWithProperty(Name::ID, next_id);
+        const ElementOrder next_order = next_element[Name::INDEX];
+        if(next_order == start_point)
+            throw CycleError("A dependency cycle in the synth graph has been detected");
+        if(!visited_elements[next_order] && precedes(next_order, start_point))
+            dfsDependencies(next_element, dependencies, visited_elements, start_point);
+    }
+}
+
+void SynthStateManager::dfsDependents(const juce::ValueTree& cur_element, AffectedVerticesList& dependents,
+                                      juce::Array<bool>& visited_elements, const ElementOrder dest_point)
+{
+    jassert(cur_element.isValid());
+    const ElementID cur_id = cur_element[Name::ID];
+    const ElementOrder cur_order = cur_element[Name::INDEX];
+
+    visited_elements.set(cur_order, true);
+    dependents.emplace_back(cur_order, cur_element);
+
+    for(const auto dependent : cur_element.getChildWithName(Name::DEPENDENTS))
+    {
+        jassert(dependent.isValid());
+        const ElementID next_id = toElementID(dependent[Name::ID]);
+        if(!matchesSign(next_id, SIGN_PROCESSOR))
+            continue; // Outputs to sinks can be treated as leaf nodes, as they are always processed after processors.
+        // FUTURE - processors that introduce a delay need to stop iteration to allow a cycle
+        const auto next_element = meta.processors.getChildWithProperty(Name::ID, next_id);
+        const ElementOrder next_order = next_element[Name::INDEX];
+        // The preceding `dfsDependencies` should already check for cycles
+        if(!visited_elements[next_order] && precedes(dest_point, next_order))
+            dfsDependents(next_element, dependents, visited_elements, dest_point);
+    }
+}
+
+void SynthStateManager::reorder(AffectedVerticesList& dependencies, AffectedVerticesList& dependents)
+{
+    // Sort to preserve original order
+    constexpr auto order_comparison = [](auto& a, auto& b){return precedes(a.first, b.first);};
+    std::sort(dependencies.begin(), dependencies.end(), order_comparison);
+    std::sort(dependents.begin(), dependents.end(), order_comparison);
+
+    // Merging into the optimal order
+    std::vector<ElementOrder> new_order; new_order.reserve(dependencies.size() + dependents.size());
+    {
+        auto cur_dependency = dependencies.begin(), cur_dependent = dependents.begin();
+        while(cur_dependency != dependencies.end() && cur_dependent != dependents.end())
+            new_order.push_back(
+                    precedes(cur_dependency->first, cur_dependent->first)
+                    ? cur_dependency++->first // Push whichever should come before
+                    : cur_dependent++->first  // and afterward move forward in that particular iterator
+                );
+        if(cur_dependency != dependencies.end())
+        {
+            jassert(cur_dependent == dependents.end()); // The other one should be what finished first
+            while(cur_dependency != dependencies.end())
+                new_order.push_back(cur_dependency++->first);
+        }
+        else if(cur_dependent != dependents.end())
+        {
+            jassert(cur_dependency == dependencies.end()); // Like above
+            while(cur_dependent != dependents.end())
+                new_order.push_back(cur_dependent++->first);
+        }
+        // Sanity checks
+        jassert(cur_dependency == dependencies.end() && cur_dependent == dependents.end());
+        jassert(new_order.size() == dependencies.size() + dependents.size());
+    }
+
+    // Reassigning
+    {
+        auto cur_new_order = new_order.begin();
+        for(auto& [_, vertex] : (boost::range::join(dependents, dependencies))) // Note - `join` is slightly slower than just having 2 loops, so this is for terseness.
+        {
+            vertex.setProperty(Name::INDEX, *cur_new_order++, nullptr);
+            meta.temp.sorting_affected_processors.push_back(vertex); // To help the synth reassign to the new order
+        }
     }
 }
 

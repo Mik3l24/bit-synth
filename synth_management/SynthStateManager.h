@@ -25,6 +25,13 @@ public:
         juce::ValueTree generators;
         juce::ValueTree processors;
         juce::ValueTree sinks;
+
+        struct {
+            // Holds all the changes made in the topological sort if one happened
+            // Should be set by SynthStateManager and cleared by BitSynthesizer
+            // Assumes only one BitSynthesizer is associated with this SynthStateManager
+            std::vector<juce::ValueTree> sorting_affected_processors;
+        } temp;
     };
     class Listener
     {
@@ -65,10 +72,17 @@ private: // Internal methods
 
     [[nodiscard]] juce::ValueTree& getElementContainer(ElementCategory element_type) const;
 
+    // Topological sorting - PK algorithm
+    typedef std::vector<std::pair<ElementOrder, juce::ValueTree>> AffectedVerticesList;
+    inline void dfsDependencies(const juce::ValueTree& cur_element, AffectedVerticesList& dependencies,
+                                juce::Array<bool>& visited_elements, ElementOrder start_point) const;
+    inline void dfsDependents(const juce::ValueTree& cur_element, AffectedVerticesList& dependents,
+                           juce::Array<bool>& visited_elements, ElementOrder dest_point);
+    inline void reorder(AffectedVerticesList& dependencies, AffectedVerticesList& dependents);
+
 public:
     juce::AudioProcessorValueTreeState& parameters;
 
-private:
     Meta& meta;
 };
 

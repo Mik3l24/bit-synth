@@ -177,13 +177,13 @@ void StructureEditor::rebuildUI()
         if(isIdentifierAGate(processor.getType()))
         {
             const ElementID id = processor[Name::ID];
-            for(const auto& connection : processor.getChildWithName(Name::CONNECTIONS))
+            for(const auto& connection : processor.getChildWithName(Name::DEPENDENCIES))
             {
                 jassert(connection.isValid());
                 throwassert(connection.hasProperty(Name::ID),
                             InvalidTreeError("Invalid connection ID in component connections"));
                 const ConnectionID source_id = connection[Name::ID];
-                const SubConnectionID target_sub_id = processor.getChildWithName(Name::CONNECTIONS).indexOf(connection); // Kinda dumb
+                const SubConnectionID target_sub_id = processor.getChildWithName(Name::DEPENDENCIES).indexOf(connection); // Kinda dumb
 
                 const auto* const processor_ptr = findProcessorByID(id);
                 jassert(processor_ptr != nullptr);
@@ -204,7 +204,7 @@ void StructureEditor::rebuildUI()
         if(sink.getType() == Name::MIX_CHANNEL)
         {
             const ElementID id = sink[Name::ID];
-            for(const auto& connection : sink.getChildWithName(Name::CONNECTIONS))
+            for(const auto& connection : sink.getChildWithName(Name::DEPENDENCIES))
             {
                 jassert(connection.isValid());
                 throwassert(connection.hasProperty(Name::ID),

@@ -32,7 +32,7 @@ protected: // Utility access methods
         // FUTURE - if we are to add sorting indirection this could be the place
         jassert(matchesSign(id, SIGN_PROCESSOR));
         id = std::abs(id);
-        return size_t(id - 1);
+        return size_t(processor_order[size_t(id - 1)]);
     }
     inline size_t getGeneratorIndex(ElementID id) const
     {
@@ -49,15 +49,24 @@ protected: // Utility access methods
 
 protected: // Utility addition methods
     dsp::ptr<dsp::Gate> selectNewGate(const juce::ValueTree& gate);
-    void addOscillator(const juce::ValueTree& tree);
-    void addGate(const juce::ValueTree& gate);
-    void addMixChannel(const juce::ValueTree& tree);
+    void appendOscillator(const juce::ValueTree& tree);
+    void appendMixChannel(const juce::ValueTree& tree);
+    // Only for adding completely new gates, assumes its index is id - 1
+    void appendGate(const juce::ValueTree& gate);
+    // For placing gates when its index may be different from the default.
+    // Assumes there is already enough space allocated in the used vectors
+    // and will replace whatever was at its index!
+    void placeGate(const juce::ValueTree& gate);
 
     void setInput(ElementID id, ConnectionID input_id, SubConnectionID sub_connection_id);
     void setInputs(const juce::ValueTree& element);
 
+    void replaceProcessors(const std::vector<juce::ValueTree>& processors_to_replace);
+
 public: // State methods
-    void reconstructSynthFromTree(juce::ValueTree& root);
+    void reconstructSynthFromTree(const juce::ValueTree& root);
+protected:
+    void reconstructConnectionsFromTree(const juce::ValueTree& root);
 
 public: // Overrides
     void valueTreePropertyChanged(juce::ValueTree& affected_tree, const juce::Identifier& property) override;
@@ -71,6 +80,8 @@ public: // Overrides
 protected: // parameter members
     SynthStateManager state_manager;
     dsp::bitset zeroes; // Used for unconnected inputs, so that they don't have to check for that every time
+    std::vector<ElementOrder> processor_order; // An indirection table. The parameter inside the ValueTree could've been used every time... but this is more convenient.
+
     double sample_rate = 44100.0;
     int samples_per_block = 512;
 };
