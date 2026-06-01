@@ -92,7 +92,9 @@ void SynthStateManager::setConnection(const ConnectionID source_id, const Connec
         if(precedes(cur_source_order, cur_target_order))
         { // So we do need to perform the sort
             // Assumptions
+#ifndef OFFLINE_UTILITY
             jassert(meta.temp.sorting_affected_processors.empty()); // If this fails the BitSynthesizer hasn't properly consumed and applied the previous changes
+#endif
 
             // Preparation
             AffectedVerticesList dependencies, outputs;

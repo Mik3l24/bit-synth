@@ -169,6 +169,8 @@ target_compile_definitions(bitprocessing_lattice
         JUCE_APPLICATION_VERSION_STRING="$<TARGET_PROPERTY:bitprocessing_lattice,JUCE_VERSION>"
         JUCE_USE_FLAC=0
         JUCE_USE_OGGVORBIS=0
+        JUCE_CHECK_MEMORY_LEAKS=0 # Does not matter for a short-lived console app, here because the leak detector doesn't like exit()
+        OFFLINE_UTILITY # Used to disable some asserts that are only relevant for the live synth.
         ${DEBUG_DEFS}
 )
 
@@ -211,6 +213,8 @@ target_compile_definitions(bitprocessing_benchmark
         JUCE_APPLICATION_VERSION_STRING="$<TARGET_PROPERTY:bitprocessing_benchmark,JUCE_VERSION>"
         JUCE_USE_FLAC=0
         JUCE_USE_OGGVORBIS=0
+        JUCE_CHECK_MEMORY_LEAKS=0 # Does not matter for a short-lived console app, here because the leak detector doesn't like exit()
+        OFFLINE_UTILITY # Used to disable some asserts that are only relevant for the live synth.
         ${DEBUG_DEFS}
 )
 
