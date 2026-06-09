@@ -146,7 +146,8 @@ void BitSynthesizer::placeGate(const juce::ValueTree& gate)
     {
         BIT_VOICE(voice);
         jassert(size_t(index) < bit_voice->gates.size());
-        (bit_voice->gates[index] = dsp::ptr(selectNewGate(gate)))
+        // ReSharper disable once CppTemplateArgumentsCanBeDeduced // Template has to be specified explicitly for MSVC
+        (bit_voice->gates[index] = dsp::ptr<dsp::Gate>(selectNewGate(gate)))
             ->prepareToPlay(sample_rate, samples_per_block);
     }
 }

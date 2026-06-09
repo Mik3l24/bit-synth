@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(bitprocessing VERSION 0.0.2)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 #set(Boost_DEBUG ON)
 #[[set(BOOST_ROOT ${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET})
