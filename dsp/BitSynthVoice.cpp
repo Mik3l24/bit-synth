@@ -92,6 +92,9 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& output_buffer, int 
         }
     }
 
+    for(auto& mix_channel : bit_inputs)
+        mix_channel->beginIteration();
+
     // Process mix channels to get floating point samples
     // This sample-wise loop is unavoidable, as floats need to be processed sample by sample.
     for(auto sample_index = start_sample; sample_index < endSample; sample_index++)
@@ -100,8 +103,7 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& output_buffer, int 
         const auto sample_index_offset = sample_index - start_sample;
         for(auto& mix_channel: bit_inputs)
             // Unconnected channels merely return 0.0f, so we don't need to check for that.
-            sample += mix_channel->getSample(sample_index_offset); // Has to be offset to account for the oscillators' allignment.
-            // We could be accumulating DC offset here?
+            sample += mix_channel->getSampleAndIterate(); // Has to be offset to account for the oscillators' allignment.
             // Limiting the max volume could also be useful, but not here.
             // oh, right, panning could be done here too!
 
