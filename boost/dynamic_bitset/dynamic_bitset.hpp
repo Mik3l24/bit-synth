@@ -31,6 +31,10 @@
 #include <type_traits>
 #include <vector>
 
+#ifndef BOOST_DYNAMIC_BITSET_MAKE_FRIEND
+#define BOOST_DYNAMIC_BITSET_MAKE_FRIEND
+#endif
+
 #if defined( BOOST_DYNAMIC_BITSET_SPECIALIZE_STD_HASH )
 #    include <functional>
 namespace std {
@@ -1349,6 +1353,8 @@ public:
     // -----------------------------------------------------------------------
     class serialize_impl;
     friend class serialize_impl;
+
+    BOOST_DYNAMIC_BITSET_MAKE_FRIEND
 
 private:
     static constexpr int                              ulong_width = std::numeric_limits< unsigned long >::digits;

@@ -47,9 +47,8 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& output_buffer, int 
 
     //// Bit processing ////
     // Process oscillators
-    for(auto sample_index = start_sample; sample_index < endSample; sample_index++)
-        for(auto& osc : oscillators)
-            osc->processSample(sample_index);
+    for(auto& osc : oscillators)
+        osc->processBlock(Oscillator::uint(sample_n)); // Note - Oscillators currently align the block to the 0th bit
 
     // Process gates
     if(!gates.empty())
@@ -98,9 +97,10 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& output_buffer, int 
     for(auto sample_index = start_sample; sample_index < endSample; sample_index++)
     {
         float sample = 0.0f;
+        const auto sample_index_offset = sample_index - start_sample;
         for(auto& mix_channel: bit_inputs)
             // Unconnected channels merely return 0.0f, so we don't need to check for that.
-            sample += mix_channel->getSample(sample_index);
+            sample += mix_channel->getSample(sample_index_offset); // Has to be offset to account for the oscillators' allignment.
             // We could be accumulating DC offset here?
             // Limiting the max volume could also be useful, but not here.
             // oh, right, panning could be done here too!

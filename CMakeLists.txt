@@ -111,6 +111,7 @@ target_compile_definitions(bitprocessing
         JUCE_APPLICATION_VERSION_STRING="$<TARGET_PROPERTY:bitprocessing,JUCE_VERSION>"
         JUCE_USE_FLAC=0
         JUCE_USE_OGGVORBIS=0
+        NOMINMAX # Prevents windows.h from defining min and max macros, which interfere with standard library functions.
         ${DEBUG_DEFS})
 
 # If your target needs extra binary assets, you can add them here. The first argument is the name of
@@ -171,6 +172,7 @@ target_compile_definitions(bitprocessing_lattice
         JUCE_USE_OGGVORBIS=0
         JUCE_CHECK_MEMORY_LEAKS=0 # Does not matter for a short-lived console app, here because the leak detector doesn't like exit()
         OFFLINE_UTILITY # Used to disable some asserts that are only relevant for the live synth.
+        NOMINMAX # Prevents windows.h from defining min and max macros, which interfere with standard library functions.
         ${DEBUG_DEFS}
 )
 
@@ -215,6 +217,7 @@ target_compile_definitions(bitprocessing_benchmark
         JUCE_USE_OGGVORBIS=0
         JUCE_CHECK_MEMORY_LEAKS=0 # Does not matter for a short-lived console app, here because the leak detector doesn't like exit()
         OFFLINE_UTILITY # Used to disable some asserts that are only relevant for the live synth.
+        NOMINMAX # Prevents windows.h from defining min and max macros, which interfere with standard library functions.
         ${DEBUG_DEFS}
 )
 
