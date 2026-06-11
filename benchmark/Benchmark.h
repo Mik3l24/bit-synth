@@ -12,8 +12,9 @@ struct BenchmarkSettings
     int sample_rate = 44100;
     int channel_n = 2;
     int block_size = 512;
+    int total_samples = block_size;
     int note = getMidiNoteNumberFromName("C4");
-    int runs_n = 1024*32;
+    int runs_n = 256;
 
     explicit operator juce::String() const
     {

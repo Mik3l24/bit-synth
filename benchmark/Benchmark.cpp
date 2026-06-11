@@ -12,7 +12,7 @@ void runBenchmark(juce::File patch_file, juce::StringRef name, BenchmarkSettings
     std::clog << "Patch: " << patch_file.getFileNameWithoutExtension() << std::endl;
     std::clog << "Settings: " << settings << std::endl;
 
-    const auto [sample_rate, channel_n, block_size, note, runs_n] = settings;
+    const auto [sample_rate, channel_n, block_size, total_samples, note, runs_n] = settings;
 
     const auto audio_processor = std::make_unique<SynthAudioProcessor>();
     jassert(audio_processor != nullptr);
@@ -42,8 +42,13 @@ void runBenchmark(juce::File patch_file, juce::StringRef name, BenchmarkSettings
     // Benchmark!
     for(auto i = 0; i < runs_n; i++)
     {
+        int samples_to_process = total_samples;
         performance_counter->start();
-        audio_processor->processBlock(block, empty_midi_buffer);
+        while(samples_to_process > 0)
+        {
+            audio_processor->processBlock(block, empty_midi_buffer);
+            samples_to_process -= block_size;
+        }
         performance_counter->stop();
     }
 }

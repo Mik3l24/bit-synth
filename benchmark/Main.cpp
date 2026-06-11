@@ -69,6 +69,7 @@ public:
         BenchmarkSettings settings;
         setIntWithOptionalArgument( "--sample_rate", settings.sample_rate, args, true);
         setIntWithOptionalArgument( "--block_size", settings.block_size, args, true);
+        setIntWithOptionalArgument("--total_samples", settings.total_samples, args, true);
         setNoteWithOptionalArgument("--note", settings.note, args, true);
         setIntWithOptionalArgument( "--runs_n", settings.runs_n, args, true);
 
