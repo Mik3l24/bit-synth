@@ -19,13 +19,13 @@ void Oscillator::prepareToPlay(double _sample_rate, int _samples_per_block)
 
 void Oscillator::prepareVoice(double pitch)
 {
-    const double samples_per_cycle_f = sample_rate / (pitch * ratio);
+    const float samples_per_cycle_f = sample_rate / (pitch * ratio);
     // Note - this causes the frequency to be strictly quantized to the discrete
     // spectrum allowed by the sample rate. When floats are used, they at least allow
     // for the wave's actual frequency to proportionally switch between the 2 closest
     // discrete frequencies when it's not an exact match.
     samples_per_cycle = uint(samples_per_cycle_f);
-    cur_sample_in_cycle = uint(starting_phase * samples_per_cycle_f);
+    cur_sample_in_cycle = uint((starting_phase/ juce::MathConstants<float>::twoPi) * samples_per_cycle_f);
     number_of_ones = uint(samples_per_cycle_f * pulse_width);
     number_of_zeroes = samples_per_cycle - number_of_ones;
     in_ones = cur_sample_in_cycle <= number_of_ones;
@@ -63,7 +63,10 @@ void Oscillator::processBlock(uint sample_n)
     constexpr bitset::block_type ALL_ZEROES = 0,
                                  ALL_ONES = std::numeric_limits<bitset::block_type>::max();
 
-    auto bitblock_iterator = out.m_bits.begin();
+    if(samples_per_cycle == 0)
+        return;
+
+    auto bitblock_iterator = out.m_bits.begin(); // TODO - iteration with a different bitblock size than in the bitset?
 
     while(sample_n)
     {
