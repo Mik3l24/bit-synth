@@ -4,6 +4,8 @@
 
 #include "Oscillator.h"
 
+#include <span>
+
 #include "juce_graphics/fonts/harfbuzz/hb.hh"
 
 using namespace dsp;
@@ -58,15 +60,18 @@ void Oscillator::processBlock(uint sample_n)
     //  so more is overwritten than the function is told to do).
     // This doesn't matter at the moment if the sinks account for that, but this may matter for e.g. delays.
 
-    static_assert(std::is_unsigned<bitset::block_type>());
+    static_assert(std::is_unsigned<bitblock_type>());
     // used to fill the current bitblock in the exact match case
-    constexpr bitset::block_type ALL_ZEROES = 0,
-                                 ALL_ONES = std::numeric_limits<bitset::block_type>::max();
+    constexpr bitblock_type ALL_ZEROES = 0,
+                            ALL_ONES = std::numeric_limits<bitblock_type>::max();
 
     if(samples_per_cycle <= EPSILON)
         return;
 
-    auto bitblock_iterator = out.m_bits.begin(); // TODO - iteration with a different bitblock size than in the bitset?
+    // Using a span as a proxy to allow using a larger block type for the bitset without disrupting the operation of the oscillator algorithm
+    // Note - may be a problem on architectures with a different byteorder!
+    auto bitblock_iterator = std::span(reinterpret_cast<bitblock_type*>(out.m_bits.data()),
+                                       out.m_bits.size() * sizeof(bitblock_type)).begin();
 
     while(sample_n)
     {
