@@ -7,7 +7,7 @@
 namespace dsp
 {
 
-typedef boost::dynamic_bitset<unsigned short> bitset;
+typedef boost::dynamic_bitset<uint64_t> bitset;
 
 //typedef int status;
 
