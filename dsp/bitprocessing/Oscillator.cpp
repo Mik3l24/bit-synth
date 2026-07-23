@@ -24,9 +24,9 @@ void Oscillator::prepareVoice(double pitch)
     // spectrum allowed by the sample rate. When floats are used, they at least allow
     // for the wave's actual frequency to proportionally switch between the 2 closest
     // discrete frequencies when it's not an exact match.
-    samples_per_cycle = uint(samples_per_cycle_f);
-    cur_sample_in_cycle = uint((starting_phase/ juce::MathConstants<float>::twoPi) * samples_per_cycle_f);
-    number_of_ones = uint(samples_per_cycle_f * pulse_width);
+    samples_per_cycle = cycle_type(samples_per_cycle_f);
+    cur_sample_in_cycle = cycle_type((starting_phase/ juce::MathConstants<float>::twoPi) * samples_per_cycle_f);
+    number_of_ones = cycle_type(samples_per_cycle_f * pulse_width);
     number_of_zeroes = samples_per_cycle - number_of_ones;
     in_ones = cur_sample_in_cycle <= number_of_ones;
 
@@ -63,7 +63,7 @@ void Oscillator::processBlock(uint sample_n)
     constexpr bitset::block_type ALL_ZEROES = 0,
                                  ALL_ONES = std::numeric_limits<bitset::block_type>::max();
 
-    if(samples_per_cycle == 0)
+    if(samples_per_cycle <= EPSILON)
         return;
 
     auto bitblock_iterator = out.m_bits.begin(); // TODO - iteration with a different bitblock size than in the bitset?
@@ -71,12 +71,12 @@ void Oscillator::processBlock(uint sample_n)
     while(sample_n)
     {
         const uint sample_n_to_process = std::min(sample_n, samples_in_bitblock);
-        const uint new_sample_in_cycle = cur_sample_in_cycle + sample_n_to_process;
+        const cycle_type new_sample_in_cycle = cur_sample_in_cycle + sample_n_to_process;
 
         // The `unlikely` optimizations here are put in assumption that the wave's frequency is much lower than the sample frequency.
         if(unlikely(new_sample_in_cycle >= samples_per_cycle))
         { // Handling the rising edge of a wave __--
-            const uint cycle_diff = new_sample_in_cycle - samples_per_cycle;
+            const cycle_type cycle_diff = new_sample_in_cycle - samples_per_cycle;
 #ifdef DEBUG_OSCILLATOR_VALIDATION
             if(cycle_diff >= samples_in_bitblock)
             {
@@ -96,18 +96,18 @@ void Oscillator::processBlock(uint sample_n)
                 {
                     // This is an edgecase - only occurs when pulse width is short enough that the `in_ones` part of the cycle is within 1 bitblock
                     *bitblock_iterator =
-                        (ALL_ONES >> (samples_in_bitblock - number_of_ones)) // First we need to shorten the length of the sequence to the pulsewidth
-                                  << (samples_in_bitblock - cycle_diff); // Then shift to the correct position like in the case below
+                        (ALL_ONES >> uint(samples_in_bitblock - number_of_ones)) // First we need to shorten the length of the sequence to the pulsewidth
+                                  << uint(samples_in_bitblock - cycle_diff); // Then shift to the correct position like in the case below
 
                     in_ones = false; // As we've already covered the entire length of ones.
                     goto reset_phase; // To skip on `in_ones` being overriden
                 }
                 break;
             case FEW_ZEROES:
-                if(const uint pulse_diff = new_sample_in_cycle - number_of_ones;
-                    cycle_diff == 0) // new cycle aligns with the end of the bitblock, but we need a falling edge ---[---___]---
+                if(const cycle_type pulse_diff = new_sample_in_cycle - number_of_ones;
+                    cycle_diff <= EPSILON) // new cycle aligns with the end of the bitblock, but we need a falling edge ---[---___]---
                 {
-                    *bitblock_iterator = ALL_ONES >> pulse_diff;
+                    *bitblock_iterator = ALL_ONES >> uint(pulse_diff);
 
                     goto reset_phase_and_set_in_ones;
                 }
@@ -117,8 +117,8 @@ void Oscillator::processBlock(uint sample_n)
                     // However, this one is slightly more complicated - as we need to create a sequence of zeros wrapped between ones
                     // Which we can only do by making sequences of ones of specific lengths
                     *bitblock_iterator =
-                        ALL_ONES >> pulse_diff // First, however many ones are remaining in the previous cycle
-                         | ALL_ONES << (number_of_zeroes + (samples_in_bitblock - pulse_diff)); // And then the ones after the zeroes (though we need to account for number of the remaining ones above)
+                        ALL_ONES >> uint(pulse_diff) // First, however many ones are remaining in the previous cycle
+                         | ALL_ONES << uint(number_of_zeroes + (samples_in_bitblock - pulse_diff)); // And then the ones after the zeroes (though we need to account for number of the remaining ones above)
 
                     goto reset_phase_and_set_in_ones;
                 }
@@ -130,13 +130,13 @@ void Oscillator::processBlock(uint sample_n)
                 break;
             }
 
-            if(cycle_diff == 0) // Easy case, the end of wave and the bitblock align ___[____]----
+            if(cycle_diff <= 0) // Easy case, the end of wave and the bitblock align ___[____]----
                 *bitblock_iterator = ALL_ZEROES;
             else // rising edge ___[___---]---
                 // We need to create an edge within a bitblock, that has `diff` ones.
                 // Since `dynamic_bitset` counts bits from the LSB, we counterintuitively need to use an lshift.
                 // Also in this case, to get the shift n we need to subtract from the number of bits in the bitblock as shifts create zeroes.
-                *bitblock_iterator = ALL_ONES << (samples_in_bitblock - cycle_diff);
+                *bitblock_iterator = ALL_ONES << uint(samples_in_bitblock - cycle_diff);
 
         reset_phase_and_set_in_ones:
             in_ones = true;

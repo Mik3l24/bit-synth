@@ -10,6 +10,7 @@ namespace dsp { class Oscillator; }
 #include "BitIO.h"
 #include <juce_core/juce_core.h>
 #include <atomic>
+#include <cfloat>
 
 namespace dsp
 {
@@ -18,6 +19,18 @@ class Oscillator : public BitSource
 {
 public:
     typedef juce::uint64 uint;
+    typedef juce::uint16 bitblock_type;
+#define BITPROCESSING_OSC_CYCLE_TYPE 1 // Float
+#if BITPROCESSING_OSC_CYCLE_TYPE==0
+    typedef uint cycle_type;
+    constexpr static cycle_type EPSILON = 0;
+#elif BITPROCESSING_OSC_CYCLE_TYPE==1
+    typedef float cycle_type;
+    constexpr static cycle_type EPSILON = FLT_EPSILON;
+#else
+#error "Unsupported bitprocessing oscillator type"
+#endif
+
 public: // Constructors, destructors
     Oscillator(std::atomic<float>& _ratio, std::atomic<float>& _pulse_width, std::atomic<float>& _starting_phase)
         : ratio(_ratio), pulse_width(_pulse_width), starting_phase(_starting_phase)
@@ -39,11 +52,11 @@ protected: // Parameters
     std::atomic<float>& starting_phase;
 
 private: // Internal processing variables
-    static constexpr uint samples_in_bitblock = std::numeric_limits<bitset::block_type>::digits;
+    static constexpr uint samples_in_bitblock = std::numeric_limits<bitblock_type>::digits;
     double sample_rate = 44100.0;
     uint samples_per_block = 512, bitblocks_per_block = samples_per_block / samples_in_bitblock;
 
-    uint samples_per_cycle = 0, number_of_ones = 0, number_of_zeroes = 0,
+    cycle_type samples_per_cycle = 0, number_of_ones = 0, number_of_zeroes = 0,
          cur_sample_in_cycle = 0;
     bool in_ones = true;
     enum : uint8_t { NONE, FEW_ZEROES, FEW_ONES } edgecase = NONE;
