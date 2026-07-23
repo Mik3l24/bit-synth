@@ -16,7 +16,7 @@ void Oscillator::prepareToPlay(double _sample_rate, int _samples_per_block)
     bitblocks_per_block = samples_per_block / samples_in_bitblock;
     BitSource::prepareToPlay(sample_rate, samples_per_block);
 }
-
+#ifdef BITPROCESSING_NEW_OSC_ALG
 void Oscillator::prepareVoice(double pitch)
 {
     const double samples_per_cycle_f = sample_rate / (pitch * ratio);
@@ -210,4 +210,43 @@ void Oscillator::processBlock(uint sample_n)
     }
 
 }
+
+#else
+void Oscillator::prepareVoice(double pitch)
+{
+    angle_delta = pitch * ratio
+            * juce::MathConstants<double>::twoPi / sample_rate;
+    current_angle = starting_phase;
+    // TODO: Assert between 0 and 1
+    width_threshold = pulse_width * juce::MathConstants<double>::twoPi;
+}
+
+void Oscillator::processBlock(uint sample_n)
+{
+    auto bitblock_iterator = out.m_bits.begin();
+    while(sample_n)
+    {
+        const uint sample_n_to_process = std::min(sample_n, samples_in_bitblock);
+
+        bitset::block_type& bitblock = *bitblock_iterator;
+        bitblock = 0; // Reset the value so that zeroes are already in place
+
+        for(uint i = 0; i < sample_n_to_process; i++)
+        {
+            // Assigning the value (if it's 1, otherwise this doesn't need to do anything)
+            const auto sample = bitset::block_type(current_angle < width_threshold);
+            bitblock |= sample << i;
+
+            // Phase accumulation and/or wrapping
+            current_angle += angle_delta;
+            if(current_angle > juce::MathConstants<double>::twoPi)
+                current_angle -= juce::MathConstants<double>::twoPi;
+        }
+
+        sample_n -= sample_n_to_process;
+        ++bitblock_iterator;
+    }
+}
+
+#endif
 

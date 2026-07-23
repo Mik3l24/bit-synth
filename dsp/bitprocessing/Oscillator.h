@@ -43,10 +43,15 @@ private: // Internal processing variables
     double sample_rate = 44100.0;
     uint samples_per_block = 512, bitblocks_per_block = samples_per_block / samples_in_bitblock;
 
+#ifdef BITPROCESSING_NEW_OSC_ALG
     uint samples_per_cycle = 0, number_of_ones = 0, number_of_zeroes = 0,
          cur_sample_in_cycle = 0;
     bool in_ones = true;
     enum : uint8_t { NONE, FEW_ZEROES, FEW_ONES } edgecase = NONE;
+#else
+    double current_angle = 0.0, angle_delta = 0.0;
+    double width_threshold = juce::MathConstants<double>::pi;
+#endif
 
 #ifdef DEBUG_OSCILLATOR_VALIDATION
     bool _debug_should_be_one = true;
