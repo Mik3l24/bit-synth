@@ -4,8 +4,6 @@
 
 #include "Oscillator.h"
 
-#include <span>
-
 #include "juce_graphics/fonts/harfbuzz/hb.hh"
 
 using namespace dsp;
@@ -68,10 +66,9 @@ void Oscillator::processBlock(uint sample_n)
     if(samples_per_cycle <= EPSILON)
         return;
 
-    // Using a span as a proxy to allow using a larger block type for the bitset without disrupting the operation of the oscillator algorithm
+    // Casting to allow using a larger block type for the bitset without disrupting the operation of the oscillator algorithm
     // Note - may be a problem on architectures with a different byteorder!
-    auto bitblock_iterator = std::span(reinterpret_cast<bitblock_type*>(out.m_bits.data()),
-                                       out.m_bits.size() * sizeof(bitblock_type)).begin();
+    auto bitblock_iterator = reinterpret_cast<bitblock_type*>(out.m_bits.data());
 
     while(sample_n)
     {
