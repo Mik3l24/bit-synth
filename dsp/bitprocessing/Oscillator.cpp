@@ -221,30 +221,26 @@ void Oscillator::prepareVoice(double pitch)
     width_threshold = pulse_width * juce::MathConstants<double>::twoPi;
 }
 
-void Oscillator::processBlock(uint sample_n)
+void Oscillator::processBlock(const uint sample_n)
 {
-    auto bitblock_iterator = out.m_bits.begin();
-    while(sample_n)
+    bitset::block_type* bitblock = nullptr;
+    for(uint i = 0; i < sample_n; i++)
     {
-        const uint sample_n_to_process = std::min(sample_n, samples_in_bitblock);
-
-        bitset::block_type& bitblock = *bitblock_iterator;
-        bitblock = 0; // Reset the value so that zeroes are already in place
-
-        for(uint i = 0; i < sample_n_to_process; i++)
+        const uint bit_i = i % samples_in_bitblock;
+        if(bit_i == 0)
         {
-            // Assigning the value (if it's 1, otherwise this doesn't need to do anything)
-            const auto sample = bitset::block_type(current_angle < width_threshold);
-            bitblock |= sample << i;
-
-            // Phase accumulation and/or wrapping
-            current_angle += angle_delta;
-            if(current_angle > juce::MathConstants<double>::twoPi)
-                current_angle -= juce::MathConstants<double>::twoPi;
+            bitblock = &out.m_bits[i/samples_in_bitblock];
+            *bitblock = 0; // Reset the value so that zeroes are already in place
         }
+        jassert(bitblock != nullptr); // Should get set, as bit_i should == 0 on first iteration - but an assertion is good to have.
 
-        sample_n -= sample_n_to_process;
-        ++bitblock_iterator;
+        const auto sample = bitset::block_type(current_angle < width_threshold);
+        *bitblock |= sample << bit_i;
+
+        // Phase accumulation and/or wrapping
+        current_angle += angle_delta;
+        if(current_angle > juce::MathConstants<double>::twoPi)
+            current_angle -= juce::MathConstants<double>::twoPi;
     }
 }
 
