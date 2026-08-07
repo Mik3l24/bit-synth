@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<BitSynth>
+  <PARAM id="MixChannel001.level" value="0.75"/>
+  <PARAM id="MixChannel002.level" value="0.75"/>
+  <PARAM id="MixChannel003.level" value="0.75"/>
+  <PARAM id="MixChannel004.level" value="0.75"/>
+  <PARAM id="MixChannel005.level" value="0.75"/>
+  <PARAM id="MixChannel006.level" value="0.75"/>
+  <PARAM id="MixChannel007.level" value="0.75"/>
+  <PARAM id="MixChannel008.level" value="0.75"/>
+  <PARAM id="MixChannel009.level" value="0.75"/>
+  <PARAM id="MixChannel010.level" value="0.75"/>
+  <PARAM id="MixChannel011.level" value="0.75"/>
+  <PARAM id="MixChannel012.level" value="0.75"/>
+  <PARAM id="MixChannel013.level" value="0.75"/>
+  <PARAM id="MixChannel014.level" value="0.75"/>
+  <PARAM id="MixChannel015.level" value="0.75"/>
+  <PARAM id="MixChannel016.level" value="0.75"/>
+  <PARAM id="MixChannel017.level" value="0.75"/>
+  <PARAM id="MixChannel018.level" value="0.75"/>
+  <PARAM id="MixChannel019.level" value="0.75"/>
+  <PARAM id="MixChannel020.level" value="0.75"/>
+  <PARAM id="MixChannel021.level" value="0.75"/>
+  <PARAM id="MixChannel022.level" value="0.75"/>
+  <PARAM id="MixChannel023.level" value="0.75"/>
+  <PARAM id="MixChannel024.level" value="0.75"/>
+  <PARAM id="MixChannel025.level" value="0.75"/>
+  <PARAM id="MixChannel026.level" value="0.75"/>
+  <PARAM id="MixChannel027.level" value="0.75"/>
+  <PARAM id="MixChannel028.level" value="0.75"/>
+  <PARAM id="MixChannel029.level" value="0.75"/>
+  <PARAM id="MixChannel030.level" value="0.75"/>
+  <PARAM id="MixChannel031.level" value="0.75"/>
+  <PARAM id="MixChannel032.level" value="0.75"/>
+  <PARAM id="Oscillator001.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator001.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator001.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator002.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator002.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator002.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator003.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator003.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator003.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator004.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator004.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator004.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator005.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator005.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator005.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator006.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator006.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator006.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator007.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator007.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator007.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator008.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator008.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator008.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator009.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator009.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator009.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator010.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator010.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator010.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator011.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator011.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator011.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator012.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator012.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator012.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator013.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator013.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator013.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator014.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator014.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator014.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator015.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator015.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator015.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator016.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator016.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator016.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator017.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator017.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator017.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator018.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator018.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator018.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator019.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator019.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator019.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator020.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator020.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator020.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator021.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator021.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator021.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator022.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator022.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator022.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator023.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator023.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator023.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator024.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator024.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator024.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator025.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator025.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator025.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator026.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator026.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator026.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator027.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator027.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator027.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator028.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator028.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator028.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator029.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator029.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator029.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator030.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator030.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator030.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator031.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator031.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator031.starting_phase" value="0.0"/>
+  <PARAM id="Oscillator032.pulse_width" value="0.9"/>
+  <PARAM id="Oscillator032.ratio" value="1.000100016593933"/>
+  <PARAM id="Oscillator032.starting_phase" value="0.0"/>
+  <PARAM id="master_level" value="0.5"/>
+  <Generators>
+    <Oscillator id="-1" index="0" ratio="Oscillator001.ratio" starting_phase="Oscillator001.starting_phase"
+                pulse_width="Oscillator001.pulse_width"/>
+    <Oscillator id="-2" index="1" ratio="Oscillator002.ratio" starting_phase="Oscillator002.starting_phase"
+                pulse_width="Oscillator002.pulse_width"/>
+    <Oscillator id="-3" index="2" ratio="Oscillator003.ratio" starting_phase="Oscillator003.starting_phase"
+                pulse_width="Oscillator003.pulse_width"/>
+    <Oscillator id="-4" index="3" ratio="Oscillator004.ratio" starting_phase="Oscillator004.starting_phase"
+                pulse_width="Oscillator004.pulse_width"/>
+    <Oscillator id="-5" index="4" ratio="Oscillator005.ratio" starting_phase="Oscillator005.starting_phase"
+                pulse_width="Oscillator005.pulse_width"/>
+    <Oscillator id="-6" index="5" ratio="Oscillator006.ratio" starting_phase="Oscillator006.starting_phase"
+                pulse_width="Oscillator006.pulse_width"/>
+    <Oscillator id="-7" index="6" ratio="Oscillator007.ratio" starting_phase="Oscillator007.starting_phase"
+                pulse_width="Oscillator007.pulse_width"/>
+    <Oscillator id="-8" index="7" ratio="Oscillator008.ratio" starting_phase="Oscillator008.starting_phase"
+                pulse_width="Oscillator008.pulse_width"/>
+    <Oscillator id="-9" index="8" ratio="Oscillator009.ratio" starting_phase="Oscillator009.starting_phase"
+                pulse_width="Oscillator009.pulse_width"/>
+    <Oscillator id="-10" index="9" ratio="Oscillator010.ratio" starting_phase="Oscillator010.starting_phase"
+                pulse_width="Oscillator010.pulse_width"/>
+    <Oscillator id="-11" index="10" ratio="Oscillator011.ratio" starting_phase="Oscillator011.starting_phase"
+                pulse_width="Oscillator011.pulse_width"/>
+    <Oscillator id="-12" index="11" ratio="Oscillator012.ratio" starting_phase="Oscillator012.starting_phase"
+                pulse_width="Oscillator012.pulse_width"/>
+    <Oscillator id="-13" index="12" ratio="Oscillator013.ratio" starting_phase="Oscillator013.starting_phase"
+                pulse_width="Oscillator013.pulse_width"/>
+    <Oscillator id="-14" index="13" ratio="Oscillator014.ratio" starting_phase="Oscillator014.starting_phase"
+                pulse_width="Oscillator014.pulse_width"/>
+    <Oscillator id="-15" index="14" ratio="Oscillator015.ratio" starting_phase="Oscillator015.starting_phase"
+                pulse_width="Oscillator015.pulse_width"/>
+    <Oscillator id="-16" index="15" ratio="Oscillator016.ratio" starting_phase="Oscillator016.starting_phase"
+                pulse_width="Oscillator016.pulse_width"/>
+  </Generators>
+  <Processors/>
+  <Sinks>
+    <MixChannel id="-1" index="0" level="MixChannel001.level">
+      <Connections>
+        <Connection id="-1"/>
+      </Connections>
+    </MixChannel>
+    <MixChannel id="-2" index="1" level="MixChannel002.level">
+      <Connections>
+        <Connection id="-2"/>
+      </Connections>
+    </MixChannel>
+    <MixChannel id="-3" index="2" level="MixChannel003.level">
+      <Connections>
+        <Connection id="-3"/>
+      </Connections>
+    </MixChannel>
+    <MixChannel id="-4" index="3" level="MixChannel004.level">
+      <Connections>
+        <Connection id="-4"/>
+      </Connections>
+    </MixChannel>
+    <MixChannel id="-5" index="4" level="MixChannel005.level">
+      <Connections>
+        <Connection id="-5"/>
+      </Connections>
+    </MixChannel>
+    <MixChannel id="-6" index="5" level="MixChannel006.level">
+      <Connections>
+        <Connection id="-6"/>
+      </Connections>
+    </MixChannel>
+    <MixChannel id="-7" index="6" level="MixChannel007.level">
+      <Connections>
+        <Connection id="-7"/>
+      </Connections>
+    </MixChannel>
+    <MixChannel id="-8" index="7" level="MixChannel008.level">
+      <Connections>
+        <Connection id="-8"/>
+      </Connections>
+    </MixChannel>
+    <MixChannel id="-9" index="8" level="MixChannel009.level">
+      <Connections>
+        <Connection id="-9"/>
+      </Connections>
+    </MixChannel>
+    <MixChannel id="-10" index="9" level="MixChannel010.level">
+      <Connections>
+        <Connection id="-10"/>
+      </Connections>
+    </MixChannel>
+    <MixChannel id="-11" index="10" level="MixChannel011.level">
+      <Connections>
+        <Connection id="-11"/>
+      </Connections>
+    </MixChannel>
+    <MixChannel id="-12" index="11" level="MixChannel012.level">
+      <Connections>
+        <Connection id="-12"/>
+      </Connections>
+    </MixChannel>
+    <MixChannel id="-13" index="12" level="MixChannel013.level">
+      <Connections>
+        <Connection id="-13"/>
+      </Connections>
+    </MixChannel>
+    <MixChannel id="-14" index="13" level="MixChannel014.level">
+      <Connections>
+        <Connection id="-14"/>
+      </Connections>
+    </MixChannel>
+    <MixChannel id="-15" index="14" level="MixChannel015.level">
+      <Connections>
+        <Connection id="-15"/>
+      </Connections>
+    </MixChannel>
+    <MixChannel id="-16" index="15" level="MixChannel016.level">
+      <Connections>
+        <Connection id="-16"/>
+      </Connections>
+    </MixChannel>
+  </Sinks>
+  <MetaState next_free_dynamic_parameter_id="0"/>
+</BitSynth>
