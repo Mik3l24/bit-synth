@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
         width = width_str.getIntValue();
         layer_n = layer_n_str.getIntValue();
         if(width_str.isEmpty() || layer_n_str.isEmpty()
-            || width <= 0 || layer_n <= 0)
+            || width <= 0 || layer_n < 0)
         {
             std::clog << "Error: width and layer numbers must be provided and greater than 0" << std::endl;
             displayHelpText(args);
