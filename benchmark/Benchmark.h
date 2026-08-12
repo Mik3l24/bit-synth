@@ -23,7 +23,8 @@ struct BenchmarkSettings
                "channel_n=" + juce::String(channel_n) + ", " +
                "block_size=" + juce::String(block_size) + ", " +
                "note=" + juce::String(note) + ", " +
-               "runs_n=" + juce::String(runs_n) +
+               "runs_n=" + juce::String(runs_n) + ", " +
+               "total_samples=" + juce::String(total_samples) +
                " }";
     }
 };
