@@ -28,7 +28,7 @@ void runBenchmark(juce::File patch_file, juce::StringRef name, BenchmarkSettings
     audio_processor->prepareToPlay(sample_rate, block_size);
 
     const auto performance_counter = std::make_unique<juce::PerformanceCounter>(
-        name + "_" + patch_file.getFileNameWithoutExtension(), runs_n, logging_file
+        name + "_" + patch_file.getFileNameWithoutExtension(), runs_n + 1, logging_file // +1 to make sure that the implicit printout is not used
     );
     jassert(performance_counter != nullptr);
 
@@ -51,4 +51,7 @@ void runBenchmark(juce::File patch_file, juce::StringRef name, BenchmarkSettings
         }
         performance_counter->stop();
     }
+    const auto stats = performance_counter->getStatisticsAndReset();
+    std::clog << stats.toString() << std::endl;
+    std::cout << stats.averageSeconds * 1000 * 1000 /* μs */ << std::endl;
 }
