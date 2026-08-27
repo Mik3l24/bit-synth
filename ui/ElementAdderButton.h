@@ -11,7 +11,7 @@ namespace ui {
 class ElementAdderButton : public juce::TextButton
 {
 public:
-    explicit ElementAdderButton(ElementCategory element_type);
+    explicit ElementAdderButton(ElementCategory element_category, ElementType element_type = ElementType::NONE);
     explicit ElementAdderButton(ElementType gate_type);
     ~ElementAdderButton() override;
 

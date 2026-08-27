@@ -8,8 +8,8 @@
 
 namespace ui
 {
-ElementAdderButton::ElementAdderButton(ElementCategory element_type)
-    : element_type(element_type), gate_type(ElementType::NONE)
+ElementAdderButton::ElementAdderButton(ElementCategory element_category, ElementType element_type)
+    : element_type(element_category), gate_type(element_type)
 {
     // Setting text is currently done in the constructor of the parent component
 }

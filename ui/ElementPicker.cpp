@@ -34,53 +34,60 @@ namespace ui
         //[Constructor_pre] You can add your own custom stuff here..
         //[/Constructor_pre]
 
-        osc_button = std::make_unique<ElementAdderButton>(ElementCategory::GENERATOR);
+        osc_button = std::make_unique<ElementAdderButton>(ElementCategory::GENERATOR, ElementType::GEN_OSCILLATOR);
         addAndMakeVisible(osc_button.get());
         osc_button->setButtonText(TRANS("Osc"));
         osc_button->addListener(this);
 
         osc_button->setBounds(0, 0, 48, 24);
 
+        lfo_button = std::make_unique<ElementAdderButton>(ElementCategory::GENERATOR, ElementType::GEN_LFO);
+        addAndMakeVisible(lfo_button.get());
+        lfo_button->setButtonText(TRANS("LFO"));
+        lfo_button->addListener(this);
+
+        lfo_button->setBounds(48, 0, 48, 24);
+
         not_button = std::make_unique<ElementAdderButton>(ElementType::GATE_NOT);
         addAndMakeVisible(not_button.get());
         not_button->setButtonText(TRANS("NOT"));
         not_button->addListener(this);
 
-        not_button->setBounds(48, 0, 48, 24);
+        not_button->setBounds(96, 0, 48, 24);
 
         and_button = std::make_unique<ElementAdderButton>(ElementType::GATE_AND);
         addAndMakeVisible(and_button.get());
         and_button->setButtonText(TRANS("AND"));
         and_button->addListener(this);
 
-        and_button->setBounds(96, 0, 48, 24);
+        and_button->setBounds(144, 0, 48, 24);
 
         or_button = std::make_unique<ElementAdderButton>(ElementType::GATE_OR);
         addAndMakeVisible(or_button.get());
         or_button->setButtonText(TRANS("OR"));
         or_button->addListener(this);
 
-        or_button->setBounds(144, 0, 48, 24);
+        or_button->setBounds(192, 0, 48, 24);
 
         xor_button = std::make_unique<ElementAdderButton>(ElementType::GATE_XOR);
         addAndMakeVisible(xor_button.get());
         xor_button->setButtonText(TRANS("XOR"));
         xor_button->addListener(this);
 
-        xor_button->setBounds(192, 0, 48, 24);
+        xor_button->setBounds(240, 0, 48, 24);
 
         mix_button = std::make_unique<ElementAdderButton>(ElementCategory::SINK);
         addAndMakeVisible(mix_button.get());
         mix_button->setButtonText(TRANS("Mix"));
         mix_button->addListener(this);
 
-        mix_button->setBounds(240, 0, 48, 24);
+        mix_button->setBounds(240+48, 0, 48, 24);
 
 
         //[UserPreSize]
         //[/UserPreSize]
 
-        setSize(288, 24);
+        setSize(288+48, 24);
 
 
         //[Constructor] You can add your own custom stuff here..

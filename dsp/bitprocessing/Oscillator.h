@@ -3,51 +3,41 @@
 //
 #pragma once
 
-namespace dsp { class Oscillator; }
+namespace dsp { template<typename cycle_type, typename bitblock_type> class BitOscillatorBase; }
 #define BOOST_DYNAMIC_BITSET_MAKE_FRIEND \
-    friend class dsp::Oscillator;
+    template<typename cycle_type, typename bitblock_type> \
+    friend class dsp::BitOscillatorBase;
 
 #include "BitIO.h"
 #include <juce_core/juce_core.h>
 #include <atomic>
-#include <cfloat>
 
 namespace dsp
 {
 
-class Oscillator : public BitSource
+template<typename cycle_type, typename bitblock_type>
+class BitOscillatorBase : public BitGenerator
 {
 public:
-    typedef juce::uint64 uint;
-    typedef juce::uint16 bitblock_type;
-#define BITPROCESSING_OSC_CYCLE_TYPE 1 // Float
-#if BITPROCESSING_OSC_CYCLE_TYPE==0
-    typedef uint cycle_type;
-    constexpr static cycle_type EPSILON = 0;
-#elif BITPROCESSING_OSC_CYCLE_TYPE==1
-    typedef float cycle_type;
-    constexpr static cycle_type EPSILON = FLT_EPSILON;
-#else
-#error "Unsupported bitprocessing oscillator type"
-#endif
+    typedef uint64_t uint;
+
+    constexpr static cycle_type EPSILON = std::numeric_limits<cycle_type>::epsilon();
 
 public: // Constructors, destructors
-    Oscillator(std::atomic<float>& _ratio, std::atomic<float>& _pulse_width, std::atomic<float>& _starting_phase)
-        : ratio(_ratio), pulse_width(_pulse_width), starting_phase(_starting_phase)
+    BitOscillatorBase(std::atomic<float>& _pulse_width, std::atomic<float>& _starting_phase)
+        : pulse_width(_pulse_width), starting_phase(_starting_phase)
     { ready = true; } // Oscillators are all processed first, so they're always ready
 
 public: // DSP setup and processing methods
     void prepareToPlay(double _sample_rate, int _samples_per_block) override;
     void prepareVoice(double pitch);
-    void processBlock(uint sample_n); // There used to be `starting_sample` argument, but got removed for simplicity
+    void processBlock(uint64_t sample_n) override; // There used to be `starting_sample` argument, but got removed for simplicity
 
 public: // Parameter setters, getters
-    [[deprecated]] void setRatio(float _ratio) { ratio = _ratio; }
     [[deprecated]] void setPulseWidth(float _pulse_width) { pulse_width = _pulse_width; }
     [[deprecated]] void setStartingPhase(float _starting_phase) { starting_phase = _starting_phase; }
 
 protected: // Parameters
-    std::atomic<float>& ratio; // Ratio of oscillator's pitch to note's pitch
     std::atomic<float>& pulse_width;
     std::atomic<float>& starting_phase;
 
@@ -67,4 +57,35 @@ private: // Internal processing variables
 #endif
 };
 
+class BitOscillator : public BitOscillatorBase<float_t, juce::uint16>
+{
+public: // Constructors
+    BitOscillator(std::atomic<float>& _ratio, std::atomic<float>& _pulse_width, std::atomic<float>& _starting_phase)
+        : BitOscillatorBase(_pulse_width, _starting_phase), ratio(_ratio) {}
+
+public: // DSP setup and processing methods
+    inline void startNote(double pitch) override;
+
+public: // Parameter setters, getters
+    [[deprecated]] void setRatio(float _ratio) { ratio = _ratio; }
+
+protected: // Parameters
+    std::atomic<float>& ratio; // Ratio of oscillator's pitch to note's pitch
+};
+
+class BitLFO : public BitOscillatorBase<juce::uint64, bitset::block_type>
+{
+public: // Constructors
+    BitLFO(std::atomic<float>& _frequency, std::atomic<float>& _pulse_width, std::atomic<float>& _starting_phase)
+        : BitOscillatorBase(_pulse_width, _starting_phase), frequency(_frequency) {}
+public: // DSP setup and processing methods
+    // Currently only a polyphonic note-synced LFO is supported. This method syncs it.
+    inline void startNote(double) override;
+
+protected: // Parameters
+    std::atomic<float>& frequency;
+};
+
 }
+
+#include "Oscillator.ipp"

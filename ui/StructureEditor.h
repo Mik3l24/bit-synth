@@ -5,6 +5,7 @@
 #include "ElementPicker.h"
 #include "Gate.h"
 #include "OscillatorParameters.h"
+#include "BitLFOParameters.h"
 #include "MixChannelParameters.h"
 #include "synth_management/SynthStateManager.h"
 
@@ -30,15 +31,16 @@ public:
     void rebuildUI();
 
 private: // Methods
-    void addNewElement(const juce::Point<int> position, const ElementCategory element_type, const ElementType gate_type = ElementType::NONE)
+    void addNewElement(const juce::Point<int> position, const ElementCategory element_category, const ElementType element_type = ElementType::NONE)
     {
-        const ElementID id = state_manager.addElementRep(element_type, gate_type);
-        addElementComponent(id, position, element_type, gate_type);
+        const ElementID id = state_manager.addElementRep(element_category, element_type);
+        addElementComponent(id, position, element_category, element_type);
     }
 
-    void addElementComponent(ElementID id, juce::Point<int> position, ElementCategory element_type, ElementType gate_type = ElementType::NONE, bool position_is_center = true);
+    void addElementComponent(ElementID id, juce::Point<int> position, ElementCategory element_category, ElementType element_type = ElementType::NONE, bool position_is_center = true);
 
     [[nodiscard]] OscillatorParameters* findGeneratorByID(ElementID id) const;
+    [[nodiscard]]     BitLFOParameters* findLFOByID(ElementID id) const; // TODO - this is temporary
     [[nodiscard]]                 Gate* findProcessorByID(ElementID id) const;
     [[nodiscard]] MixChannelParameters* findSinkByID(ElementID id) const;
 
@@ -49,6 +51,7 @@ private: // Members
     SynthStateManager state_manager;
 
     std::vector<std::unique_ptr<OscillatorParameters>> osc_components;
+    std::vector<std::unique_ptr<BitLFOParameters>> bit_lfo_components; // TODO - make a generic with above
     std::vector<std::unique_ptr<Gate>> processor_components;
     std::vector<std::unique_ptr<MixChannelParameters>> mix_components;
 

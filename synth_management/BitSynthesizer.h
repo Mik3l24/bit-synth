@@ -49,7 +49,8 @@ protected: // Utility access methods
 
 protected: // Utility addition methods
     dsp::ptr<dsp::Gate> selectNewGate(const juce::ValueTree& gate);
-    void appendOscillator(const juce::ValueTree& tree);
+    void appendBitOscillator(const juce::ValueTree& tree);
+    void appendBitLFO(const juce::ValueTree& tree);
     void appendMixChannel(const juce::ValueTree& tree);
     // Only for adding completely new gates, assumes its index is id - 1
     void appendGate(const juce::ValueTree& gate);

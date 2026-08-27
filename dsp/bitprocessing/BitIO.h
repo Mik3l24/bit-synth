@@ -65,4 +65,12 @@ private: // Fields
     const bitset& zeroes;
 };
 
+
+class BitGenerator : public BitSource
+{
+public:
+    virtual void startNote(double pitch) = 0;
+    virtual void processBlock(uint64_t sample_n) = 0;
+};
+
 }

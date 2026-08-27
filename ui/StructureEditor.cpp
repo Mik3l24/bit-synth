@@ -112,22 +112,25 @@ void StructureEditor::rebuildUI()
     for(const auto& generator : generators)
     {
         jassert(generator.isValid());
+        ElementType type = ElementType::NONE;
         if(generator.getType() == Name::OSCILLATOR)
-        {
-            throwassert(generator.hasProperty(Name::ID),
-                        InvalidTreeError("No valid ID for generator in generators tree"));
-            const ElementID id = generator[Name::ID];
-            throwassert(matchesSign(id, SIGN_GENERATOR),
-                        InvalidTreeError("Invalid ID for generator in generators tree"));
-
-            const juce::Point<int> position =
-                generator.hasProperty(Name::META_UI_POSITION_X) && generator.hasProperty(Name::META_UI_POSITION_Y)
-                ? juce::Point<int>(generator[Name::META_UI_POSITION_X], generator[Name::META_UI_POSITION_Y])
-                : juce::Point<int>(getWidth() / 2, getHeight() / 2); // Default position if not specified
-
-            addElementComponent(id, position, ElementCategory::GENERATOR, ElementType::NONE, false);
-        }
+            type = ElementType::GEN_OSCILLATOR;
+        else if(generator.getType() == Name::BIT_LFO)
+            type = ElementType::GEN_LFO;
         else throw InvalidTreeError("Invalid child type in generators tree: "+generator.getType());
+
+        throwassert(generator.hasProperty(Name::ID),
+                        InvalidTreeError("No valid ID for generator in generators tree"));
+        const ElementID id = generator[Name::ID];
+        throwassert(matchesSign(id, SIGN_GENERATOR),
+                    InvalidTreeError("Invalid ID for generator in generators tree"));
+
+        const juce::Point<int> position =
+            generator.hasProperty(Name::META_UI_POSITION_X) && generator.hasProperty(Name::META_UI_POSITION_Y)
+            ? juce::Point<int>(generator[Name::META_UI_POSITION_X], generator[Name::META_UI_POSITION_Y])
+            : juce::Point<int>(getWidth() / 2, getHeight() / 2); // Default position if not specified
+
+        addElementComponent(id, position, ElementCategory::GENERATOR, type, false);
     }
     for(const auto& processor : processors)
     {
@@ -248,20 +251,29 @@ void StructureEditor::itemDropped(const juce::DragAndDropTarget::SourceDetails& 
 
 }
 
-void StructureEditor::addElementComponent(ElementID id, juce::Point<int> position, ElementCategory element_type, ElementType gate_type, const bool position_is_center)
+void StructureEditor::addElementComponent(ElementID id, juce::Point<int> position, ElementCategory element_category, ElementType element_type, const bool position_is_center)
 {
     SynthElement* component = nullptr;
-    switch(element_type)
+    switch(element_category)
     {
         case ElementCategory::GENERATOR:
         {
-            osc_components.emplace_back(new OscillatorParameters(id, state_manager));
-            component = osc_components.back().get();
+            // If the element type is NONE, we default to creating an oscillator
+            if(element_type == ElementType::GEN_OSCILLATOR || element_type == ElementType::NONE)
+            {
+                osc_components.emplace_back(new OscillatorParameters(id, state_manager));
+                component = osc_components.back().get();
+            }
+            else if(element_type == ElementType::GEN_LFO)
+            {
+                bit_lfo_components.emplace_back(new BitLFOParameters(id, state_manager));
+                component = bit_lfo_components.back().get();
+            }
             break;
         }
         case ElementCategory::PROCESSOR:
         {
-            processor_components.emplace_back(new Gate(id, gate_type, state_manager));
+            processor_components.emplace_back(new Gate(id, element_type, state_manager));
             component = processor_components.back().get();
             break;
         }
@@ -293,6 +305,21 @@ OscillatorParameters* StructureEditor::findGeneratorByID(const ElementID id) con
 
     // Then we have to do the slow search...
     for(const auto& generator : osc_components)
+        if(generator->id == id)
+            return generator.get();
+    return nullptr;
+}
+
+BitLFOParameters* StructureEditor::findLFOByID(const ElementID id) const
+{
+    jassert(matchesSign(id, SIGN_GENERATOR));
+    // Most likely, the ID corresponds to its index.
+    const auto index = getElementIndex(id);
+    if(auto* generator = bit_lfo_components[index].get(); generator != nullptr && generator->id == id)
+        return generator;
+
+    // Then we have to do the slow search...
+    for(const auto& generator : bit_lfo_components)
         if(generator->id == id)
             return generator.get();
     return nullptr;

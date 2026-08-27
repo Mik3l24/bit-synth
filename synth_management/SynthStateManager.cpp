@@ -25,6 +25,13 @@ const std::map<juce::Identifier, std::vector<ParamInfo>> param_map =
             {Name::STARTING_PHASE, 0, juce::MathConstants<float>::twoPi, 0}
         }
     },
+    {Name::BIT_LFO,
+        {
+            {Name::FREQUENCY, 0, 200, 1},
+            {Name::PULSE_WIDTH, 0, 1, .5f},
+            {Name::STARTING_PHASE, 0, juce::MathConstants<float>::twoPi, 0}
+        }
+    },
     {Name::MIX_CHANNEL,
         {
             {Name::LEVEL, 0, 1, .75f}
@@ -72,7 +79,7 @@ void SynthStateManager::setConnection(const ConnectionID source_id, const Connec
     auto target_element = container_tree.getChildWithProperty(Name::ID, target_element_id);
     jassert(target_element.isValid());
     ConnectionID old_source_id = target_element.getChildWithName(Name::DEPENDENCIES).getChild(target_subconnection_id)[Name::ID];
-    if(matchesSign(old_source_id, SIGN_PROCESSOR))
+    if(matchesSign(old_source_id, SIGN_PROCESSOR) && matchesSign(target_id, SIGN_PROCESSOR))
     { // We need to handle removing the old dependency.
         auto old_source_element = meta.processors.getChildWithProperty(Name::ID, toElementID(old_source_id));
         jassert(old_source_element.isValid());
@@ -234,6 +241,21 @@ juce::ValueTree SynthStateManager::newOscillatorRep(ElementID id)
     );
 }
 
+juce::ValueTree SynthStateManager::newBitLFORep(ElementID id)
+{
+    jassert(matchesSign(id, SIGN_GENERATOR));
+    return juce::ValueTree(Name::BIT_LFO,
+        {
+            {Name::ID,             id},
+            {Name::INDEX,          -id-1},
+            // FIXME Hack - see addElementRep's FIXME
+            {Name::FREQUENCY,      getDynamicParameterNameID(Name::BIT_LFO, Name::FREQUENCY,      id)},
+            {Name::STARTING_PHASE, getDynamicParameterNameID(Name::BIT_LFO, Name::STARTING_PHASE, id)},
+            {Name::PULSE_WIDTH,    getDynamicParameterNameID(Name::BIT_LFO, Name::PULSE_WIDTH,    id)},
+        }
+    );
+}
+
 inline juce::ValueTree newConnectionRep(ConnectionID id, bool is_a_dependent)
 {
     return juce::ValueTree(is_a_dependent ? Name::DEPENDENT :Name::DEPENDENCY,
@@ -285,7 +307,7 @@ juce::ValueTree SynthStateManager::newBitMixChannelRep(const ElementID id)
     );
 }
 
-ElementID SynthStateManager::addElementRep(const ElementCategory element_category, const ElementType gate_type)
+ElementID SynthStateManager::addElementRep(const ElementCategory element_category, const ElementType element_type)
 {
     juce::ValueTree& element_container = getElementContainer(element_category);
     jassert(element_container.isValid());
@@ -307,10 +329,13 @@ ElementID SynthStateManager::addElementRep(const ElementCategory element_categor
     switch(element_category)
     {
         case ElementCategory::GENERATOR:
-            new_tree = newOscillatorRep(new_id);
+            if(element_type == ElementType::GEN_OSCILLATOR)
+                new_tree = newOscillatorRep(new_id);
+            else if(element_type == ElementType::GEN_LFO)
+                new_tree = newBitLFORep(new_id);
             break;
         case ElementCategory::PROCESSOR:
-            new_tree = newGateRep(new_id, gate_type);
+            new_tree = newGateRep(new_id, element_type);
             break;
         case ElementCategory::SINK:
             new_tree = newBitMixChannelRep(new_id);

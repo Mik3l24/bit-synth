@@ -37,6 +37,8 @@ protected:
             case status::POSTPONED:
                 ready = false;
                 return status::POSTPONED;
+            case status::SUCCESS:
+            case status::UNCONNECTED:
             default:
                 break;
         }
@@ -65,6 +67,8 @@ protected:
             case status::POSTPONED:
                 ready = false;
                 return status::POSTPONED;
+            case status::SUCCESS:
+            case status::UNCONNECTED:
             default:
                 break;
         }

@@ -2,13 +2,14 @@
 // Created by micha on 06.11.2023.
 //
 
-#include "Oscillator.h"
+//#include "Oscillator.h"
 
 #include "juce_graphics/fonts/harfbuzz/hb.hh"
 
-using namespace dsp;
-
-void Oscillator::prepareToPlay(double _sample_rate, int _samples_per_block)
+namespace dsp
+{
+template<typename cycle_type, typename bitblock_type>
+void BitOscillatorBase<cycle_type, bitblock_type>::prepareToPlay(double _sample_rate, int _samples_per_block)
 {
     sample_rate = _sample_rate;
     samples_per_block = _samples_per_block;
@@ -17,9 +18,10 @@ void Oscillator::prepareToPlay(double _sample_rate, int _samples_per_block)
     BitSource::prepareToPlay(sample_rate, samples_per_block);
 }
 
-void Oscillator::prepareVoice(double pitch)
+template<typename cycle_type, typename bitblock_type>
+void BitOscillatorBase<cycle_type, bitblock_type>::prepareVoice(double pitch)
 {
-    const float samples_per_cycle_f = sample_rate / (pitch * ratio);
+    const float samples_per_cycle_f = sample_rate / pitch;
     // Note - this causes the frequency to be strictly quantized to the discrete
     // spectrum allowed by the sample rate. When floats are used, they at least allow
     // for the wave's actual frequency to proportionally switch between the 2 closest
@@ -49,7 +51,8 @@ void Oscillator::prepareVoice(double pitch)
 #endif
 }
 
-void Oscillator::processBlock(uint sample_n)
+template<typename cycle_type, typename bitblock_type>
+void BitOscillatorBase<cycle_type, bitblock_type>::processBlock(uint64_t sample_n)
 {
     // Note - currently the processing disregards the `starting_sample`
     // (effectively aligning the generated bit buffers to the start of the note)
@@ -136,14 +139,14 @@ void Oscillator::processBlock(uint sample_n)
                 *bitblock_iterator = ALL_ZEROES;
             else // rising edge ___[___---]---
                 // We need to create an edge within a bitblock, that has `diff` ones.
-                // Since `dynamic_bitset` counts bits from the LSB, we counterintuitively need to use an lshift.
-                // Also in this case, to get the shift n we need to subtract from the number of bits in the bitblock as shifts create zeroes.
-                *bitblock_iterator = ALL_ONES << uint(samples_in_bitblock - cycle_diff);
+                    // Since `dynamic_bitset` counts bits from the LSB, we counterintuitively need to use an lshift.
+                        // Also in this case, to get the shift n we need to subtract from the number of bits in the bitblock as shifts create zeroes.
+                            *bitblock_iterator = ALL_ONES << uint(samples_in_bitblock - cycle_diff);
 
-        reset_phase_and_set_in_ones:
-            in_ones = true;
-        reset_phase:
-            cur_sample_in_cycle = cycle_diff; // To reset the cycle while keeping the phase
+            reset_phase_and_set_in_ones:
+                in_ones = true;
+            reset_phase:
+                cur_sample_in_cycle = cycle_diff; // To reset the cycle while keeping the phase
         }
         else if(unlikely(new_sample_in_cycle >= number_of_ones && in_ones))
         { // Handling the falling edge of a wave --__
@@ -216,3 +219,13 @@ void Oscillator::processBlock(uint sample_n)
 
 }
 
+void BitOscillator::startNote(const double pitch)
+{
+    BitOscillatorBase::prepareVoice(pitch * double(ratio));
+}
+
+inline void BitLFO::startNote(double)
+{
+    BitOscillatorBase::prepareVoice(double(frequency));
+}
+}

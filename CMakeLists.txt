@@ -57,7 +57,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 set(BITPROCESSING_SOURCES_DSP
     dsp/bitprocessing/BitIO.cpp
     dsp/bitprocessing/Gate.cpp
-    dsp/bitprocessing/Oscillator.cpp
     dsp/bitprocessing/BitMixChannel.cpp
     dsp/BitSynthVoice.cpp
 )
@@ -74,6 +73,7 @@ set(BITPROCESSING_SOURCES_UI
     ui/TargetConnector.cpp
     ui/SynthElement.cpp
     ui/OscillatorParameters.cpp
+    ui/BitLFOParameters.cpp
     ui/MixChannelParameters.cpp
     ui/Gate.cpp
     ui/ElementAdderButton.cpp

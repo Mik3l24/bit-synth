@@ -27,7 +27,7 @@ void BitSynthVoice::startNote(int midi_note_number, float velocity, juce::Synthe
     voice_active = true;
     double pitch = juce::MidiMessage::getMidiNoteInHertz(midi_note_number);
     for(auto& osc : oscillators)
-        osc->prepareVoice(pitch);
+        osc->startNote(pitch);
 }
 
 void BitSynthVoice::stopNote(float, bool allowTailOff)
@@ -48,7 +48,7 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& output_buffer, int 
     //// Bit processing ////
     // Process oscillators
     for(auto& osc : oscillators)
-        osc->processBlock(Oscillator::uint(sample_n)); // Note - Oscillators currently align the block to the 0th bit
+        osc->processBlock(BitOscillator::uint(sample_n)); // Note - Oscillators currently align the block to the 0th bit
 
     // Process gates
     if(!gates.empty())
@@ -100,7 +100,7 @@ void BitSynthVoice::renderNextBlock(juce::AudioSampleBuffer& output_buffer, int 
     for(auto sample_index = start_sample; sample_index < endSample; sample_index++)
     {
         float sample = 0.0f;
-        const auto sample_index_offset = sample_index - start_sample;
+        //const auto sample_index_offset = sample_index - start_sample;
         for(auto& mix_channel: bit_inputs)
             // Unconnected channels merely return 0.0f, so we don't need to check for that.
             sample += mix_channel->getSampleAndIterate(); // Has to be offset to account for the oscillators' allignment.

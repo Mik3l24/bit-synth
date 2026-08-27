@@ -61,6 +61,7 @@ private:
 
     //==============================================================================
     std::unique_ptr<ElementAdderButton> osc_button;
+    std::unique_ptr<ElementAdderButton> lfo_button;
     std::unique_ptr<ElementAdderButton> not_button;
     std::unique_ptr<ElementAdderButton> and_button;
     std::unique_ptr<ElementAdderButton> or_button;

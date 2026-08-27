@@ -41,7 +41,7 @@ public: // Parameter access methods
 
 public:
     // Bit processing
-    std::vector<ptr<Oscillator>> oscillators;
+    std::vector<ptr<BitGenerator>> oscillators;
     std::vector<ptr<Gate>> gates;
     std::vector<ptr<BitMixChannel>> bit_inputs;
 
@@ -51,7 +51,7 @@ protected:
 
 private:
     // Voice processing
-    float enveloped_level = 0.0;
+    [[maybe_unused]] float enveloped_level = 0.0;
     bool voice_active = false;
 };
 

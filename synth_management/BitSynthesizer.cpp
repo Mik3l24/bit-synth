@@ -59,7 +59,7 @@ void BitSynthesizer::prepareToPlayVoices()
     }
 }
 
-void BitSynthesizer::appendOscillator(const juce::ValueTree& tree)
+void BitSynthesizer::appendBitOscillator(const juce::ValueTree& tree)
 {
     throwassert(tree.isValid(),
                 InvalidTreeError("Invalid oscillator ValueTree"));
@@ -87,7 +87,40 @@ void BitSynthesizer::appendOscillator(const juce::ValueTree& tree)
     {
         BIT_VOICE(voice);
         bit_voice->oscillators.emplace_back(
-            new dsp::Oscillator(*ratio_param, *pw_param, *starting_phase_param)
+            new dsp::BitOscillator(*ratio_param, *pw_param, *starting_phase_param)
+        )->prepareToPlay(sample_rate, samples_per_block);
+    }
+}
+
+void BitSynthesizer::appendBitLFO(const juce::ValueTree& tree)
+{
+    throwassert(tree.isValid(),
+                InvalidTreeError("Invalid oscillator ValueTree"));
+    throwassert(tree.getType() == Name::BIT_LFO,
+                InvalidTreeError("Invalid type for BitLFO"));
+    throwassert(tree.hasProperty(Name::ID),
+                InvalidTreeError("No valid ID in oscillator ValueTree"));
+
+#ifdef DEBUG_VERBOSE
+    juce::XmlElement::TextFormat format;
+#ifndef _WIN32
+    format.newLineChars = "\n";
+#endif
+    std::cout << tree.toXmlString(format) << std::endl;
+    std::cout << state_manager.parameters.getParameter(tree[Name::RATIO].toString()) << std::endl;
+#endif
+
+    auto* const frequency_param      = state_manager.parameters.getRawParameterValue(tree[Name::FREQUENCY].toString());
+    auto* const pw_param             = state_manager.parameters.getRawParameterValue(tree[Name::PULSE_WIDTH].toString());
+    auto* const starting_phase_param = state_manager.parameters.getRawParameterValue(tree[Name::STARTING_PHASE].toString());
+    throwassert(pw_param != nullptr && frequency_param != nullptr && starting_phase_param != nullptr,
+                InvalidTreeError("Invalid dynamic parameter ID in oscillator"));
+
+    for(const auto& voice : voices)
+    {
+        BIT_VOICE(voice);
+        bit_voice->oscillators.emplace_back(
+            new dsp::BitLFO(*frequency_param, *pw_param, *starting_phase_param)
         )->prepareToPlay(sample_rate, samples_per_block);
     }
 }
@@ -113,7 +146,6 @@ void BitSynthesizer::appendGate(const juce::ValueTree& gate)
     throwassert(gate.hasProperty(Name::INDEX),
                 InvalidTreeError("No index in gate ValueTree"));
 
-    const ElementID id = gate[Name::ID];
     const ElementOrder index = gate[Name::INDEX];
     jassert(index == id - 1);
     processor_order.push_back(index);
@@ -263,9 +295,13 @@ void BitSynthesizer::reconstructSynthFromTree(const juce::ValueTree& root)
     // Create the components
     for(const auto& generator : generators)
     {
-        throwassert(generator.getType() == Name::OSCILLATOR,
-                    InvalidTreeError("Invalid child type in generators tree"));
-        appendOscillator(generator);
+        if(generator.getType() == Name::OSCILLATOR)
+            appendBitOscillator(generator);
+        else if(generator.getType() == Name::BIT_LFO)
+            appendBitLFO(generator);
+        else
+            throwassert(false, InvalidTreeError("Invalid child type in generators tree"));
+
     }
     for(const auto& processor : processors)
     {
@@ -354,7 +390,11 @@ void BitSynthesizer::valueTreeChildAdded(juce::ValueTree& parent_tree, juce::Val
     {
         if(child_tree.getType() == Name::OSCILLATOR)
         {
-            appendOscillator(child_tree);
+            appendBitOscillator(child_tree);
+        }
+        else if(child_tree.getType() == Name::BIT_LFO)
+        {
+            appendBitLFO(child_tree);
         }
         else throw InvalidTreeError("Invalid child type added to generators tree");
     }

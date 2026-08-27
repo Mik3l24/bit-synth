@@ -51,7 +51,7 @@ public:
     SynthStateManager(SynthStateManager&&) = default;
 
 
-    ElementID addElementRep(ElementCategory element_category, ElementType gate_type = ElementType::NONE);
+    ElementID addElementRep(ElementCategory element_category, ElementType element_type = ElementType::NONE);
 
     void setConnection(ConnectionID source_id, ConnectionID target_id);
     void setElementPosition(ElementID id, ElementCategory element_category, juce::Point<int> position);
@@ -65,6 +65,7 @@ private: // Internal methods
     [[deprecated]] void setNextFreeDynamicParameterID(size_t id);
 
     [[nodiscard]] juce::ValueTree newOscillatorRep(ElementID id);
+    [[nodiscard]] juce::ValueTree newBitLFORep(ElementID id);
     [[nodiscard]] juce::ValueTree newGateRep(ElementID id, ElementType type);
     [[nodiscard]] juce::ValueTree newBitMixChannelRep(ElementID id);
 

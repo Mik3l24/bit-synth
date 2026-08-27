@@ -33,6 +33,7 @@ namespace Name
 
     // Element subtree names
     const juce::Identifier OSCILLATOR("Oscillator");
+    const juce::Identifier BIT_LFO("BitLFO");
 
     const juce::Identifier GATE_OR  ("GateOR");
     const juce::Identifier GATE_AND ("GateAND");
@@ -50,6 +51,7 @@ namespace Name
     const juce::Identifier ID("id");
     const juce::Identifier INDEX("index");
     const juce::Identifier RATIO("ratio");
+    const juce::Identifier FREQUENCY("frequency");
     const juce::Identifier STARTING_PHASE("starting_phase");
     const juce::Identifier PULSE_WIDTH("pulse_width");
 
@@ -84,6 +86,7 @@ enum class ElementType
 
     // Generator types
     GEN_OSCILLATOR = 65,
+    GEN_LFO,
 
     // Sink types
     SINK_BITMIX = 129,

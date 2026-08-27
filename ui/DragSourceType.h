@@ -3,7 +3,7 @@
 //
 #pragma once
 
-enum DragSourceType
+enum DragSourceType : int
 {
     ELEMENT_ADDER_BUTTON = 594, // number chosen arbitrarily
     SOURCE_CONNECTOR,
