@@ -147,7 +147,6 @@ void BitSynthesizer::appendGate(const juce::ValueTree& gate)
                 InvalidTreeError("No index in gate ValueTree"));
 
     const ElementOrder index = gate[Name::INDEX];
-    jassert(index == id - 1);
     processor_order.push_back(index);
 
     for(const auto& voice : voices)
